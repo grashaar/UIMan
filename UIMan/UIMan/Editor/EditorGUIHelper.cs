@@ -191,7 +191,7 @@ namespace UnuGames
             this._onPropertyChanged = onPropertyChanged;
             this._onPropertyDelete = onPropertyDelete;
 
-            this.observableTypes = ReflectionUtils.GetAllObservableType(this._viewModelType);
+            this.observableTypes = ReflectionUtils.GetAllObservableTypes(this._viewModelType);
             for (var i = 0; i < this.observableTypes.Length; i++)
             {
                 if (this._property.LastPropertyType.GetAllias() == this.observableTypes[i])

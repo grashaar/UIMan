@@ -51,8 +51,8 @@ namespace UnuGames
         [MenuItem("UIMan/UI Generator", false, -1)]
         private static void Init()
         {
-            ReflectionUtils.RefreshAssembly(false);
-            _types = ReflectionUtils.GetAllUIManType();
+            ReflectionUtils.RefreshAssemblies(false);
+            _types = ReflectionUtils.GetAllUIManTypes();
             _container = EditorWindow.GetWindow<UIGenerator>(true, "UIMan - UI Generator");
             _container.minSize = new Vector2(800, 600);
             _container.maxSize = _container.minSize;
@@ -626,7 +626,7 @@ namespace UnuGames
         [UnityEditor.Callbacks.DidReloadScripts]
         private static void OnScriptsReloaded()
         {
-            ReflectionUtils.RefreshAssembly(true);
+            ReflectionUtils.RefreshAssemblies(true);
         }
     }
 }

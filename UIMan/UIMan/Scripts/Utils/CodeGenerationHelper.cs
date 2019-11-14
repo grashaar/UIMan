@@ -259,8 +259,6 @@ namespace UnuGames
                 sb.Append(NewLine());
             }
 
-            sb.Remove(sb.Length - NewLine().Length, NewLine().Length);
-
             return sb.ToString();
         }
 

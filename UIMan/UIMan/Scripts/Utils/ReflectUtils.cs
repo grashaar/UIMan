@@ -8,8 +8,7 @@ namespace UnuGames
     public static class ReflectUtils
     {
 #if !UNITY_EDITOR
-		static Dictionary<object, string[]> cachedMembersName = new Dictionary<object, string[]> ();
-		static Dictionary<object, Type> cachedTypes = new Dictionary<object, Type> ();
+		private readonly static Dictionary<object, Type> _types = new Dictionary<object, Type>();
 #endif
 
         private readonly static Dictionary<Type, object> _cachedInstance = new Dictionary<Type, object>();
@@ -176,15 +175,17 @@ namespace UnuGames
         static public Type GetCachedType(this object obj)
         {
             Type type = null;
+
 #if UNITY_EDITOR
             if (obj != null)
                 type = obj.GetType();
             else
                 return null;
 #else
-			if (!cachedTypes.TryGetValue (obj, out type)) {
-				type = obj.GetType ();
-				cachedTypes.Add (obj, type);
+			if (!_types.TryGetValue(obj, out type))
+            {
+				type = obj.GetType();
+				_types.Add(obj, type);
 			}
 #endif
             return type;
