@@ -62,7 +62,8 @@ namespace UnuGames
                 {
                     this.typeName = Path.GetFileNameWithoutExtension(lastPath);
 
-                    lastPath = Path.GetDirectoryName(lastPath).Replace(Application.dataPath, "");
+                    lastPath = Path.GetDirectoryName(lastPath).Replace("\\", "/").Replace(Application.dataPath, "");
+
                     if (this.baseTypePopup.SelectedItem == this.arrSupportType[0])
                     {
                         uiManConfig.modelScriptFolder = lastPath;
@@ -95,7 +96,9 @@ namespace UnuGames
 
             var warn = false;
 
-            if (this.typeName.Length <= 1 || (!this.typeName.Substring(0, 2).Equals("UI") && !this.baseTypePopup.SelectedItem.Equals(UIGenerator.GetSupportTypeName(0))))
+            if (this.typeName.Length <= 1 ||
+                (!this.typeName.Substring(0, 2).Equals("UI") &&
+                 !this.baseTypePopup.SelectedItem.Equals(UIGenerator.GetSupportTypeName(0))))
             {
                 this.typeName = "UI" + this.typeName;
                 warn = true;
@@ -155,10 +158,12 @@ namespace UnuGames
         {
             var handlerScriptPath = CodeGenerationHelper.GeneratPathWithSubfix(scriptPath, ".Handler.cs");
             var handlerCode = "";
+
             if (string.IsNullOrEmpty(handlerCode))
                 handlerCode = CodeGenerationHelper.GenerateViewModelHandler(this.typeName, this.baseType);
             else
                 handlerCode = handlerCode.Replace(": " + this.typeName, ": " + this.baseType);
+
             CodeGenerationHelper.SaveScript(handlerScriptPath, handlerCode, false, this.typeName, this.baseType);
         }
     }
