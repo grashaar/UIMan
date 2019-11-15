@@ -6,5 +6,5 @@ using UnuGames.MVVM;
 
 public partial class <#CNAME#> : <#CTYPE#>
 {
-    <#PROPERTIES#>
+<#PROPERTIES#>
 }
