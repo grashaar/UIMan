@@ -571,7 +571,7 @@ namespace UnuGames
 
                     var newPrefabPath = UIManDefine.ASSETS_FOLDER + (_config.generatingTypeIsDialog ? _config.dialogPrefabFolder : _config.screenPrefabFolder);
                     EditorUtils.CreatePath(newPrefabPath);
-                    PrefabUtility.CreatePrefab(newPrefabPath + "/" + _config.generatingType + PREFAB_EXT, newPrefab);
+                    PrefabUtility.SaveAsPrefabAsset(newPrefab, newPrefabPath + "/" + _config.generatingType + PREFAB_EXT);
 
                     DestroyImmediate(newPrefab);
                 }
