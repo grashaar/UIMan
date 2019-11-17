@@ -35,19 +35,21 @@ namespace UnuGames
             LabelHelper.HeaderLabel("General");
             GUILayout.BeginVertical("Box");
 
+            EditorGUI.BeginChangeCheck();
+
             if (uiManBase is UIManDialog dialog)
             {
                 dialog.useCover = EditorGUILayout.Toggle(this.cover, dialog.useCover);
-                EditorUtility.SetDirty(this.target);
             }
-            else if (uiManBase is UIManBase)
+            else if (uiManBase is UIManScreen screen)
             {
-                var screen = (UIManScreen)uiManBase;
                 screen.useBackground = EditorGUILayout.Toggle(this.background, screen.useBackground);
                 if (screen.useBackground)
                     screen.background = EditorGUILayout.TextField(screen.background);
-                EditorUtility.SetDirty(this.target);
             }
+
+            if (EditorGUI.EndChangeCheck())
+                EditorUtility.SetDirty(this.target);
 
             if (uiManBase.motionShow == UIMotion.CUSTOM_MECANIM_ANIMATION || uiManBase.motionHide == UIMotion.CUSTOM_MECANIM_ANIMATION)
             {

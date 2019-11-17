@@ -111,23 +111,23 @@ namespace UnuGames.MVVM
         /// <summary>
         /// Subscribe the on changed event
         /// </summary>
-        /// <param name="_field">_binding info.</param>
+        /// <param name="field">_binding info.</param>
         /// <param name="onChanged">On changed.</param>
-        protected void SubscribeOnChangedEvent(BindingField _field, Action<object> onChanged)
+        protected void SubscribeOnChangedEvent(BindingField field, Action<object> onChanged)
         {
-            _field.UpdateAction += onChanged;
-            RegisterViewModel(_field.member, onChanged);
+            field.UpdateAction += onChanged;
+            RegisterViewModel(field.member, onChanged);
         }
 
         /// <summary>
         /// Unsubscribe the on changed event
         /// </summary>
-        /// <param name="_field"></param>
+        /// <param name="field"></param>
         /// <param name="onChanged"></param>
-        protected void UnsubscribeOnChangedEvent(BindingField _field, Action<object> onChanged)
+        protected void UnsubscribeOnChangedEvent(BindingField field, Action<object> onChanged)
         {
-            _field.UpdateAction -= onChanged;
-            UnregisterViewModel(_field.member, onChanged);
+            field.UpdateAction -= onChanged;
+            UnregisterViewModel(field.member, onChanged);
         }
 
         /// <summary>

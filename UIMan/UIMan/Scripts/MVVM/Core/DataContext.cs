@@ -60,12 +60,12 @@ namespace UnuGames.MVVM
             if (!contextsList.Contains(this))
                 contextsList.Add(this);
 
-            Init();
+            Initialize();
             RegisterBindingMessage(false);
         }
 
         // Subscript for property change event
-        public void Init()
+        public void Initialize()
         {
             GetPropertyInfo();
             if (this.propertyInfo != null)
