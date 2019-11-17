@@ -193,7 +193,7 @@ namespace UnuGames
             {
                 this.background.gameObject.SetActive(true);
 
-                AssetLoader.Load<Texture2D>(screen.background, SetScreenBackground);
+                StartCoroutine(AssetLoader.Load<Texture2D>(screen.background, SetScreenBackground));
             }
 
             BringToFront(this.screenRoot, screen.transform, 2);
