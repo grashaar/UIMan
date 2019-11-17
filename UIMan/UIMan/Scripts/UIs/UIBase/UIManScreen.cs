@@ -14,7 +14,7 @@ namespace UnuGames
         public bool useBackground = false;
 
         [HideInInspector]
-        public string backgroundType = "";
+        public string background = "";
 
         public override UIBaseType GetUIBaseType()
         {

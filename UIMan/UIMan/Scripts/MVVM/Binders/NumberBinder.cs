@@ -15,13 +15,13 @@ namespace UnuGames.MVVM
         public string format;
         public float timeChange = 0.25f;
 
-        public override void Init(bool forceInit)
+        public override void Initialize(bool forceInit)
         {
-            if (CheckInit(forceInit))
-            {
-                this.text = GetComponent<Text>();
-                SubscribeOnChangedEvent(this.textValue, OnUpdateText);
-            }
+            if (!CheckInitialize(forceInit))
+                return;
+
+            this.text = GetComponent<Text>();
+            SubscribeOnChangedEvent(this.textValue, OnUpdateText);
         }
 
         public void OnUpdateText(object newText)
@@ -35,7 +35,7 @@ namespace UnuGames.MVVM
 
             UITweener.Value(this.gameObject, this.timeChange, (float)val, (float)change).SetOnUpdate(UpdateText).SetOnComplete(() => {
                 this.text.text = newText.ToString();
-                                                                                                                           });
+            });
         }
 
         private void UpdateText(float val)

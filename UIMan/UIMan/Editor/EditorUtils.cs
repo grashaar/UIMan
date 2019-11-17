@@ -7,7 +7,7 @@ namespace UnuGames
 {
     public class EditorUtils : Editor
     {
-        static public void CreatePath(string path)
+        public static void CreatePath(string path)
         {
             var root = Application.dataPath;
             var folders = Regex.Split(path, "/");
@@ -24,7 +24,7 @@ namespace UnuGames
             }
         }
 
-        static public void OverwriteAsset<T>(string path, string newPath) where T : Object
+        public static void OverwriteAsset<T>(string path, string newPath) where T : Object
         {
             if (path != newPath)
             {

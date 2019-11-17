@@ -81,50 +81,50 @@ namespace UnuGames.MVVM
 
 #endif
 
-        public override void Init(bool forceInit)
+        public override void Initialize(bool forceInit)
         {
-            if (CheckInit(forceInit))
+            if (!CheckInitialize(forceInit))
+                return;
+
+            this.scrollRect = GetComponent<ScrollRect>();
+            if (this.grouping == Vector2.zero)
+                this.grouping = Vector2.one;
+            RectTransform contentItemRect = this.contentPrefab.GetComponent<RectTransform>();
+            if (this.contentWidth == 0)
+                this.contentWidth = contentItemRect.sizeDelta.x;
+            if (this.contentHeight == 0)
+                this.contentHeight = contentItemRect.sizeDelta.y;
+
+            if (this.contentRect == null)
+                this.contentRect = this.scrollRect.content;
+            if (this.viewPort == null)
+                this.viewPort = this.scrollRect.viewport;
+
+            InitPool();
+
+            this.sourceMember = this.dataContext.viewModel.GetMemberInfo(this.observableList.member);
+            if (this.sourceMember is FieldInfo)
             {
-                this.scrollRect = GetComponent<ScrollRect>();
-                if (this.grouping == Vector2.zero)
-                    this.grouping = Vector2.one;
-                RectTransform contentItemRect = this.contentPrefab.GetComponent<RectTransform>();
-                if (this.contentWidth == 0)
-                    this.contentWidth = contentItemRect.sizeDelta.x;
-                if (this.contentHeight == 0)
-                    this.contentHeight = contentItemRect.sizeDelta.y;
-
-                if (this.contentRect == null)
-                    this.contentRect = this.scrollRect.content;
-                if (this.viewPort == null)
-                    this.viewPort = this.scrollRect.viewport;
-
-                InitPool();
-
-                this.sourceMember = this.dataContext.viewModel.GetMemberInfo(this.observableList.member);
-                if (this.sourceMember is FieldInfo)
-                {
-                    FieldInfo sourceField = this.sourceMember.ToField();
-                    this.dataList = (IObservaleCollection)sourceField.GetValue(this.dataContext.viewModel);
-                }
-                else
-                {
-                    PropertyInfo sourceProperty = this.sourceMember.ToProperty();
-                    this.dataList = (IObservaleCollection)sourceProperty.GetValue(this.dataContext.viewModel, null);
-                }
-                if (this.dataList != null)
-                {
-                    this.dataList.OnAddObject += HandleOnAdd;
-                    this.dataList.OnRemoveObject += HandleOnRemove;
-                    this.dataList.OnRemoveAt += HandleOnRemoveAt;
-                    this.dataList.OnInsertObject += HandleOnInsert;
-                    this.dataList.OnClearObjects += HandleOnClear;
-                    this.dataList.OnChangeObject += HandleOnChange;
-                }
-                this.scrollRect.onValueChanged.AddListener(OnScroll);
-
-                this.contentPrefab.SetActive(false);
+                FieldInfo sourceField = this.sourceMember.ToField();
+                this.dataList = (IObservaleCollection)sourceField.GetValue(this.dataContext.viewModel);
             }
+            else
+            {
+                PropertyInfo sourceProperty = this.sourceMember.ToProperty();
+                this.dataList = (IObservaleCollection)sourceProperty.GetValue(this.dataContext.viewModel, null);
+            }
+            if (this.dataList != null)
+            {
+                this.dataList.OnAddObject += HandleOnAdd;
+                this.dataList.OnRemoveObject += HandleOnRemove;
+                this.dataList.OnRemoveAt += HandleOnRemoveAt;
+                this.dataList.OnInsertObject += HandleOnInsert;
+                this.dataList.OnClearObjects += HandleOnClear;
+                this.dataList.OnChangeObject += HandleOnChange;
+            }
+            this.scrollRect.onValueChanged.AddListener(OnScroll);
+
+            this.contentPrefab.SetActive(false);
         }
 
         #region Pooling
@@ -309,6 +309,7 @@ namespace UnuGames.MVVM
         {
             if (!rectBounds.HasValue)
                 rectBounds = GetScrollRectBounds();
+
             if (this.scrollRect.horizontal)
             {
                 if (cell.column > rectBounds.Value.x && cell.column < rectBounds.Value.y)

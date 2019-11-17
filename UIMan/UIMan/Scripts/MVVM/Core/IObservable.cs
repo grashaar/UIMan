@@ -10,7 +10,7 @@ namespace UnuGames.MVVM
 
         void SubscribeAction(string propertyName, Action<object> updateAction);
 
-        void UnSubscribeAction(string propertyName, Action<object> updateAction);
+        void UnsubscribeAction(string propertyName, Action<object> updateAction);
 
         void SetValue(string propertyName, object value);
     }

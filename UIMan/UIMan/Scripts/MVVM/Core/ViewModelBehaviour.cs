@@ -113,7 +113,7 @@ namespace UnuGames.MVVM
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="updateAction"></param>
-        public void UnSubscribeAction(string propertyName, Action<object> updateAction)
+        public void UnsubscribeAction(string propertyName, Action<object> updateAction)
         {
             var propertyKey = "set_" + propertyName;
             if (this.actions.ContainsKey(propertyKey))

@@ -19,7 +19,7 @@ namespace UnuGames
         /// <param name="obj"></param>
         /// <param name="memberTypes"></param>
         /// <returns></returns>
-        static public string[] GetAllMembers(this IObservable type, params MemberTypes[] memberTypes)
+        public static string[] GetAllMembers(this IObservable type, params MemberTypes[] memberTypes)
         {
             if (type == null)
                 return null;
@@ -51,7 +51,7 @@ namespace UnuGames
             return results.ToArray();
         }
 
-        static public MemberInfo[] GetAllMembersInfo(this IObservable type, params MemberTypes[] memberTypes)
+        public static MemberInfo[] GetAllMembersInfo(this IObservable type, params MemberTypes[] memberTypes)
         {
             if (type == null)
                 return null;
@@ -83,7 +83,7 @@ namespace UnuGames
             return results.ToArray();
         }
 
-        static public string[] GetAllMembers(this PropertyInfo proInfo, params MemberTypes[] memberTypes)
+        public static string[] GetAllMembers(this PropertyInfo proInfo, params MemberTypes[] memberTypes)
         {
             if (proInfo == null)
                 return null;
@@ -115,7 +115,7 @@ namespace UnuGames
             return results.ToArray();
         }
 
-        static public MemberInfo[] GetAllMembersInfo(this PropertyInfo proInfo, params MemberTypes[] memberTypes)
+        public static MemberInfo[] GetAllMembersInfo(this PropertyInfo proInfo, params MemberTypes[] memberTypes)
         {
             if (proInfo == null)
                 return null;
@@ -140,7 +140,7 @@ namespace UnuGames
             return results.ToArray();
         }
 
-        static public MemberInfo GetMemberInfo(this IObservable type, string memberName, params MemberTypes[] memberTypes)
+        public static MemberInfo GetMemberInfo(this IObservable type, string memberName, params MemberTypes[] memberTypes)
         {
             MemberInfo[] infos = type.GetAllMembersInfo(memberTypes);
             MemberInfo result = null;
@@ -157,22 +157,22 @@ namespace UnuGames
             return result;
         }
 
-        static public FieldInfo ToField(this MemberInfo member)
+        public static FieldInfo ToField(this MemberInfo member)
         {
             return (member as FieldInfo);
         }
 
-        static public PropertyInfo ToProperty(this MemberInfo member)
+        public static PropertyInfo ToProperty(this MemberInfo member)
         {
             return (member as PropertyInfo);
         }
 
-        static public MethodInfo ToMethod(this MemberInfo member)
+        public static MethodInfo ToMethod(this MemberInfo member)
         {
             return (member as MethodInfo);
         }
 
-        static public Type GetCachedType(this object obj)
+        public static Type GetCachedType(this object obj)
         {
             Type type = null;
 
@@ -191,7 +191,7 @@ namespace UnuGames
             return type;
         }
 
-        static public Type GetUIManTypeByName(string typeName)
+        public static Type GetUIManTypeByName(string typeName)
         {
             Type uiManType = null;
             var type = Type.GetType(typeName);
@@ -211,7 +211,7 @@ namespace UnuGames
 
 #if UNITY_EDITOR
 
-        static public CustomPropertyInfo[] GetUIManProperties(this Type uiManType)
+        public static CustomPropertyInfo[] GetUIManProperties(this Type uiManType)
         {
             PropertyInfo[] properties = uiManType.GetProperties();
             var customProperties = new List<CustomPropertyInfo>();
@@ -229,7 +229,7 @@ namespace UnuGames
 
 #endif
 
-        static public string GetAllias(this Type type)
+        public static string GetAllias(this Type type)
         {
             if (type == null)
                 return null;
@@ -265,7 +265,7 @@ namespace UnuGames
 			void : System.Void*/
         }
 
-        static public bool IsAllias(this System.Type type)
+        public static bool IsAllias(this System.Type type)
         {
             if (type.GetAllias() == type.Name)
                 return false;
@@ -273,7 +273,7 @@ namespace UnuGames
                 return true;
         }
 
-        static public bool IsSupportType(this System.Type type)
+        public static bool IsSupportType(this System.Type type)
         {
             if (type == null)
                 return false;
@@ -288,7 +288,7 @@ namespace UnuGames
             return false;
         }
 
-        static public object GetCachedTypeInstance(Type type)
+        public static object GetCachedTypeInstance(Type type)
         {
             if (!_cachedInstance.TryGetValue(type, out var instance))
             {
@@ -307,7 +307,7 @@ namespace UnuGames
             return instance;
         }
 
-        static public object GetDefaultValue(Type type)
+        public static object GetDefaultValue(Type type)
         {
             try
             {

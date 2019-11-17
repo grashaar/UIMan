@@ -6,9 +6,9 @@ namespace UnuGames
 {
     public class FilterPopup : EditorWindow
     {
-        static private string[] mItems;
+        private static string[] mItems;
 
-        static private Action<string> OnSelected { get; set; }
+        private static Action<string> OnSelected { get; set; }
 
         private const int MEMBER_HEIGHT = 37;
         private static Rect inspectorRect;
@@ -38,7 +38,7 @@ namespace UnuGames
         /// </summary>
         /// <param name="binderEditor"></param>
         /// <param name="field"></param>
-        static public void Browse(string[] items, Action<string> onSelected)
+        public static void Browse(string[] items, Action<string> onSelected)
         {
             searchField = new UISearchField(Filter, null, null);
             OnSelected = onSelected;
@@ -69,12 +69,12 @@ namespace UnuGames
         /// Set the window's rectangle
         /// </summary>
         /// <param name="rect"></param>
-        static public void SetPopupRect(Rect rect)
+        public static void SetPopupRect(Rect rect)
         {
             inspectorRect = rect;
         }
 
-        static public void SetShowPosition()
+        public static void SetShowPosition()
         {
             SetPopupRect(new Rect(GUILayoutUtility.GetLastRect().x, Event.current.mousePosition.y, GUILayoutUtility.GetLastRect().width, 10));
         }
@@ -87,7 +87,7 @@ namespace UnuGames
         {
         }
 
-        new static public void Close()
+        new public static void Close()
         {
             if (listView != null && listView.Window != null)
                 listView.Window.Close();

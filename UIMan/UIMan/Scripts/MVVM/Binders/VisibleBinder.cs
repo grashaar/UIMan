@@ -11,12 +11,12 @@ namespace UnuGames.MVVM
         [HideInInspector]
         public BindingField value = new BindingField("bool");
 
-        public override void Init(bool forceInit)
+        public override void Initialize(bool forceInit)
         {
-            if (CheckInit(forceInit))
-            {
-                SubscribeOnChangedEvent(this.value, OnUpdateValue);
-            }
+            if (!CheckInitialize(forceInit))
+                return;
+
+            SubscribeOnChangedEvent(this.value, OnUpdateValue);
         }
 
         public void OnUpdateValue(object val)

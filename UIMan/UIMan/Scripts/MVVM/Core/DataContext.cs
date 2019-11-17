@@ -13,7 +13,7 @@ namespace UnuGames.MVVM
 
         private readonly static List<DataContext> contextsList = new List<DataContext>();
 
-        static public void NotifyObjectChange(object modelInstance)
+        public static void NotifyObjectChange(object modelInstance)
         {
             for (var i = 0; i < contextsList.Count; i++)
             {
@@ -90,7 +90,7 @@ namespace UnuGames.MVVM
                 BinderBase binder = binders[i];
                 if (binder.dataContext == this)
                 {
-                    binder.Init(forceReinit);
+                    binder.Initialize(forceReinit);
                 }
             }
         }

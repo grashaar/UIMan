@@ -10,14 +10,14 @@ namespace UnuGames.MVVM
 
         //Define any field for binding as you want, just copy above fied
 
-        public override void Init(bool forceInit)
+        public override void Initialize(bool forceInit)
         {
-            if (CheckInit(forceInit))
-            {
-                // Get view's components here
+            if (!CheckInitialize(forceInit))
+                return;
 
-                SubscribeOnChangedEvent(this.yourValue, OnUpdateValue);
-            }
+            // Get view's components here
+
+            SubscribeOnChangedEvent(this.yourValue, OnUpdateValue);
         }
 
         public void OnUpdateValue(object newValue)

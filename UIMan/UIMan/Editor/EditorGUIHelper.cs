@@ -341,7 +341,7 @@ namespace UnuGames
 
     public class LineHelper
     {
-        static public void Draw(Color color, float width, float height = 1)
+        public static void Draw(Color color, float width, float height = 1)
         {
             Color backupColor = GUI.color;
             GUI.color = color;
@@ -349,7 +349,7 @@ namespace UnuGames
             GUI.color = backupColor;
         }
 
-        static public void Draw(Color color)
+        public static void Draw(Color color)
         {
             Color backupColor = GUI.color;
             GUI.color = color;
@@ -363,7 +363,7 @@ namespace UnuGames
         private static GUIStyle headerLabel;
         private static GUIStyle titleLabel;
 
-        static public void HeaderLabel(string text, GUILayoutOption width = null)
+        public static void HeaderLabel(string text, GUILayoutOption width = null)
         {
             if (headerLabel == null)
             {
@@ -382,7 +382,7 @@ namespace UnuGames
             GUILayout.EndHorizontal();
         }
 
-        static public void TitleLabel(string text)
+        public static void TitleLabel(string text)
         {
             if (titleLabel == null)
             {
@@ -399,7 +399,7 @@ namespace UnuGames
             GUILayout.EndHorizontal();
         }
 
-        static public void ColumnLabel(string text, GUILayoutOption width)
+        public static void ColumnLabel(string text, GUILayoutOption width)
         {
             EditorGUILayout.LabelField("<b>" + text + "</b>", EditorGUIHelper.RichText(), width);
         }
@@ -463,7 +463,7 @@ namespace UnuGames
     {
         private static GUISkin skin;
 
-        static public GUIStyle RichText(bool wordWrap = false)
+        public static GUIStyle RichText(bool wordWrap = false)
         {
             var style = new GUIStyle();
             style.richText = true;
@@ -471,17 +471,17 @@ namespace UnuGames
             return style;
         }
 
-        static public bool QuickPickerButton()
+        public static bool QuickPickerButton()
         {
             return GUILayout.Button("Browse...");
         }
 
-        static public Vector3 DrawVector3(string label, float x, float y, float z)
+        public static Vector3 DrawVector3(string label, float x, float y, float z)
         {
             return EditorGUILayout.Vector3Field(label, new Vector3(x, y, z));
         }
 
-        static public Vector3 DrawArc(string label, float angle, float radius, float height)
+        public static Vector3 DrawArc(string label, float angle, float radius, float height)
         {
             EditorGUILayout.BeginVertical();
             EditorGUILayout.PrefixLabel(label);
@@ -499,7 +499,7 @@ namespace UnuGames
             return new Vector3(angle, radius, height);
         }
 
-        static public float DrawFloat(string label, float value)
+        public static float DrawFloat(string label, float value)
         {
             EditorGUILayout.BeginVertical();
             EditorGUILayout.PrefixLabel(label);
@@ -516,7 +516,7 @@ namespace UnuGames
         private static Color orgBgColor;
         private static Color orgTextColor;
 
-        static public bool Draw(string text, Color color, params GUILayoutOption[] options)
+        public static bool Draw(string text, Color color, params GUILayoutOption[] options)
         {
             orgBgColor = GUI.backgroundColor;
             GUI.backgroundColor = color;
@@ -525,7 +525,7 @@ namespace UnuGames
             return press;
         }
 
-        static public bool Draw(string text, Color color, Color textColor, params GUILayoutOption[] options)
+        public static bool Draw(string text, Color color, Color textColor, params GUILayoutOption[] options)
         {
             orgBgColor = GUI.backgroundColor;
             orgTextColor = GUI.contentColor;
@@ -537,7 +537,7 @@ namespace UnuGames
             return press;
         }
 
-        static public bool Draw(string text, Color color)
+        public static bool Draw(string text, Color color)
         {
             orgBgColor = GUI.backgroundColor;
             GUI.backgroundColor = color;
@@ -567,11 +567,11 @@ namespace UnuGames
         }
     }
 
-    static public class CommonColor
+    public static class CommonColor
     {
-        static public Color LightGreen = new Color(0.2f, 1, 0.35f);
-        static public Color LightRed = new Color(1, 0.3f, 0.3f);
-        static public Color LightBlue = new Color(0, 0.85f, 1);
-        static public Color LightOrange = new Color(1, 0.56f, 0.14f);
+        public static Color LightGreen = new Color(0.2f, 1, 0.35f);
+        public static Color LightRed = new Color(1, 0.3f, 0.3f);
+        public static Color LightBlue = new Color(0, 0.85f, 1);
+        public static Color LightOrange = new Color(1, 0.56f, 0.14f);
     }
 }

@@ -86,10 +86,10 @@ namespace UnuGames
                 DontDestroyOnLoad(this.gameObject);
             }
 
-            Init();
+            Initialize();
         }
 
-        public virtual void Init()
+        public virtual void Initialize()
         {
         }
     }

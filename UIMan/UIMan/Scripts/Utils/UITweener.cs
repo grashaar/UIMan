@@ -144,17 +144,17 @@ namespace UnuGames
             return tweener;
         }
 
-        static public UITweener Move(GameObject target, float time, Vector3 position)
+        public static UITweener Move(GameObject target, float time, Vector3 position)
         {
             return DoTween(target, UITweenType.MOVE, time, position);
         }
 
-        static public UITweener Value(GameObject target, float time, float startValue, float endValue)
+        public static UITweener Value(GameObject target, float time, float startValue, float endValue)
         {
             return DoTween(target, UITweenType.VALUE, time, startValue, endValue);
         }
 
-        static public UITweener Alpha(GameObject target, float time, float startAlpha, float endAlpha)
+        public static UITweener Alpha(GameObject target, float time, float startAlpha, float endAlpha)
         {
             return DoTween(target, UITweenType.ALPHA, time, startAlpha, endAlpha);
         }

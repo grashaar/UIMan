@@ -38,12 +38,12 @@ namespace UnuGames
         private ListView listTypes;
         private EditablePopup baseTypePopup;
 
-        static public string GetSupportTypeName(int index)
+        public static string GetSupportTypeName(int index)
         {
             return _arrSupportType[index];
         }
 
-        static public bool IsViewModelExisted(string name)
+        public static bool IsViewModelExisted(string name)
         {
             return ArrayUtility.Contains(_types, name);
         }

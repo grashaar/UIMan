@@ -6,7 +6,7 @@ namespace UnuGames
 {
     public class AnimationEditorUtils : Editor
     {
-        static public Animator GenerateAnimator(GameObject target, params string[] clipsName)
+        public static Animator GenerateAnimator(GameObject target, params string[] clipsName)
         {
             UIManConfig config = Resources.Load<UIManConfig>("UIManConfig");
 

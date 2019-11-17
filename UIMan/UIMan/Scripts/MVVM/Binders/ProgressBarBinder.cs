@@ -14,13 +14,13 @@ namespace UnuGames.MVVM
         public bool tweenValueChange;
         public float changeTime = 0.1f;
 
-        public override void Init(bool forceInit)
+        public override void Initialize(bool forceInit)
         {
-            if (CheckInit(forceInit))
-            {
-                this.value = GetComponent<UIProgressBar>();
-                SubscribeOnChangedEvent(this.Value, OnUpdateValue);
-            }
+            if (!CheckInitialize(forceInit))
+                return;
+
+            this.value = GetComponent<UIProgressBar>();
+            SubscribeOnChangedEvent(this.Value, OnUpdateValue);
         }
 
         public void OnUpdateValue(object val)

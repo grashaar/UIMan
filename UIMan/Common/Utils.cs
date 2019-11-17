@@ -6,7 +6,7 @@ namespace UnuGames
 {
     public class Utils
     {
-        static public T ParseEnum<T>(string value)
+        public static T ParseEnum<T>(string value)
         {
             try
             {
@@ -19,7 +19,7 @@ namespace UnuGames
         }
     }
 
-    static public class EnumExtensions
+    public static class EnumExtensions
     {
 #if !UNITY_EDITOR
 		static Dictionary<Enum, string> caches = new Dictionary<Enum, string> ();
@@ -27,7 +27,7 @@ namespace UnuGames
 
         // This extension method is broken out so you can use a similar pattern with
         // other MetaData elements in the future. This is your base method for each.
-        static public T GetAttribute<T>(this Enum value) where T : Attribute
+        public static T GetAttribute<T>(this Enum value) where T : Attribute
         {
             var type = value.GetCachedType();
             var memberInfo = type.GetMember(value.ToString());
@@ -37,7 +37,7 @@ namespace UnuGames
 
         // This method creates a specific call to the above method, requesting the
         // Description MetaData attribute.
-        static public string ToName(this Enum value)
+        public static string ToName(this Enum value)
         {
 #if !UNITY_EDITOR
 			string name = null;
@@ -55,9 +55,9 @@ namespace UnuGames
         }
     }
 
-    static public class AnimatorExtensions
+    public static class AnimatorExtensions
     {
-        static public void EnableAndPlay(this Animator animator, string stateName)
+        public static void EnableAndPlay(this Animator animator, string stateName)
         {
             if (animator != null)
             {
@@ -66,7 +66,7 @@ namespace UnuGames
             }
         }
 
-        static public void Disable(this Animator animator)
+        public static void Disable(this Animator animator)
         {
             if (animator != null)
             {

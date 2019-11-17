@@ -8,9 +8,9 @@ namespace UnuGames
         //
         // Properties
         //
-        public Dictionary<string, Delegate> Routers { get; set; }
+        public Dictionary<string, Delegate> Routers { get; }
 
-        public List<string> PermanentEvents { get; set; }
+        public List<string> PermanentEvents { get; }
 
         //
         // Constructors

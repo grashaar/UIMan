@@ -17,15 +17,7 @@ namespace UnuGames
         private Action<object[]> loadingCallback;
         private object[] loadingCallbackArgs;
 
-        private float progress;
-
-        public float Progress
-        {
-            get
-            {
-                return this.progress;
-            }
-        }
+        public float Progress { get; private set; }
 
         public void Setup(Transform root)
         {
@@ -43,22 +35,9 @@ namespace UnuGames
         {
             while (!asyncTask.isDone)
             {
-                this.progress = asyncTask.progress;
+                this.Progress = asyncTask.progress;
                 if (this.progressValue.enabled)
-                    ShowValue(Mathf.FloorToInt(this.progress).ToString() + "%");
-                yield return null;
-            }
-            DoCallback();
-            Hide();
-        }
-
-        private IEnumerator WaitTask(WWW www)
-        {
-            while (!www.isDone)
-            {
-                this.progress = www.progress;
-                if (this.progressValue.enabled)
-                    ShowValue(Mathf.FloorToInt(this.progress).ToString() + "%");
+                    ShowValue(Mathf.FloorToInt(this.Progress).ToString() + "%");
                 yield return null;
             }
             DoCallback();
@@ -107,15 +86,6 @@ namespace UnuGames
             StartCoroutine(WaitTask(task));
         }
 
-        public void Show(WWW www, bool showIcon = true, bool showCover = true, bool showBackground = false, bool showProgress = false, string tip = "", Action<object[]> callBacks = null, params object[] args)
-        {
-            this.loadingCallback = callBacks;
-            this.loadingCallbackArgs = args;
-            this.isLoading = true;
-            Setting(showIcon, showCover, showBackground, showProgress, tip);
-            StartCoroutine(WaitTask(www));
-        }
-
         public void Hide()
         {
             this.isLoading = false;
@@ -141,7 +111,7 @@ namespace UnuGames
         public void ShowImage(string spritePath)
         {
             this.backgroundImage.enabled = true;
-            ResourceFactory.LoadAsync<Sprite>(spritePath, OnLoadBackground);
+            StartCoroutine(AssetLoader.Load<Sprite>(spritePath, OnLoadedImage));
         }
 
         public void HideImage()
@@ -149,8 +119,14 @@ namespace UnuGames
             this.backgroundImage.enabled = false;
         }
 
-        private void OnLoadBackground(Sprite sprite, object[] args)
+        private void OnLoadedImage(string key, UnityEngine.Object asset)
         {
+            if (!(asset is Sprite sprite))
+            {
+                Debug.LogError($"Asset of key={key} is not a Sprite.");
+                return;
+            }
+
             this.backgroundImage.sprite = sprite;
         }
     }

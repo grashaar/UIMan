@@ -2,9 +2,9 @@
 
 public class UnuLogger
 {
-    static private bool _enableAllLog = true;
+    private static bool _enableAllLog = true;
 
-    static public bool EnableAllLog
+    public static bool EnableAllLog
     {
         get { return _enableAllLog; }
         set
@@ -13,9 +13,9 @@ public class UnuLogger
         }
     }
 
-    static private bool _enableLogInfo = true;
+    private static bool _enableLogInfo = true;
 
-    static public bool EnableLogInfo
+    public static bool EnableLogInfo
     {
         get { return _enableLogInfo; }
         set
@@ -24,9 +24,9 @@ public class UnuLogger
         }
     }
 
-    static private bool _enableLogWarning = true;
+    private static bool _enableLogWarning = true;
 
-    static public bool EnableLogWarning
+    public static bool EnableLogWarning
     {
         get { return _enableLogWarning; }
         set
@@ -35,9 +35,9 @@ public class UnuLogger
         }
     }
 
-    static private bool _enableLogError = true;
+    private static bool _enableLogError = true;
 
-    static public bool EnableLogError
+    public static bool EnableLogError
     {
         get { return _enableLogError; }
         set
@@ -46,7 +46,7 @@ public class UnuLogger
         }
     }
 
-    static public void Log(object message)
+    public static void Log(object message)
     {
 #if UNITY_DEBUG || UNITY_EDITOR
         if (EnableAllLog || EnableLogInfo)
@@ -54,7 +54,7 @@ public class UnuLogger
 #endif
     }
 
-    static public void LogFormat(string message, params object[] args)
+    public static void LogFormat(string message, params object[] args)
     {
 #if UNITY_DEBUG || UNITY_EDITOR
         if (EnableAllLog || EnableLogInfo)
@@ -62,7 +62,7 @@ public class UnuLogger
 #endif
     }
 
-    static public void LogError(object message)
+    public static void LogError(object message)
     {
 #if UNITY_DEBUG || UNITY_EDITOR
         if (EnableAllLog || EnableLogError)
@@ -70,7 +70,7 @@ public class UnuLogger
 #endif
     }
 
-    static public void LogErrorFormat(string message, params object[] args)
+    public static void LogErrorFormat(string message, params object[] args)
     {
 #if UNITY_DEBUG || UNITY_EDITOR
         if (EnableAllLog || EnableLogError)
@@ -78,7 +78,7 @@ public class UnuLogger
 #endif
     }
 
-    static public void LogWarning(object message)
+    public static void LogWarning(object message)
     {
 #if UNITY_DEBUG || UNITY_EDITOR
         if (EnableAllLog || EnableLogWarning)
@@ -86,7 +86,7 @@ public class UnuLogger
 #endif
     }
 
-    static public void LogFormatWarning(string message, params object[] args)
+    public static void LogFormatWarning(string message, params object[] args)
     {
 #if UNITY_DEBUG || UNITY_EDITOR
         if (EnableAllLog || EnableLogWarning)

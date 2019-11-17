@@ -4,18 +4,18 @@ using UnuGames.MVVM;
 
 namespace UnuGames
 {
-    static public class ReflectionUtils
+    public static class ReflectionUtils
     {
         private readonly static List<Type> _types = new List<Type>();
         private readonly static List<string> _assemblies = new List<string>();
         private readonly static Dictionary<string, Type> _typeNames = new Dictionary<string, Type>();
 
-        static public List<Type> GetAllTypes()
+        public static List<Type> GetAllTypes()
         {
             return _types;
         }
 
-        static public string[] GetAllUIManTypes()
+        public static string[] GetAllUIManTypes()
         {
             var uiManTypes = new List<string>();
             var types = GetAllTypes();
@@ -41,7 +41,7 @@ namespace UnuGames
             return uiManTypes.ToArray();
         }
 
-        static public string[] GetAllRefTypes(Type baseType)
+        public static string[] GetAllRefTypes(Type baseType)
         {
             var refTypes = new List<string>();
             var types = GetAllTypes();
@@ -65,7 +65,7 @@ namespace UnuGames
             return refTypes.ToArray();
         }
 
-        static public Type GetTypeByName(string name)
+        public static Type GetTypeByName(string name)
         {
             if (_typeNames.ContainsKey(name))
                 return _typeNames[name];
@@ -84,7 +84,7 @@ namespace UnuGames
             return null;
         }
 
-        static public string[] GetAllObservableTypes(Type excludeType = null)
+        public static string[] GetAllObservableTypes(Type excludeType = null)
         {
             var types = GetAllTypes();
             var observableTypes = new List<string>();
@@ -100,12 +100,12 @@ namespace UnuGames
             return observableTypes.ToArray();
         }
 
-        static public List<string> GetAllAssemblies()
+        public static List<string> GetAllAssemblies()
         {
             return _assemblies;
         }
 
-        static public void RefreshAssemblies(bool force)
+        public static void RefreshAssemblies(bool force)
         {
             if (!force && _assemblies.Count > 0)
                 return;

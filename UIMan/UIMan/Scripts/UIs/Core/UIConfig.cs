@@ -7,7 +7,7 @@
 
         private static bool _isBGMOn = true;
 
-        static public bool IsBGMOn
+        public static bool IsBGMOn
         {
             get { return _isBGMOn; }
             set { _isBGMOn = value; }
@@ -15,13 +15,13 @@
 
         private static bool _isSFXOn = true;
 
-        static public bool IsSFXOn
+        public static bool IsSFXOn
         {
             get { return _isSFXOn; }
             set { _isSFXOn = value; }
         }
 
-        static public void Save(string key, string val)
+        public static void Save(string key, string val)
         {
         }
     }

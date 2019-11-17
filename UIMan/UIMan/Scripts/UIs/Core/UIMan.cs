@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace UnuGames
 {
-    [StartupAttribute(StartupType.PREFAB)]
+    [Startup(StartupType.PREFAB)]
     public class UIMan : SingletonBehaviour<UIMan>
     {
         // Constants
@@ -23,16 +23,16 @@ namespace UnuGames
         private UIManConfig config;
 
         // Caches
-        private Dictionary<Type, UIManScreen> screenDict = new Dictionary<Type, UIManScreen>();
+        private readonly Dictionary<Type, UIManScreen> screenDict = new Dictionary<Type, UIManScreen>();
 
-        private Dictionary<Type, UIManDialog> dialogDict = new Dictionary<Type, UIManDialog>();
-        private Dictionary<Type, string> prefabURLCache = new Dictionary<Type, string>();
+        private readonly Dictionary<Type, UIManDialog> dialogDict = new Dictionary<Type, UIManDialog>();
+        private readonly Dictionary<Type, string> prefabURLCache = new Dictionary<Type, string>();
 
         // Transition queue
-        private List<UIManScreen> screenQueue = new List<UIManScreen>();
+        private readonly List<UIManScreen> screenQueue = new List<UIManScreen>();
 
-        private Queue<UIDialogQueueData> dialogQueue = new Queue<UIDialogQueueData>();
-        private Stack<Type> activeDialog = new Stack<Type>();
+        private readonly Queue<UIDialogQueueData> dialogQueue = new Queue<UIDialogQueueData>();
+        private readonly Stack<Type> activeDialog = new Stack<Type>();
 
         // Assignable field
         public Transform uiRoot;
@@ -50,19 +50,7 @@ namespace UnuGames
 
         public bool IsLoadingUnityScene { get; set; }
 
-        private UIManScreen currentScreen;
-
-        public UIManScreen CurrentScreen
-        {
-            get
-            {
-                return this.currentScreen;
-            }
-            set
-            {
-                this.currentScreen = value;
-            }
-        }
+        public UIManScreen CurrentScreen { get; set; }
 
         public UIManDialog TopDialog
         {
@@ -88,42 +76,46 @@ namespace UnuGames
             }
         }
 
-        private string currentUnityScene;
+        public string CurrentUnityScene { get; set; }
 
-        public string CurrentUnityScene
+        private UIActivity uiLoading;
+
+        public void Loading(Action<UIActivity> callback)
         {
-            get
+            if (this.uiLoading)
             {
-                return this.currentUnityScene;
+                callback?.Invoke(this.uiLoading);
+                return;
             }
-            set
-            {
-                this.currentUnityScene = value;
-            }
+
+            StartCoroutine(OnLoading(callback));
         }
 
-        private static UIActivity _uiLoading;
-
-        static public UIActivity Loading
+        private IEnumerator OnLoading(Action<UIActivity> callback)
         {
-            get
-            {
-                if (_uiLoading == null)
-                {
-                    GameObject loadingObj = ResourceFactory.Load<GameObject>(ACTIVITY_INDICATOR_NAME);
-                    loadingObj = Instantiate(loadingObj) as GameObject;
-                    loadingObj.name = ACTIVITY_INDICATOR_NAME;
-                    _uiLoading = loadingObj.GetComponent<UIActivity>();
-                    _uiLoading.Setup(UIMan.Instance.transform);
-                }
-                return _uiLoading;
-            }
+            yield return AssetLoader.Load<GameObject>(ACTIVITY_INDICATOR_NAME, (key, asset) => OnLoading(key, asset, callback));
         }
 
-        // Initialize
-        public override void Init()
+        private void OnLoading(string key, UnityEngine.Object asset, Action<UIActivity> callback)
         {
-            _uiLoading = GetComponentInChildren<UIActivity>();
+            if (!(asset is GameObject prefab))
+            {
+                Debug.LogError($"Asset of key={key} is not a prefab.");
+                return;
+            }
+
+            var obj = Instantiate(prefab) as GameObject;
+            obj.name = ACTIVITY_INDICATOR_NAME;
+            this.uiLoading = obj.GetComponent<UIActivity>();
+            this.uiLoading.Setup(UIMan.Instance.transform);
+
+            callback?.Invoke(this.uiLoading);
+        }
+
+        public override void Initialize()
+        {
+            this.uiLoading = GetComponentInChildren<UIActivity>();
+
             this.config = Resources.Load<UIManConfig>("UIManConfig");
             this.bgRectTrans = this.background.GetComponent<RectTransform>();
 
@@ -190,8 +182,7 @@ namespace UnuGames
 
             if (!this.screenDict.TryGetValue(uiType, out UIManScreen screen))
             {
-                var prefabPath = Path.Combine(GetUIPrefabPath(uiType, false), uiType.Name);
-                ResourceFactory.LoadAsync<GameObject>(prefabPath, PreprocessUI, uiType, seal, args);
+                StartCoroutine(AssetLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessScreen(key, asset, uiType, seal, args)));
                 return;
             }
 
@@ -201,15 +192,8 @@ namespace UnuGames
             if (screen.useBackground)
             {
                 this.background.gameObject.SetActive(true);
-                var bgName = "";
-                if (!string.IsNullOrEmpty(this.config.backgroundRootFolder))
-                {
-                    var resFolderIndex = this.config.backgroundRootFolder.LastIndexOf(UIManDefine.RESOURCES_FOLDER);
-                    if (resFolderIndex > -1)
-                        bgName = this.config.backgroundRootFolder.Substring(resFolderIndex + 10);
-                }
-                bgName = bgName + screen.backgroundType;
-                ResourceFactory.LoadAsync<Texture2D>(bgName, SetScreenBackground);
+
+                AssetLoader.Load<Texture2D>(screen.background, SetScreenBackground);
             }
 
             BringToFront(this.screenRoot, screen.transform, 2);
@@ -320,8 +304,7 @@ namespace UnuGames
             if (!this.dialogDict.TryGetValue(uiType, out UIManDialog dialog))
             {
                 this.IsLoadingDialog = true;
-                var prefabPath = Path.Combine(GetUIPrefabPath(uiType, true), uiType.Name);
-                ResourceFactory.LoadAsync<GameObject>(prefabPath, PreprocessUI, uiType, callbacks, args);
+                StartCoroutine(AssetLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessDialogue(key, asset, uiType, callbacks, args)));
                 return;
             }
 
@@ -461,8 +444,9 @@ namespace UnuGames
         public void LoadUnityScene(string name, Type screen, bool showLoading, params object[] args)
         {
             Instance.cover.gameObject.SetActive(false);
+
             if (showLoading)
-                Loading.Show(SceneManager.LoadSceneAsync(name), true, false, false, false, "", OnLoadUnitySceneComplete, screen, args);
+                Loading(x => x.Show(SceneManager.LoadSceneAsync(name), true, false, false, false, "", OnLoadUnitySceneComplete, screen, args));
             else
                 StartCoroutine(LoadUnityScene(name, screen, args));
         }
@@ -510,7 +494,7 @@ namespace UnuGames
         /// Sets the native loading.
         /// </summary>
         /// <param name="isLoading">If set to <c>true</c> is loading.</param>
-        static public void SetNativeLoading(bool isLoading)
+        public static void SetNativeLoading(bool isLoading)
         {
 #if UNITY_IOS || UNITY_ANDROID
 		if(isLoading)
@@ -623,94 +607,89 @@ namespace UnuGames
         #region Utils
 
         /// <summary>
-        /// Gets the user interface prefab UR.
-        /// </summary>
-        /// <returns>The user interface prefab UR.</returns>
-        /// <param name="uiType">User interface type.</param>
-        /// <param name="isDialog">If set to <c>true</c> is dialog.</param>
-        private string GetUIPrefabPath(Type uiType, bool isDialog)
-        {
-            if (!this.prefabURLCache.TryGetValue(uiType, out var url))
-            {
-                var attributes = uiType.GetCustomAttributes(typeof(UIDescriptor), true);
-                if (attributes != null && attributes.Length > 0)
-                {
-                    url = ((UIDescriptor)attributes[0]).url;
-                }
-                else
-                {
-                    if (isDialog)
-                    {
-                        url = this.config.dialogPrefabFolder;
-                    }
-                    else
-                    {
-                        url = this.config.screenPrefabFolder;
-                    }
-
-                    if (!string.IsNullOrEmpty(url))
-                    {
-                        var resFolderIndex = url.LastIndexOf(UIManDefine.RESOURCES_FOLDER);
-                        if (resFolderIndex > -1)
-                            url = url.Substring(resFolderIndex + 10);
-                    }
-                }
-                this.prefabURLCache.Add(uiType, url);
-            }
-
-            return url;
-        }
-
-        /// <summary>
-        /// Preprocesses the UI.
+        /// Preprocesses the UIManScreen.
         /// </summary>
         /// <param name="prefab">Prefab.</param>
         /// <param name="args">Arguments.</param>
-        private void PreprocessUI(GameObject prefab, object[] args)
+        private void PreprocessScreen(string key, UnityEngine.Object asset, Type uiType, bool seal, params object[] args)
         {
-            var uiType = (Type)args[0];
-            if (prefab == null)
+            if (!(asset is GameObject prefab))
             {
-                UnuLogger.LogFormatWarning("UI Error: cannot find {0}, make sure you have put UI prefab in Resources folder!", uiType.Name);
+                Debug.LogError($"Asset of key={key} is not a prefab.");
                 return;
             }
 
-            var uiObj = Instantiate(prefab) as GameObject;
-            uiObj.name = uiType.Name;
+            var obj = Instantiate(prefab) as GameObject;
+            obj.name = uiType.Name;
 
-            UIManBase uiBase = uiObj.GetComponent<UIManBase>();
-            if (uiBase is UIManScreen)
+            var screen = obj.GetComponent<UIManScreen>();
+
+            if (!screen)
             {
-                uiBase.Transform.SetParent(this.screenRoot, false);
-                uiBase.RectTransform.localScale = Vector3.one;
-                if (!this.screenDict.ContainsKey(uiType))
-                    this.screenDict.Add(uiType, uiBase as UIManScreen);
-                var seal = (bool)args[1];
-                var param = (object[])args[2];
-                ShowScreen(uiType, seal, param);
+                Destroy(obj);
+                Debug.LogError($"{obj} does not contain any component derived from UIManScreen.");
+                return;
             }
-            else if (uiBase is UIManDialog)
+
+            screen.Transform.SetParent(this.screenRoot, false);
+            screen.RectTransform.localScale = Vector3.one;
+
+            if (!this.screenDict.ContainsKey(uiType))
+                this.screenDict.Add(uiType, screen);
+
+            ShowScreen(uiType, seal, args);
+        }
+
+        /// <summary>
+        /// Preprocesses the UIManDialogue.
+        /// </summary>
+        /// <param name="prefab">Prefab.</param>
+        /// <param name="args">Arguments.</param>
+        private void PreprocessDialogue(string key, UnityEngine.Object asset, Type uiType, UICallback callbacks, params object[] args)
+        {
+            if (!(asset is GameObject prefab))
             {
-                uiBase.Transform.SetParent(this.dialogRoot, false);
-                uiBase.RectTransform.localScale = Vector3.one;
-                this.dialogDict.Add(uiType, uiBase as UIManDialog);
-                var callbacks = (UICallback)args[1];
-                var param = (object[])args[2];
-                this.IsLoadingDialog = false;
-                ShowDialog(uiType, callbacks, param);
+                Debug.LogError($"Asset of key={key} is not a prefab.");
+                return;
             }
+
+            var obj = Instantiate(prefab) as GameObject;
+            obj.name = uiType.Name;
+
+            var dialogue = obj.GetComponent<UIManDialog>();
+
+            if (!dialogue)
+            {
+                Destroy(obj);
+                Debug.LogError($"{obj} does not contain any component derived from UIManDialogue.");
+                return;
+            }
+
+            dialogue.Transform.SetParent(this.dialogRoot, false);
+            dialogue.RectTransform.localScale = Vector3.one;
+            this.dialogDict.Add(uiType, dialogue as UIManDialog);
+            this.IsLoadingDialog = false;
+
+            ShowDialog(uiType, callbacks, args);
         }
 
         /// <summary>
         /// Sets the screen background.
         /// </summary>
         /// <param name="texture">Texture.</param>
-        private void SetScreenBackground(Texture2D texture, object[] args)
+        private void SetScreenBackground(string key, UnityEngine.Object asset)
         {
+            if (!(asset is Texture2D texture))
+            {
+                Debug.LogError($"Asset of key={key} is not a Texture2D.");
+                return;
+            }
+
             if (texture != null)
             {
                 this.background.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
             }
+
             UITweener.Alpha(this.bgRectTrans.gameObject, 0.25f, 0, 1);
         }
 
@@ -969,39 +948,54 @@ namespace UnuGames
             }
 
             // Preload
-            var prefabPath = Path.Combine(GetUIPrefabPath(uiType, uiType.BaseType == typeof(UIManDialog)), uiType.Name);
-            ResourceFactory.LoadAsync<GameObject>(prefabPath, PreprocessPreload, uiType);
+            StartCoroutine(AssetLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessPreload(key, asset, uiType)));
         }
 
-        private void PreprocessPreload(GameObject prefab, object[] args)
+        private void PreprocessPreload(string key, UnityEngine.Object asset, Type uiType, params object[] args)
         {
-            var uiType = (Type)args[0];
-            if (prefab == null)
+            if (!(asset is GameObject prefab))
             {
-                UnuLogger.LogFormatWarning("UI Error: cannot find {0}, make sure you have put UI prefab in Resources folder!", uiType.Name);
+                Debug.LogError($"Asset of key={key} is not a prefab.");
                 return;
             }
 
-            var uiObj = Instantiate(prefab) as GameObject;
-            uiObj.name = uiType.Name;
-            uiObj.GetComponent<CanvasGroup>().alpha = 0;
+            var obj = Instantiate(prefab) as GameObject;
+            obj.name = uiType.Name;
 
-            UIManBase uiBase = uiObj.GetComponent<UIManBase>();
-            if (uiBase is UIManScreen)
+            var canvasGroup = obj.GetComponent<CanvasGroup>();
+
+            if (canvasGroup)
+                canvasGroup.alpha = 0;
+
+            var uiBase = obj.GetComponent<UIManBase>();
+
+            switch (uiBase)
             {
-                uiBase.Transform.SetParent(this.screenRoot, false);
-                uiBase.RectTransform.localScale = Vector3.one;
-                if (!this.screenDict.ContainsKey(uiType))
-                    this.screenDict.Add(uiType, uiBase as UIManScreen);
+                case UIManScreen screen:
+                    screen.Transform.SetParent(this.screenRoot, false);
+                    screen.RectTransform.localScale = Vector3.one;
+
+                    if (!this.screenDict.ContainsKey(uiType))
+                        this.screenDict.Add(uiType, screen);
+
+                    screen.ForceState(UIState.HIDE);
+                    break;
+
+                case UIManDialog dialogue:
+                    dialogue.Transform.SetParent(this.dialogRoot, false);
+                    dialogue.RectTransform.localScale = Vector3.one;
+
+                    if (!this.dialogDict.ContainsKey(uiType))
+                        this.dialogDict.Add(uiType, dialogue);
+
+                    dialogue.ForceState(UIState.HIDE);
+                    break;
+
+                default:
+                    Destroy(obj);
+                    Debug.LogError($"{obj} does not contain any component derived from either UIManScreen or UIManDialogue.");
+                    break;
             }
-            else if (uiBase is UIManDialog)
-            {
-                uiBase.Transform.SetParent(this.dialogRoot, false);
-                uiBase.RectTransform.localScale = Vector3.one;
-                if (!this.dialogDict.ContainsKey(uiType))
-                    this.dialogDict.Add(uiType, uiBase as UIManDialog);
-            }
-            uiBase.ForceState(UIState.HIDE);
         }
 
         #endregion Utils

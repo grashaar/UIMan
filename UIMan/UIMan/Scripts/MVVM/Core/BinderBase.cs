@@ -12,7 +12,7 @@ namespace UnuGames.MVVM
     [ExecuteInEditMode]
     public abstract class BinderBase : MonoBehaviour
     {
-        protected bool isInit = false;
+        protected bool isInitialize = false;
 
         private Type type;
 
@@ -101,7 +101,7 @@ namespace UnuGames.MVVM
         /// <summary>
         /// All binder must implement this method to initialize the binder's instance.
         /// </summary>
-        public abstract void Init(bool forceInit = false);
+        public abstract void Initialize(bool forceInit = false);
 
         /// <summary>
         /// All binder must implement this method to unsubsribe onchanged event when object is disable
@@ -124,10 +124,10 @@ namespace UnuGames.MVVM
         /// </summary>
         /// <param name="_field"></param>
         /// <param name="onChanged"></param>
-        protected void UnSubscribeOnChangedEvent(BindingField _field, Action<object> onChanged)
+        protected void UnsubscribeOnChangedEvent(BindingField _field, Action<object> onChanged)
         {
             _field.UpdateAction -= onChanged;
-            UnRegisterViewModel(_field.member, onChanged);
+            UnregisterViewModel(_field.member, onChanged);
         }
 
         /// <summary>
@@ -154,11 +154,11 @@ namespace UnuGames.MVVM
         /// Un register the view model.
         /// </summary>
         /// <param name="propertyName">Property name.</param>
-        private void UnRegisterViewModel(string propertyName, Action<object> updateAction)
+        private void UnregisterViewModel(string propertyName, Action<object> updateAction)
         {
             if (this.dataContext != null && !string.IsNullOrEmpty(propertyName) && this.dataContext.viewModel != null)
             {
-                this.dataContext.viewModel.UnSubscribeAction(propertyName, updateAction);
+                this.dataContext.viewModel.UnsubscribeAction(propertyName, updateAction);
             }
         }
 
@@ -194,13 +194,13 @@ namespace UnuGames.MVVM
             return this.fields;
         }
 
-        protected bool CheckInit(bool forceInit)
+        protected bool CheckInitialize(bool forceInitialize)
         {
             if (!Application.isPlaying)
                 return false;
-            if (this.isInit)
-                return forceInit;
-            this.isInit = true;
+            if (this.isInitialize)
+                return forceInitialize;
+            this.isInitialize = true;
             return true;
         }
 

@@ -5,7 +5,7 @@ namespace UnuGames
 {
     public class UIManDefine
     {
-        static public Vector3[] ARR_HIDE_TARGET_POS = new Vector3[6] {
+        public static Vector3[] ARR_HIDE_TARGET_POS = new Vector3[6] {
             Vector3.zero, //Center
             new Vector3 (2000, 2000, 0), //Hidden pos
             new Vector3 (-2000, 0, 0), //Left
@@ -14,7 +14,7 @@ namespace UnuGames
             new Vector3 (0, -1000, 0) //Bottom
         };
 
-        static public Vector3[] ARR_SHOW_TARGET_POS = new Vector3[6] {
+        public static Vector3[] ARR_SHOW_TARGET_POS = new Vector3[6] {
             Vector3.zero, //Center
             new Vector3 (2000, 2000, 0), //Hidden pos
             new Vector3 (2000, 0, 0), //Right

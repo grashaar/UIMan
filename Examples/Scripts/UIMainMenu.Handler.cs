@@ -56,7 +56,13 @@ public partial class UIMainMenu : UIManScreen
 
     public void Ranking()
     {
-        UIMan.Loading.Show(FakeLoadRanking(), true, true, false, true, "Fetching data from server... please wait!");
+        UIMan.Instance.Loading(OnShowLoading);
+    }
+
+    private void OnShowLoading(UIActivity loading)
+    {
+        if (loading)
+            loading.Show(FakeLoadRanking(), true, true, false, true, "Fetching data from server... please wait!");
     }
 
     private IEnumerator FakeLoadRanking()

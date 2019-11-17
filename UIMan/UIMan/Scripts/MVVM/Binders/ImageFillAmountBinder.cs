@@ -14,14 +14,14 @@ namespace UnuGames.MVVM
 
         private readonly float timeChangeValue = 0.75f;
 
-        public override void Init(bool forceInit)
+        public override void Initialize(bool forceInit)
         {
-            if (CheckInit(forceInit))
-            {
-                this.image = GetComponent<Image>();
+            if (!CheckInitialize(forceInit))
+                return;
 
-                SubscribeOnChangedEvent(this.value, OnUpdateValue);
-            }
+            this.image = GetComponent<Image>();
+
+            SubscribeOnChangedEvent(this.value, OnUpdateValue);
         }
 
         public void OnUpdateValue(object val)

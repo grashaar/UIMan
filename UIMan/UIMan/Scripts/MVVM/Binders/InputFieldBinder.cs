@@ -12,14 +12,14 @@ namespace UnuGames.MVVM
         [HideInInspector]
         public BindingField textValue = new BindingField("Text");
 
-        public override void Init(bool forceInit)
+        public override void Initialize(bool forceInit)
         {
-            if (CheckInit(forceInit))
-            {
-                this.input = GetComponent<InputField>();
+            if (!CheckInitialize(forceInit))
+                return;
 
-                SubscribeOnChangedEvent(this.textValue, OnUpdateText);
-            }
+            this.input = GetComponent<InputField>();
+
+            SubscribeOnChangedEvent(this.textValue, OnUpdateText);
         }
 
         public void OnUpdateText(object newText)

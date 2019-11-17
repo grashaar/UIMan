@@ -17,15 +17,15 @@ namespace UnuGames.MVVM
 
         public string format;
 
-        public override void Init(bool forceInit)
+        public override void Initialize(bool forceInit)
         {
-            if (CheckInit(forceInit))
-            {
-                this.text = GetComponent<Text>();
+            if (!CheckInitialize(forceInit))
+                return;
 
-                SubscribeOnChangedEvent(this.textValue, OnUpdateText);
-                SubscribeOnChangedEvent(this.textColor, OnUpdateColor);
-            }
+            this.text = GetComponent<Text>();
+
+            SubscribeOnChangedEvent(this.textValue, OnUpdateText);
+            SubscribeOnChangedEvent(this.textColor, OnUpdateColor);
         }
 
         public void OnUpdateText(object newText)

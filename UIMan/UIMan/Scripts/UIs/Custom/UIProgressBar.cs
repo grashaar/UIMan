@@ -10,7 +10,7 @@ public class UIProgressBar : MonoBehaviour
     private Image foreGroundImg;
 
     [SerializeField]
-    private float maxWidth;
+    private float maxWidth = 0;
 
     [SerializeField]
     [Range(0, 1)]

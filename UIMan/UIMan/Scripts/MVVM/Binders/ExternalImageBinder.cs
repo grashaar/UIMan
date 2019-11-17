@@ -17,22 +17,23 @@ namespace UnuGames.MVVM
 
         public string resourcePath = "/Images/";
 
-        public override void Init(bool forceInit)
+        public override void Initialize(bool forceInit)
         {
-            if (CheckInit(forceInit))
-            {
-                this.image = GetComponent<Image>();
+            if (!CheckInitialize(forceInit))
+                return;
 
-                SubscribeOnChangedEvent(this.imageValue, OnUpdateImage);
-                SubscribeOnChangedEvent(this.imageColor, OnUpdateColor);
-            }
+            this.image = GetComponent<Image>();
+
+            SubscribeOnChangedEvent(this.imageValue, OnUpdateImage);
+            SubscribeOnChangedEvent(this.imageColor, OnUpdateColor);
         }
 
         public void OnUpdateImage(object newImage)
         {
             if (newImage == null)
                 return;
-            ImageFactory.Instance.LoadSprite("file:///" + Application.persistentDataPath + this.resourcePath + newImage.ToString(), OnLoadComplete);
+
+            ExternalImageLoader.Instance.Load("file:///" + Application.persistentDataPath + this.resourcePath + newImage.ToString(), OnLoadComplete);
         }
 
         private void OnLoadComplete(Sprite sprite)

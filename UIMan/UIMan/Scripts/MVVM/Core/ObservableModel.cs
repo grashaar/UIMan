@@ -13,7 +13,7 @@ namespace UnuGames.MVVM
         /// <summary>
         /// Initializes a new instance of the <see cref="UnuGames.ObservableModel"/> class.
         /// </summary>
-        static public T New<T>() where T : ObservableModel
+        public static T New<T>() where T : ObservableModel
         {
             return (T)new ObservableModel();
         }
@@ -22,7 +22,7 @@ namespace UnuGames.MVVM
         /// Initializes a new instance of the <see cref="UnuGames.ObservableModel"/> class.
         /// </summary>
         /// <param name="instance">Instance.</param>
-        static public T New<T>(T instance) where T : ObservableModel, new()
+        public static T New<T>(T instance) where T : ObservableModel, new()
         {
             var other = new T();
 
@@ -110,7 +110,7 @@ namespace UnuGames.MVVM
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="updateAction"></param>
-        public void UnSubscribeAction(string propertyName, Action<object> updateAction)
+        public void UnsubscribeAction(string propertyName, Action<object> updateAction)
         {
             var propertyKey = "set_" + propertyName;
             if (this.actions.ContainsKey(propertyKey))

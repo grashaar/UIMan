@@ -4,11 +4,15 @@
     {
         public static class UIMan
         {
-            public static readonly string OnBack = "OnBack";
-            public static readonly string OnShowUI = "OnShowDialog";
-            public static readonly string OnShowUIComplete = "OnShowUIComplete";
-            public static readonly string OnHideUI = "OnHideDialog";
-            public static readonly string OnHideUIComplete = "OnHideUIComplete";
+            public static string OnBack { get; }  = "OnBack";
+
+            public static string OnShowUI { get; } = "OnShowDialog";
+
+            public static string OnShowUIComplete { get; } = "OnShowUIComplete";
+
+            public static string OnHideUI { get; } = "OnHideDialog";
+
+            public static string OnHideUIComplete { get; } = "OnHideUIComplete";
         }
     }
 }

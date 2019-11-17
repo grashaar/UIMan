@@ -45,7 +45,7 @@ namespace UnuGames
                 var screen = (UIManScreen)uiManBase;
                 screen.useBackground = EditorGUILayout.Toggle(this.background, screen.useBackground);
                 if (screen.useBackground)
-                    screen.backgroundType = EditorGUILayout.TextField(screen.backgroundType);
+                    screen.background = EditorGUILayout.TextField(screen.background);
                 EditorUtility.SetDirty(this.target);
             }
 

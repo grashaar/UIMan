@@ -36,7 +36,7 @@ namespace UnuGames
             return "";
         }
 
-        static public string GenerateScript(string modelName, string baseType, params CustomPropertyInfo[] properties)
+        public static string GenerateScript(string modelName, string baseType, params CustomPropertyInfo[] properties)
         {
             var code = "";
 
@@ -57,7 +57,7 @@ namespace UnuGames
             return code;
         }
 
-        static public string GenerateViewModelHandler(string modelName, string viewModelType)
+        public static string GenerateViewModelHandler(string modelName, string viewModelType)
         {
             var code = "";
             TextAsset text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(VIEW_MODEL_HANDLER_PATH));
@@ -75,7 +75,7 @@ namespace UnuGames
             return code;
         }
 
-        static public string AddProperty(Type type, params CustomPropertyInfo[] properties)
+        public static string AddProperty(Type type, params CustomPropertyInfo[] properties)
         {
             var code = GetScriptByType(type);
 
@@ -114,7 +114,7 @@ namespace UnuGames
             return sb1.ToString();
         }
 
-        static public string AddCodeBlock(string code, string oldBlock, string newBlock, string region)
+        public static string AddCodeBlock(string code, string oldBlock, string newBlock, string region)
         {
             var sb = new StringBuilder();
 
@@ -162,7 +162,7 @@ namespace UnuGames
             return sb.ToString();
         }
 
-        static public string GetScriptByType(Type type)
+        public static string GetScriptByType(Type type)
         {
             var scriptPath = GetScriptPathByType(type);
             TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(scriptPath);
@@ -174,7 +174,7 @@ namespace UnuGames
             return string.Empty;
         }
 
-        static public string GetScriptPathByType(Type type)
+        public static string GetScriptPathByType(Type type)
         {
             var typeName = type.Name;
             var assets = AssetDatabase.FindAssets(typeName);
@@ -219,7 +219,7 @@ namespace UnuGames
             return string.Empty;
         }
 
-        static public string GenerateNamespaceBlock(params CustomPropertyInfo[] properties)
+        public static string GenerateNamespaceBlock(params CustomPropertyInfo[] properties)
         {
             if (properties == null)
                 return string.Empty;
@@ -246,7 +246,7 @@ namespace UnuGames
             return sb.ToString();
         }
 
-        static public string GeneratePropertiesBlock(params CustomPropertyInfo[] properties)
+        public static string GeneratePropertiesBlock(params CustomPropertyInfo[] properties)
         {
             if (properties == null)
                 return string.Empty;
@@ -262,7 +262,7 @@ namespace UnuGames
             return sb.ToString();
         }
 
-        static public string GetCodeRegion(string code, string region)
+        public static string GetCodeRegion(string code, string region)
         {
             var propertiesCode = "";
             var propertiesRegionIndex = code.IndexOf(region, StringComparison.OrdinalIgnoreCase);
@@ -280,14 +280,14 @@ namespace UnuGames
             return propertiesCode;
         }
 
-        static public string NormalizeFieldName(string name)
+        public static string NormalizeFieldName(string name)
         {
             if (name.Length > 1)
                 return name[0].ToString().ToLower() + name.Substring(1, name.Length - 1);
             return name.ToLower();
         }
 
-        static public string NormalizePropertyName(string name)
+        public static string NormalizePropertyName(string name)
         {
             if (name.Length > 1)
                 return name[0].ToString().ToUpper() + name.Substring(1, name.Length - 1);
@@ -297,7 +297,7 @@ namespace UnuGames
         private static string NewLine()
             => "\n";
 
-        static public string GeneratPathWithSubfix(string path, string subfix)
+        public static string GeneratPathWithSubfix(string path, string subfix)
         {
             if (!string.IsNullOrEmpty(subfix))
             {
@@ -307,7 +307,7 @@ namespace UnuGames
             return path;
         }
 
-        static public string DeleteScript(string path)
+        public static string DeleteScript(string path)
         {
             var code = "";
 
@@ -337,7 +337,7 @@ namespace UnuGames
         /// <param name="overwrite">If set to <c>true</c> overwrite.</param>
         /// <param name="currentBaseType">Current base type.</param>
         /// <param name="newBaseType">New base type.</param>
-        static public bool SaveScript(string path, string code, bool overwrite, string currentBaseType = "", string newBaseType = "")
+        public static bool SaveScript(string path, string code, bool overwrite, string currentBaseType = "", string newBaseType = "")
         {
             try
             {
