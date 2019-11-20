@@ -2,15 +2,19 @@ using System;
 using System.ComponentModel;
 using UnityEngine;
 
+#if !UNITY_EDITOR
+using System.Collections.Generic;
+#endif
+
 namespace UnuGames
 {
     public class Utils
     {
-        public static T ParseEnum<T>(string value)
+        public static T ParseEnum<T>(string value) where T : Enum
         {
             try
             {
-                return (T)System.Enum.Parse(typeof(T), value, true);
+                return (T)Enum.Parse(typeof(T), value, true);
             }
             catch
             {
@@ -22,7 +26,7 @@ namespace UnuGames
     public static class EnumExtensions
     {
 #if !UNITY_EDITOR
-		static Dictionary<Enum, string> caches = new Dictionary<Enum, string> ();
+		private readonly static Dictionary<Enum, string> caches = new Dictionary<Enum, string>();
 #endif
 
         // This extension method is broken out so you can use a similar pattern with
@@ -41,9 +45,11 @@ namespace UnuGames
         {
 #if !UNITY_EDITOR
 			string name = null;
-			if (!caches.TryGetValue (value, out name)) {
-				var attribute = value.GetAttribute<DescriptionAttribute> ();
-				name = (attribute == null ? value.ToString () : attribute.Description);
+
+			if (!caches.TryGetValue(value, out name))
+            {
+				var attribute = value.GetAttribute<DescriptionAttribute>();
+				name = (attribute == null ? value.ToString() : attribute.Description);
 				caches.Add(value, name);
 			}
 
