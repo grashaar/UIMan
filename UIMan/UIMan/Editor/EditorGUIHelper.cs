@@ -405,6 +405,27 @@ namespace UnuGames
         }
     }
 
+    public class TextFieldHelper
+    {
+        public string Text { get; set; }
+
+        public string Draw(GUIContent label)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(label, GUILayout.Width(100));
+            this.Text = EditorGUILayout.TextField(this.Text);
+
+            GUILayout.EndHorizontal();
+
+            return this.Text;
+        }
+
+        public TextFieldHelper(string text)
+        {
+            this.Text = text;
+        }
+    }
+
     public class PathBrowser
     {
         public string SelectedPath { get; set; }
@@ -413,7 +434,7 @@ namespace UnuGames
         public string Draw(GUIContent label)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(label, GUILayout.Width(80));
+            GUILayout.Label(label, GUILayout.Width(100));
             this.SelectedPath = EditorGUILayout.TextField(this.SelectedPath);
             if (GUILayout.Button("Browse", GUILayout.Height(15)))
             {

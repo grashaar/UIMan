@@ -5,11 +5,13 @@ using UnuGames;
 [CustomEditor(typeof(UIManConfig))]
 public class UIManConfigEditor : Editor
 {
+    private readonly GUIContent namespaceGUI = new GUIContent("Namespace: ", "The default namespace for generated classes is UnuGames");
     private readonly GUIContent screenGUI = new GUIContent("Screen: ", "The default path for the system find and load screen's prefab");
     private readonly GUIContent dialogGUI = new GUIContent("Dialog: ", "The default path for the system find and load dialog's prefab");
     private readonly GUIContent bgGUI = new GUIContent("Background: ", "The default path for the system find and load background image");
     private readonly GUIContent animRootGUI = new GUIContent("Animation: ", "The default path for the system to generate animator and animations into that");
 
+    private TextFieldHelper namespaceField;
     private PathBrowser screenPath;
     private PathBrowser dialogPath;
     private PathBrowser bgPath;
@@ -19,8 +21,9 @@ public class UIManConfigEditor : Editor
     {
         var config = this.target as UIManConfig;
 
-        if (this.screenPath == null || this.dialogPath == null || this.bgPath == null)
+        if (this.namespaceField == null || this.screenPath == null || this.dialogPath == null || this.bgPath == null)
         {
+            this.namespaceField = new TextFieldHelper(config.classNamespace);
             this.screenPath = new PathBrowser(config.screenPrefabFolder, Application.dataPath);
             this.dialogPath = new PathBrowser(config.dialogPrefabFolder, Application.dataPath);
             this.bgPath = new PathBrowser(config.backgroundRootFolder, Application.dataPath);
@@ -32,6 +35,7 @@ public class UIManConfigEditor : Editor
         EditorGUILayout.Space();
 
         GUILayout.BeginVertical("Box");
+        config.classNamespace = this.namespaceField.Draw(this.namespaceGUI);
         config.screenPrefabFolder = this.screenPath.Draw(this.screenGUI);
         config.dialogPrefabFolder = this.dialogPath.Draw(this.dialogGUI);
         config.backgroundRootFolder = this.bgPath.Draw(this.bgGUI);

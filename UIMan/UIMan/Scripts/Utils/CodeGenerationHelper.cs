@@ -16,6 +16,7 @@ namespace UnuGames
         #region TAGS and REGIONS
 
         private const string NAME_SPACES_TAG = "<#NAME_SPACES#>";
+        private const string NAME_SPACE_TAG = "<#NAME_SPACE#>";
         private const string NAME_TAG = "<#CNAME#>";
         private const string TYPE_TAG = "<#CTYPE#>";
         private const string PROPERTIES_TAG = "<#PROPERTIES#>";
@@ -28,6 +29,8 @@ namespace UnuGames
         private const string TYPE_PATH = "TypeTemplate";
         private const string VIEW_MODEL_HANDLER_PATH = "ViewModelHandlerTemplate";
 
+        private const string DEFAULT_NAMESPACE = "UnuGames";
+
         private static string Getpath(string fileName)
         {
             var assets = AssetDatabase.FindAssets(fileName);
@@ -39,11 +42,12 @@ namespace UnuGames
         public static string GenerateScript(string modelName, string baseType, params CustomPropertyInfo[] properties)
         {
             var code = "";
+            var text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(TYPE_PATH));
 
-            TextAsset text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(TYPE_PATH));
             if (text != null)
             {
                 code = text.text;
+                code = Regex.Replace(code, NAME_SPACE_TAG, GetNamespace());
                 code = Regex.Replace(code, NAME_TAG, modelName);
                 code = Regex.Replace(code, TYPE_TAG, baseType);
                 code = Regex.Replace(code, PROPERTIES_TAG, GeneratePropertiesBlock(properties));
@@ -60,10 +64,12 @@ namespace UnuGames
         public static string GenerateViewModelHandler(string modelName, string viewModelType)
         {
             var code = "";
-            TextAsset text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(VIEW_MODEL_HANDLER_PATH));
+            var text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(VIEW_MODEL_HANDLER_PATH));
+
             if (text != null)
             {
                 code = text.text;
+                code = Regex.Replace(code, NAME_SPACE_TAG, GetNamespace());
                 code = Regex.Replace(code, NAME_TAG, modelName);
                 code = Regex.Replace(code, TYPE_TAG, viewModelType);
             }
@@ -73,6 +79,17 @@ namespace UnuGames
             }
 
             return code;
+        }
+
+        public static string GetNamespace()
+        {
+            var config = Resources.Load<UIManConfig>("UIManConfig");
+            var result = DEFAULT_NAMESPACE;
+
+            if (config && !string.IsNullOrEmpty(config.classNamespace))
+                result = config.classNamespace;
+
+            return result;
         }
 
         public static string AddProperty(Type type, params CustomPropertyInfo[] properties)
@@ -236,11 +253,16 @@ namespace UnuGames
             }
 
             var sb = new StringBuilder();
+            var last = namespaces.Count - 1;
 
-            foreach (var ns in namespaces)
+            for (var i = 0; i < namespaces.Count; i++)
             {
+                var ns = namespaces[i];
+
                 sb.Append($"using {ns};");
-                sb.Append(NewLine());
+
+                if (i < last)
+                    sb.Append(NewLine());
             }
 
             return sb.ToString();
@@ -252,11 +274,19 @@ namespace UnuGames
                 return string.Empty;
 
             var sb = new StringBuilder();
+            var last = properties.Length - 1;
 
-            foreach (CustomPropertyInfo cpi in properties)
+            for (var i = 0; i < properties.Length; i++)
             {
+                var cpi = properties[i];
+
                 sb.Append(cpi.ToString());
-                sb.Append(NewLine());
+
+                if (i < last)
+                {
+                    sb.Append(NewLine());
+                    sb.Append(NewLine());
+                }
             }
 
             return sb.ToString();
@@ -480,16 +510,16 @@ namespace UnuGames
             string field;
 
             if (this.PropertyType.IsAllias())
-                field     = $"    private {this.PropertyType.GetAllias()} m_{fieldName} = {strDefaultValue};";
+                field     = $"        private {this.PropertyType.GetAllias()} m_{fieldName} = {strDefaultValue};";
             else
-                field     = $"    private {this.PropertyType.GetAllias()} m_{fieldName};";
+                field     = $"        private {this.PropertyType.GetAllias()} m_{fieldName};";
 
-            var attribute =  "    [UIManProperty]";
-            var property  = $"    public {this.PropertyType.GetAllias()} {propertyName}";
-            //                    {
-            var getter    = $"        get {{ return this.m_{fieldName}; }}";
-            var setter    = $"        set {{ this.m_{fieldName} = value; OnPropertyChanged(); }}";
-            //                    }
+            var attribute =  "        [UIManProperty]";
+            var property  = $"        public {this.PropertyType.GetAllias()} {propertyName}";
+            //                        {
+            var getter    = $"            get {{ return this.m_{fieldName}; }}";
+            var setter    = $"            set {{ this.m_{fieldName} = value; OnPropertyChanged(); }}";
+            //                        }
 
             var sb = new StringBuilder();
             sb.Append(field);
@@ -499,13 +529,13 @@ namespace UnuGames
             sb.Append(NewLine());
             sb.Append(property);
             sb.Append(NewLine());
-            sb.Append("    {");
+            sb.Append("        {");
             sb.Append(NewLine());
             sb.Append(getter);
             sb.Append(NewLine());
             sb.Append(setter);
             sb.Append(NewLine());
-            sb.Append("    }");
+            sb.Append("        }");
 
             return sb.ToString();
         }

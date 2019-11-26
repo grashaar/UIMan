@@ -4,6 +4,7 @@ namespace UnuGames
 {
     public class UIManConfig : ScriptableObject
     {
+        public string classNamespace;
         public string dialogPrefabFolder;
         public string screenPrefabFolder;
         public string backgroundRootFolder;
