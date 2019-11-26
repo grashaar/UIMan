@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 010af554679ddb14ca8f5288595dcdde, type: 3}
   m_Name: UIManConfig
   m_EditorClassIdentifier: 
-  dialogPrefabFolder: UIMan/Examples/Resources/Dialogs/
-  screenPrefabFolder: UIMan/Examples/Resources/Screens/
-  backgroundRootFolder: UIMan/Examples/Resources/Backgrounds/
+  dialogPrefabFolder: UIMan/Examples/Addressables/Dialogs/
+  screenPrefabFolder: UIMan/Examples/Addressables/Screens/
+  backgroundRootFolder: UIMan/Examples/Addressables/Backgrounds/
   animRootFolder: UIMan/Examples/Animations/
   modelScriptFolder: /UIMan/Examples/Scripts
   dialogScriptFolder: /UIMan/Examples/Scripts
