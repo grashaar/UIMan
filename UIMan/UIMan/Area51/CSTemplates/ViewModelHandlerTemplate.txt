@@ -14,24 +14,24 @@ namespace <#NAME_SPACE#>
 
 #region Built-in Events
 
-        public override void OnShow (params object[] args)
+        public override void OnShow(params object[] args)
         {
-            base.OnShow (args);
+            base.OnShow(args);
         }
 
-        public override void OnShowComplete ()
+        public override void OnShowComplete()
         {
-            base.OnShowComplete ();
+            base.OnShowComplete();
         }
 
-        public override void OnHide ()
+        public override void OnHide()
         {
-            base.OnHide ();
+            base.OnHide();
         }
 
-        public override void OnHideComplete ()
+        public override void OnHideComplete()
         {
-            base.OnHideComplete ();
+            base.OnHideComplete();
         }
 
 #endregion
@@ -45,19 +45,19 @@ namespace <#NAME_SPACE#>
 #region Override animations
 
         /* Uncommend this for override show/hide animation of Screen/Dialog use tweening code
-        public override IEnumerator AnimationShow ()
+        public override IEnumerator AnimationShow()
         {
-            return base.AnimationShow ();
+            return base.AnimationShow();
         }
 
-        public override IEnumerator AnimationHide ()
+        public override IEnumerator AnimationHide()
         {
-            return base.AnimationHide ();
+            return base.AnimationHide();
         }
 
-        public override IEnumerator AnimationIdle ()
+        public override IEnumerator AnimationIdle()
         {
-            return base.AnimationHide ();
+            return base.AnimationHide();
         }
         */
 
