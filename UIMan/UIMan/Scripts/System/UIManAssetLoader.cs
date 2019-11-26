@@ -8,7 +8,7 @@ namespace UnuGames
     using Result = UnityEngine.Object;
     using Callback = Action<string, UnityEngine.Object>;
 
-    public static class AssetLoader
+    public static class UIManAssetLoader
     {
         private readonly static Dictionary<string, Request> _requests = new Dictionary<string, Request>();
 

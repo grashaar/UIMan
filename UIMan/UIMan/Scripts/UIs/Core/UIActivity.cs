@@ -111,7 +111,7 @@ namespace UnuGames
         public void ShowImage(string spritePath)
         {
             this.backgroundImage.enabled = true;
-            StartCoroutine(AssetLoader.Load<Sprite>(spritePath, OnLoadedImage));
+            StartCoroutine(UIManAssetLoader.Load<Sprite>(spritePath, OnLoadedImage));
         }
 
         public void HideImage()

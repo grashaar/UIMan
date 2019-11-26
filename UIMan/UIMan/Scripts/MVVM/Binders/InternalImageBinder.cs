@@ -54,7 +54,7 @@ namespace UnuGames.MVVM
             else
             {
                 this.image.color = Color.white;
-                StartCoroutine(AssetLoader.Load<Sprite>(key, OnLoadedImage));
+                StartCoroutine(UIManAssetLoader.Load<Sprite>(key, OnLoadedImage));
             }
         }
 
