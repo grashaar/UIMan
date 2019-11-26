@@ -27,35 +27,42 @@ namespace UnuGames
 
         internal static IEnumerator Load<T>(string key, Callback callback = null) where T : Result
         {
-            var exist = _requests.ContainsKey(key) && _requests[key] != null;
-
-            if (!exist)
+            if (!string.IsNullOrEmpty(key))
             {
-                _requests[key] = new Request(key);
+                var exist = _requests.ContainsKey(key) && _requests[key] != null;
+
+                if (!exist)
+                {
+                    _requests[key] = new Request(key);
+                }
+
+                _requests[key].Handle(callback);
+
+                if (!exist)
+                {
+                    var type = typeof(T);
+
+                    if (type == typeof(GameObject))
+                    {
+                        yield return _loadMethodGameObject(key, Handle);
+                    }
+                    else if (type == typeof(Sprite))
+                    {
+                        yield return _loadMethodSprite(key, Handle);
+                    }
+                    else if (type == typeof(Texture2D))
+                    {
+                        yield return _loadMethodTexture2D(key, Handle);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Type {type} is not supported.");
+                    }
+                }
             }
-
-            _requests[key].Handle(callback);
-
-            if (!exist)
+            else
             {
-                var type = typeof(T);
-
-                if (type == typeof(GameObject))
-                {
-                    yield return _loadMethodGameObject(key, Handle);
-                }
-                else if (type == typeof(Sprite))
-                {
-                    yield return _loadMethodSprite(key, Handle);
-                }
-                else if (type == typeof(Texture2D))
-                {
-                    yield return _loadMethodTexture2D(key, Handle);
-                }
-                else
-                {
-                    Debug.LogError($"Type {type} is not supported.");
-                }
+                Debug.LogWarning("Key is null or empty.");
             }
         }
 

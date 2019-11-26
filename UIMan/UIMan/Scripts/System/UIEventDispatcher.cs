@@ -8,7 +8,7 @@ namespace UnuGames
         // Static Properties
         //
 
-        public static UIEventController Controller { get; set; }
+        public static UIEventController Controller { get; set; } = new UIEventController();
 
         //
         // Static Methods
