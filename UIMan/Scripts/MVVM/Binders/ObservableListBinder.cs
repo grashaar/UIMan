@@ -164,7 +164,7 @@ namespace UnuGames.MVVM
 
         private void ReleaseModule(IModule module)
         {
-            module.VM.transform.position = _hidePosition;
+            module.ViewModel.transform.position = _hidePosition;
             this.modulesPool.Enqueue(module);
         }
 
@@ -217,7 +217,7 @@ namespace UnuGames.MVVM
                         IModule module = GetModuleFromPool();
                         if (module != null)
                         {
-                            module.VM.RectTransform.anchoredPosition = GetPositionByCell(cell);
+                            module.ViewModel.RectTransform.anchoredPosition = GetPositionByCell(cell);
                             if (this.activeCells.ContainsKey(cell))
                                 this.activeCells[cell] = module;
                             else
@@ -383,8 +383,8 @@ namespace UnuGames.MVVM
             Cell cell = GetCellByIndex(this.orgDataList.Count - 1);
             if (this.activeCells.ContainsKey(cell))
             {
-                ReleaseModule((IModule)this.activeCells[cell].VM);
-                this.activeCells[cell].VM.RectTransform.anchoredPosition = _hidePosition;
+                ReleaseModule((IModule)this.activeCells[cell].ViewModel);
+                this.activeCells[cell].ViewModel.RectTransform.anchoredPosition = _hidePosition;
             }
             this.listModules.RemoveAt(index);
             this.dataDict.Remove(cell);
@@ -406,7 +406,7 @@ namespace UnuGames.MVVM
                 {
                     this.listModules.Add(module);
                     module.OriginalData = obj;
-                    module.VM.RectTransform.anchoredPosition = GetPositionByCell(cell);
+                    module.ViewModel.RectTransform.anchoredPosition = GetPositionByCell(cell);
                     if (this.activeCells.ContainsKey(cell))
                         this.activeCells[cell] = module;
                     else
@@ -447,7 +447,7 @@ namespace UnuGames.MVVM
         public ViewModelBehaviour GetItem(Cell cell)
         {
             if (this.activeCells.ContainsKey(cell))
-                return this.activeCells[cell].VM;
+                return this.activeCells[cell].ViewModel;
             return null;
         }
     }

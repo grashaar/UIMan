@@ -6,7 +6,7 @@ namespace UnuGames.MVVM
     public class BinderTemplate : BinderBase
     {
         [HideInInspector]
-        public BindingField yourValue = new BindingField("Text");
+        public BindingField value = new BindingField("Text");
 
         //Define any field for binding as you want, just copy above fied
 
@@ -17,7 +17,7 @@ namespace UnuGames.MVVM
 
             // Get view's components here
 
-            SubscribeOnChangedEvent(this.yourValue, OnUpdateValue);
+            SubscribeOnChangedEvent(this.value, OnUpdateValue);
         }
 
         public void OnUpdateValue(object newValue)

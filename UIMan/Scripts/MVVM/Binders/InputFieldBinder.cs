@@ -10,7 +10,7 @@ namespace UnuGames.MVVM
         protected InputField input;
 
         [HideInInspector]
-        public BindingField textValue = new BindingField("Text");
+        public BindingField value = new BindingField("Text");
 
         public override void Initialize(bool forceInit)
         {
@@ -19,7 +19,7 @@ namespace UnuGames.MVVM
 
             this.input = GetComponent<InputField>();
 
-            SubscribeOnChangedEvent(this.textValue, OnUpdateText);
+            SubscribeOnChangedEvent(this.value, OnUpdateText);
         }
 
         public void OnUpdateText(object newText)
@@ -41,7 +41,7 @@ namespace UnuGames.MVVM
                     this.oldText.Replace("\t", string.Empty);
                 }
                 this.input.text = this.oldText;
-                SetValue(this.textValue.member, this.oldText);
+                SetValue(this.value.member, this.oldText);
             }
         }
 

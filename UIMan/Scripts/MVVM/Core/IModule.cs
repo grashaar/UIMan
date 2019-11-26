@@ -8,6 +8,6 @@
             set;
         }
 
-        ViewModelBehaviour VM { get; }
+        ViewModelBehaviour ViewModel { get; }
     }
 }

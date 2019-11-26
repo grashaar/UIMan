@@ -10,10 +10,10 @@ namespace UnuGames.MVVM
         protected Text text;
 
         [HideInInspector]
-        public BindingField textValue = new BindingField("Text");
+        public BindingField value = new BindingField("Text");
 
         [HideInInspector]
-        public BindingField textColor = new BindingField("Color", true);
+        public BindingField color = new BindingField("Color", true);
 
         public string format;
 
@@ -24,8 +24,8 @@ namespace UnuGames.MVVM
 
             this.text = GetComponent<Text>();
 
-            SubscribeOnChangedEvent(this.textValue, OnUpdateText);
-            SubscribeOnChangedEvent(this.textColor, OnUpdateColor);
+            SubscribeOnChangedEvent(this.value, OnUpdateText);
+            SubscribeOnChangedEvent(this.color, OnUpdateColor);
         }
 
         public void OnUpdateText(object newText)

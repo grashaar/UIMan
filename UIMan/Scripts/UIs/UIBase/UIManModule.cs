@@ -32,7 +32,7 @@ namespace UnuGames
             }
         }
 
-        public ViewModelBehaviour VM
+        public ViewModelBehaviour ViewModel
         {
             get
             {

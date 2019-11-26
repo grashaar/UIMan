@@ -10,7 +10,7 @@ namespace UnuGames.MVVM
         protected Text text;
 
         [HideInInspector]
-        public BindingField textValue = new BindingField("Text");
+        public BindingField value = new BindingField("Text");
 
         public string format;
         public float timeChange = 0.25f;
@@ -21,7 +21,7 @@ namespace UnuGames.MVVM
                 return;
 
             this.text = GetComponent<Text>();
-            SubscribeOnChangedEvent(this.textValue, OnUpdateText);
+            SubscribeOnChangedEvent(this.value, OnUpdateText);
         }
 
         public void OnUpdateText(object newText)

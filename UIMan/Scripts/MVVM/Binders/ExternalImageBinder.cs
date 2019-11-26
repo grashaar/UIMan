@@ -10,10 +10,10 @@ namespace UnuGames.MVVM
         protected Image image;
 
         [HideInInspector]
-        public BindingField imageValue = new BindingField("Image");
+        public BindingField value = new BindingField("Image");
 
         [HideInInspector]
-        public BindingField imageColor = new BindingField("Color");
+        public BindingField color = new BindingField("Color");
 
         public string resourcePath = "/Images/";
 
@@ -24,8 +24,8 @@ namespace UnuGames.MVVM
 
             this.image = GetComponent<Image>();
 
-            SubscribeOnChangedEvent(this.imageValue, OnUpdateImage);
-            SubscribeOnChangedEvent(this.imageColor, OnUpdateColor);
+            SubscribeOnChangedEvent(this.value, OnUpdateImage);
+            SubscribeOnChangedEvent(this.color, OnUpdateColor);
         }
 
         public void OnUpdateImage(object newImage)
