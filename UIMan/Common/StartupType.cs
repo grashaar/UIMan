@@ -4,8 +4,8 @@ namespace UnuGames
 {
     public enum StartupType
     {
-        NORMAL,
-        PREFAB
+        Normal,
+        Prefab
     }
 
     public class StartupAttribute : Attribute
@@ -14,7 +14,7 @@ namespace UnuGames
         public Type ParentType { get; set; }
         public string PrefabURL { get; set; }
 
-        public StartupAttribute(StartupType type = StartupType.NORMAL)
+        public StartupAttribute(StartupType type = StartupType.Normal)
         {
             this.Type = type;
             this.ParentType = null;

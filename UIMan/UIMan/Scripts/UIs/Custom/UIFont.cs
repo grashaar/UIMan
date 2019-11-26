@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 
-public class UIFont : MonoBehaviour
+namespace UnuGames
 {
-    public Font font;
+    public class UIFont : MonoBehaviour
+    {
+        public Font font;
+    }
 }

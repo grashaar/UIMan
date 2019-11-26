@@ -32,8 +32,8 @@ namespace UnuGames
 
     public enum UITransitionType
     {
-        SHOW,
-        HIDE
+        Show,
+        Hide
     }
 
     public struct UIDialogQueueData

@@ -8,9 +8,9 @@ namespace UnuGames
     {
         private enum UITweenType
         {
-            VALUE,
-            MOVE,
-            ALPHA
+            Value,
+            Move,
+            Alpha
         }
 
         private UITweenType tweenType;
@@ -65,10 +65,10 @@ namespace UnuGames
                 this.t = 1;
             switch (this.tweenType)
             {
-                case UITweenType.VALUE:
-                case UITweenType.ALPHA:
+                case UITweenType.Value:
+                case UITweenType.Alpha:
                     this.currentValue = Mathf.Lerp(this.startValue, this.endValue, this.t);
-                    if (this.tweenType == UITweenType.ALPHA)
+                    if (this.tweenType == UITweenType.Alpha)
                     {
                         if (this.canvasGroup != null)
                             this.canvasGroup.alpha = this.currentValue;
@@ -79,7 +79,7 @@ namespace UnuGames
                     }
                     break;
 
-                case UITweenType.MOVE:
+                case UITweenType.Move:
                     this.transform.localPosition = Vector3.Lerp(this.originalPosition, this.targetPosition, this.t);
                     break;
             }
@@ -129,13 +129,13 @@ namespace UnuGames
 
             switch (tweenType)
             {
-                case UITweenType.VALUE:
-                case UITweenType.ALPHA:
+                case UITweenType.Value:
+                case UITweenType.Alpha:
                     tweener.startValue = (float)tweenArgs[0];
                     tweener.endValue = (float)tweenArgs[1];
                     break;
 
-                case UITweenType.MOVE:
+                case UITweenType.Move:
                     tweener.targetPosition = (Vector3)tweenArgs[0];
                     break;
             }
@@ -146,17 +146,17 @@ namespace UnuGames
 
         public static UITweener Move(GameObject target, float time, Vector3 position)
         {
-            return DoTween(target, UITweenType.MOVE, time, position);
+            return DoTween(target, UITweenType.Move, time, position);
         }
 
         public static UITweener Value(GameObject target, float time, float startValue, float endValue)
         {
-            return DoTween(target, UITweenType.VALUE, time, startValue, endValue);
+            return DoTween(target, UITweenType.Value, time, startValue, endValue);
         }
 
         public static UITweener Alpha(GameObject target, float time, float startAlpha, float endAlpha)
         {
-            return DoTween(target, UITweenType.ALPHA, time, startAlpha, endAlpha);
+            return DoTween(target, UITweenType.Alpha, time, startAlpha, endAlpha);
         }
     }
 }

@@ -57,15 +57,15 @@ namespace UnuGames
                 var smb = (UIAnimationState)newState.AddStateMachineBehaviour(typeof(UIAnimationState));
                 if (clipName == UIManDefine.ANIM_SHOW)
                 {
-                    smb.Init(UIAnimationType.SHOW, true, false);
+                    smb.Init(UIAnimationType.Show, true, false);
                 }
                 else if (clipName == UIManDefine.ANIM_HIDE)
                 {
-                    smb.Init(UIAnimationType.HIDE, true, true);
+                    smb.Init(UIAnimationType.Hide, true, true);
                 }
                 else if (clipName == UIManDefine.ANIM_IDLE)
                 {
-                    smb.Init(UIAnimationType.IDLE, true, false);
+                    smb.Init(UIAnimationType.Idle, true, false);
                 }
 
                 // Add trasition to controller

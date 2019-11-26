@@ -6,33 +6,33 @@
 
     public enum UIMotion
     {
-        NONE = 0,
-        HIDDEN = 1,
-        MOVE_RIGHT_TO_LEFT = 2,
-        MOVE_LEFT_TO_RIGHT = 3,
-        MOVE_BOTTOM_TO_TOP = 4,
-        MOVE_TOP_TO_BOTTOM = 5,
-        CUSTOM_SCRIPT_ANIMATION = 6,
-        CUSTOM_MECANIM_ANIMATION = 7
+        None = 0,
+        Hidden = 1,
+        MoveRightToLeft = 2,
+        MoveLeftToRight = 3,
+        MoveBottomToTop = 4,
+        MoveTopToBottom = 5,
+        CustomScriptAnimation = 6,
+        CustomMecanimAnimation = 7
     }
 
     public enum UIBaseType
     {
-        SCREEN,
-        DIALOG
+        Screen,
+        Dialog
     }
 
     public enum UIAnimationType
     {
-        SHOW,
-        HIDE,
-        IDLE
+        Show,
+        Hide,
+        Idle
     }
 
     public enum UIState
     {
-        SHOW,
-        HIDE,
-        BUSY
+        Show,
+        Hide,
+        Busy
     }
 }

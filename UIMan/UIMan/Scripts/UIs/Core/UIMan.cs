@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace UnuGames
 {
-    [Startup(StartupType.PREFAB)]
+    [Startup(StartupType.Prefab)]
     public class UIMan : SingletonBehaviour<UIMan>
     {
         // Constants
@@ -62,7 +62,7 @@ namespace UnuGames
                 {
                     Transform child = this.dialogRoot.GetChild(i);
                     UIManDialog curDlg = child.GetComponent<UIManDialog>();
-                    if (curDlg != null && curDlg.State == UIState.SHOW && child.GetSiblingIndex() > lastSibIndex)
+                    if (curDlg != null && curDlg.State == UIState.Show && child.GetSiblingIndex() > lastSibIndex)
                     {
                         lastTrans = child;
                         lastSibIndex = lastTrans.GetSiblingIndex();
@@ -177,7 +177,7 @@ namespace UnuGames
         /// <param name="args">Arguments.</param>
         private void ShowScreen(Type uiType, bool seal, params object[] args)
         {
-            if (this.CurrentScreen != null && this.CurrentScreen.State != UIState.BUSY && this.CurrentScreen.State != UIState.HIDE)
+            if (this.CurrentScreen != null && this.CurrentScreen.State != UIState.Busy && this.CurrentScreen.State != UIState.Hide)
                 this.CurrentScreen.HideMe();
 
             if (!this.screenDict.TryGetValue(uiType, out UIManScreen screen))
@@ -297,7 +297,7 @@ namespace UnuGames
         {
             if (this.IsInDialogTransition || this.IsLoadingDialog)
             {
-                EnqueueDialog(uiType, UITransitionType.SHOW, args, callbacks);
+                EnqueueDialog(uiType, UITransitionType.Show, args, callbacks);
                 return;
             }
 
@@ -390,12 +390,12 @@ namespace UnuGames
         {
             if (this.IsInDialogTransition)
             {
-                EnqueueDialog(uiType, UITransitionType.HIDE, null, null);
+                EnqueueDialog(uiType, UITransitionType.Hide, null, null);
                 return;
             }
             if (this.dialogDict.TryGetValue(uiType, out UIManDialog dialog))
             {
-                if (dialog.State == UIState.HIDE)
+                if (dialog.State == UIState.Hide)
                     return;
 
                 if (this.activeDialog.Count > 0)
@@ -479,7 +479,7 @@ namespace UnuGames
 
         private IEnumerator WaitForTransitionComplete(params object[] args)
         {
-            while (this.CurrentScreen != null && this.CurrentScreen.State != UIState.HIDE)
+            while (this.CurrentScreen != null && this.CurrentScreen.State != UIState.Hide)
             {
                 yield return null;
             }
@@ -701,12 +701,12 @@ namespace UnuGames
         {
             ui.LockInput();
 
-            if (ui.motionShow == UIMotion.CUSTOM_MECANIM_ANIMATION)
+            if (ui.motionShow == UIMotion.CustomMecanimAnimation)
             { //Custom animation use animator
                 ui.CanvasGroup.alpha = 1;
                 ui.animRoot.EnableAndPlay(UIManDefine.ANIM_SHOW);
             }
-            else if (ui.motionShow == UIMotion.CUSTOM_SCRIPT_ANIMATION)
+            else if (ui.motionShow == UIMotion.CustomScriptAnimation)
             { //Custom animation use overrided function
                 ui.animRoot.Disable();
                 StartCoroutine(DelayDequeueDialog(ui.AnimationShow(), ui, true));
@@ -719,14 +719,14 @@ namespace UnuGames
                 ui.RectTransform.localPosition = initPos;
                 ui.CanvasGroup.alpha = 0;
                 // Tween position
-                if (ui.motionShow != UIMotion.NONE)
+                if (ui.motionShow != UIMotion.None)
                 {
                     UITweener.Move(ui.gameObject, ui.animTime, ui.showPosition);
                 }
                 UITweener.Alpha(ui.gameObject, ui.animTime, 0f, 1f).SetOnComplete(() => {
                     ui.OnShowComplete();
                     OnShowUIComplete(ui);
-                    if (ui.GetUIBaseType() == UIBaseType.DIALOG)
+                    if (ui.GetUIBaseType() == UIBaseType.Dialog)
                     {
                         this.IsInDialogTransition = false;
                     }
@@ -743,11 +743,11 @@ namespace UnuGames
         private void DoAnimHide(UIManBase ui)
         {
             ui.LockInput();
-            if (ui.motionHide == UIMotion.CUSTOM_MECANIM_ANIMATION)
+            if (ui.motionHide == UIMotion.CustomMecanimAnimation)
             { //Custom animation use animator
                 ui.animRoot.EnableAndPlay(UIManDefine.ANIM_HIDE);
             }
-            else if (ui.motionHide == UIMotion.CUSTOM_SCRIPT_ANIMATION)
+            else if (ui.motionHide == UIMotion.CustomScriptAnimation)
             { //Custom animation use overrided function
                 ui.animRoot.Disable();
                 StartCoroutine(DelayDequeueDialog(ui.AnimationHide(), ui, false));
@@ -757,7 +757,7 @@ namespace UnuGames
                 ui.animRoot.Disable();
                 Vector3 hidePos = GetTargetPosition(ui.motionHide, UIManDefine.ARR_HIDE_TARGET_POS);
                 // Tween position
-                if (ui.motionHide != UIMotion.NONE)
+                if (ui.motionHide != UIMotion.None)
                 {
                     UITweener.Move(ui.gameObject, ui.animTime, hidePos);
                 }
@@ -765,7 +765,7 @@ namespace UnuGames
                     ui.RectTransform.anchoredPosition3D = hidePos;
                     ui.OnHideComplete();
                     OnHideUIComplete(ui);
-                    if (ui.GetUIBaseType() == UIBaseType.DIALOG)
+                    if (ui.GetUIBaseType() == UIBaseType.Dialog)
                     {
                         this.IsInDialogTransition = false;
                         DequeueDialog();
@@ -780,11 +780,11 @@ namespace UnuGames
         /// <param name="ui">User interface.</param>
         public void DoAnimIdle(UIManBase ui)
         {
-            if (ui.motionIdle == UIMotion.CUSTOM_MECANIM_ANIMATION)
+            if (ui.motionIdle == UIMotion.CustomMecanimAnimation)
             { //Custom animation use animator
                 ui.animRoot.EnableAndPlay(UIManDefine.ANIM_IDLE);
             }
-            else if (ui.motionHide == UIMotion.CUSTOM_SCRIPT_ANIMATION)
+            else if (ui.motionHide == UIMotion.CustomScriptAnimation)
             { //Custom animation use overrided function
                 ui.animRoot.Disable();
                 StartCoroutine(DelayDequeueDialog(ui.AnimationIdle(), ui, false));
@@ -792,7 +792,7 @@ namespace UnuGames
             else
             { // Simple tween
                 ui.animRoot.Disable();
-                if (ui.motionIdle != UIMotion.NONE && ui.motionIdle != UIMotion.HIDDEN)
+                if (ui.motionIdle != UIMotion.None && ui.motionIdle != UIMotion.Hidden)
                 {
                     UnuLogger.LogWarning("UIMan does not support simple tween animation for idle yet!");
                 }
@@ -836,7 +836,7 @@ namespace UnuGames
             this.IsInDialogTransition = false;
             ui.UnlockInput();
             ui.OnHideComplete();
-            if (ui.GetUIBaseType() == UIBaseType.DIALOG && !resetDialogTransitionStatus)
+            if (ui.GetUIBaseType() == UIBaseType.Dialog && !resetDialogTransitionStatus)
                 DequeueDialog();
         }
 
@@ -848,11 +848,11 @@ namespace UnuGames
             if (this.dialogQueue.Count > 0)
             {
                 UIDialogQueueData transition = this.dialogQueue.Dequeue();
-                if (transition.TransitionType == UITransitionType.SHOW)
+                if (transition.TransitionType == UITransitionType.Show)
                 {
                     ShowDialog(transition.UIType, transition.Callbacks, transition.Args);
                 }
-                else if (transition.TransitionType == UITransitionType.HIDE)
+                else if (transition.TransitionType == UITransitionType.Hide)
                 {
                     HideDialog(transition.UIType);
                 }
@@ -978,7 +978,7 @@ namespace UnuGames
                     if (!this.screenDict.ContainsKey(uiType))
                         this.screenDict.Add(uiType, screen);
 
-                    screen.ForceState(UIState.HIDE);
+                    screen.ForceState(UIState.Hide);
                     break;
 
                 case UIManDialog dialogue:
@@ -988,7 +988,7 @@ namespace UnuGames
                     if (!this.dialogDict.ContainsKey(uiType))
                         this.dialogDict.Add(uiType, dialogue);
 
-                    dialogue.ForceState(UIState.HIDE);
+                    dialogue.ForceState(UIState.Hide);
                     break;
 
                 default:

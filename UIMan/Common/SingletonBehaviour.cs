@@ -25,7 +25,7 @@ namespace UnuGames
                     if (_instance == null)
                     {
                         var attributes = typeof(T).GetCustomAttributes(typeof(StartupAttribute), true);
-                        StartupType type = StartupType.NORMAL;
+                        StartupType type = StartupType.Normal;
                         Type parent = null;
                         var prefabURL = "";
                         if (attributes != null && attributes.Length > 0)
@@ -36,7 +36,7 @@ namespace UnuGames
                             prefabURL = attribute.PrefabURL;
                         }
 
-                        if (type == StartupType.NORMAL)
+                        if (type == StartupType.Normal)
                         {
                             _instance = new GameObject(typeof(T).Name).AddComponent<T>();
                         }

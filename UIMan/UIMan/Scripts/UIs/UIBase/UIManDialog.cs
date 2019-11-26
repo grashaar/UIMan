@@ -17,7 +17,7 @@ namespace UnuGames
 
         public override UIBaseType GetUIBaseType()
         {
-            return UIBaseType.DIALOG;
+            return UIBaseType.Dialog;
         }
 
         public void SetCallbacks(UICallback callbacks)
@@ -29,13 +29,13 @@ namespace UnuGames
         {
             if (this.m_callbacks == null || index > this.m_callbacks.Callbacks.Count - 1)
             {
-                if (this.State != UIState.BUSY && this.State != UIState.HIDE)
+                if (this.State != UIState.Busy && this.State != UIState.Hide)
                     HideMe();
 
                 return;
             }
 
-            if (this.State != UIState.BUSY && this.State != UIState.HIDE)
+            if (this.State != UIState.Busy && this.State != UIState.Hide)
                 HideMe();
 
             this.m_callbacks.Callbacks[index]?.Invoke(args);

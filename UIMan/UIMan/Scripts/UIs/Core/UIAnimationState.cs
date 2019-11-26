@@ -31,7 +31,7 @@ namespace UnuGames
             {
                 if (this.cachedUI == null)
                     this.cachedUI = animator.GetComponent<UIManBase>();
-                if (this.cachedUI.GetUIBaseType() == UIBaseType.DIALOG)
+                if (this.cachedUI.GetUIBaseType() == UIBaseType.Dialog)
                 {
                     if (this.isResetDialogTransitionStatus)
                         UIMan.Instance.IsInDialogTransition = false;
@@ -39,17 +39,17 @@ namespace UnuGames
                         UIMan.Instance.DequeueDialog();
                 }
 
-                if (this.type == UIAnimationType.SHOW)
+                if (this.type == UIAnimationType.Show)
                 {//TODO: bug!?
                     this.cachedUI.UnlockInput();
                     this.cachedUI.OnShowComplete();
                 }
-                else if (this.type == UIAnimationType.HIDE)
+                else if (this.type == UIAnimationType.Hide)
                 {
                     this.cachedUI.OnHideComplete();
                 }
 
-                if (this.autoPlayIdle && this.cachedUI.motionIdle == UIMotion.CUSTOM_MECANIM_ANIMATION)
+                if (this.autoPlayIdle && this.cachedUI.motionIdle == UIMotion.CustomMecanimAnimation)
                     UIMan.Instance.DoAnimIdle(this.cachedUI);
             }
         }

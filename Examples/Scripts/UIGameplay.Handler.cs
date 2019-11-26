@@ -57,7 +57,7 @@ public partial class UIGameplay : UIManScreen
     // Your custom code here
     private void Update()
     {
-        if (this.State != UIState.SHOW)
+        if (this.State != UIState.Show)
             return;
 
         this.circleTimer += this.circleMultiplier * Time.deltaTime * 10;

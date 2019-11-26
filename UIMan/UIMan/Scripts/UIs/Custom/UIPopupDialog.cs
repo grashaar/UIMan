@@ -1,51 +1,52 @@
-﻿using UnuGames;
+﻿// This code is generated automatically by UIMan ViewModelGerenrator, please do not modify!
 
-// This code is generated automatically by UIMan ViewModelGerenrator, please do not modify!
-
-public partial class UIPopupDialog : UIManDialog
+namespace UnuGames
 {
-    private string m_title = "";
-
-    [UIManProperty]
-    public string Title
+    public partial class UIPopupDialog : UIManDialog
     {
-        get { return this.m_title; }
-        set { this.m_title = value; OnPropertyChanged(); }
-    }
+        private string m_title = "";
 
-    private string m_content = "";
+        [UIManProperty]
+        public string Title
+        {
+            get { return this.m_title; }
+            set { this.m_title = value; OnPropertyChanged(); }
+        }
 
-    [UIManProperty]
-    public string Content
-    {
-        get { return this.m_content; }
-        set { this.m_content = value; OnPropertyChanged(); }
-    }
+        private string m_content = "";
 
-    private string m_labelButtonYes = "";
+        [UIManProperty]
+        public string Content
+        {
+            get { return this.m_content; }
+            set { this.m_content = value; OnPropertyChanged(); }
+        }
 
-    [UIManProperty]
-    public string LabelButtonYes
-    {
-        get { return this.m_labelButtonYes; }
-        set { this.m_labelButtonYes = value; OnPropertyChanged(); }
-    }
+        private string m_labelButtonYes = "";
 
-    private string m_labelButtonNo = "";
+        [UIManProperty]
+        public string LabelButtonYes
+        {
+            get { return this.m_labelButtonYes; }
+            set { this.m_labelButtonYes = value; OnPropertyChanged(); }
+        }
 
-    [UIManProperty]
-    public string LabelButtonNo
-    {
-        get { return this.m_labelButtonNo; }
-        set { this.m_labelButtonNo = value; OnPropertyChanged(); }
-    }
+        private string m_labelButtonNo = "";
 
-    private bool m_isConfirmDialog = false;
+        [UIManProperty]
+        public string LabelButtonNo
+        {
+            get { return this.m_labelButtonNo; }
+            set { this.m_labelButtonNo = value; OnPropertyChanged(); }
+        }
 
-    [UIManProperty]
-    public bool IsConfirmDialog
-    {
-        get { return this.m_isConfirmDialog; }
-        set { this.m_isConfirmDialog = value; OnPropertyChanged(); }
+        private bool m_isConfirmDialog = false;
+
+        [UIManProperty]
+        public bool IsConfirmDialog
+        {
+            get { return this.m_isConfirmDialog; }
+            set { this.m_isConfirmDialog = value; OnPropertyChanged(); }
+        }
     }
 }

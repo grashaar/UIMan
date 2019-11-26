@@ -18,7 +18,7 @@ namespace UnuGames
 
         public override UIBaseType GetUIBaseType()
         {
-            return UIBaseType.SCREEN;
+            return UIBaseType.Screen;
         }
     }
 }

@@ -77,9 +77,9 @@ namespace UnuGames
         /// <param name="args">Arguments.</param>
         public virtual void OnShow(params object[] args)
         {
-            if (this.CanvasGroup.alpha != 0 && (this.motionShow != UIMotion.CUSTOM_MECANIM_ANIMATION && this.motionShow != UIMotion.CUSTOM_SCRIPT_ANIMATION))
+            if (this.CanvasGroup.alpha != 0 && (this.motionShow != UIMotion.CustomMecanimAnimation && this.motionShow != UIMotion.CustomScriptAnimation))
                 this.CanvasGroup.alpha = 0;
-            this.State = UIState.BUSY;
+            this.State = UIState.Busy;
             this.IsActive = false;
         }
 
@@ -88,9 +88,9 @@ namespace UnuGames
         /// </summary>
         public virtual void OnHide()
         {
-            if (this.CanvasGroup.alpha != 1 && this.motionHide != UIMotion.CUSTOM_MECANIM_ANIMATION && this.motionHide != UIMotion.CUSTOM_SCRIPT_ANIMATION)
+            if (this.CanvasGroup.alpha != 1 && this.motionHide != UIMotion.CustomMecanimAnimation && this.motionHide != UIMotion.CustomScriptAnimation)
                 this.CanvasGroup.alpha = 1;
-            this.State = UIState.BUSY;
+            this.State = UIState.Busy;
             this.IsActive = false;
         }
 
@@ -99,7 +99,7 @@ namespace UnuGames
         /// </summary>
         public virtual void OnShowComplete()
         {
-            this.State = UIState.SHOW;
+            this.State = UIState.Show;
             this.IsActive = true;
         }
 
@@ -108,7 +108,7 @@ namespace UnuGames
         /// </summary>
         public virtual void OnHideComplete()
         {
-            this.State = UIState.HIDE;
+            this.State = UIState.Hide;
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace UnuGames
         /// </summary>
         public void HideMe()
         {
-            if (GetUIBaseType() == UIBaseType.SCREEN)
+            if (GetUIBaseType() == UIBaseType.Screen)
             {
                 UIMan.Instance.HideScreen(this.UIType);
             }

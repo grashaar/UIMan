@@ -51,7 +51,7 @@ namespace UnuGames
             if (EditorGUI.EndChangeCheck())
                 EditorUtility.SetDirty(this.target);
 
-            if (uiManBase.motionShow == UIMotion.CUSTOM_MECANIM_ANIMATION || uiManBase.motionHide == UIMotion.CUSTOM_MECANIM_ANIMATION)
+            if (uiManBase.motionShow == UIMotion.CustomMecanimAnimation || uiManBase.motionHide == UIMotion.CustomMecanimAnimation)
             {
                 if (uiManBase.gameObject != null)
                 {
@@ -90,7 +90,7 @@ namespace UnuGames
                 GUILayout.EndHorizontal();
             }
 
-            if (uiManBase.motionIdle != UIMotion.CUSTOM_MECANIM_ANIMATION && uiManBase.motionIdle != UIMotion.NONE)
+            if (uiManBase.motionIdle != UIMotion.CustomMecanimAnimation && uiManBase.motionIdle != UIMotion.None)
             {
                 GUILayout.BeginHorizontal("Box");
                 EditorGUILayout.LabelField("<color=red><b>Warning: </b>Idle motion is now only support Mecanim animation!</color>", EditorGUIHelper.RichText(true));
@@ -120,7 +120,7 @@ namespace UnuGames
                 }
                 else
                 {
-                    var isDialog = uiManBase.GetUIBaseType() == UIBaseType.DIALOG;
+                    var isDialog = uiManBase.GetUIBaseType() == UIBaseType.Dialog;
                     prefabInstance = PrefabUtility.InstantiatePrefab(uiManBase.gameObject) as GameObject;
                     if (isDialog)
                         prefabInstance.transform.SetParent(UIMan.Instance.dialogRoot, false);

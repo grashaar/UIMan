@@ -1,79 +1,82 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-[ExecuteInEditMode]
-public class UIProgressBar : MonoBehaviour
+namespace UnuGames
 {
-    public RectTransform foreground;
-    public RectTransform thumb;
-    public Image.Type type;
-    private Image foreGroundImg;
-
-    [SerializeField]
-    private float maxWidth = 0;
-
-    [SerializeField]
-    [Range(0, 1)]
-    private float currentValue;
-
-    public float CurrentValue
+    [ExecuteInEditMode]
+    public class UIProgressBar : MonoBehaviour
     {
-        get
-        {
-            return this.currentValue;
-        }
-        set
-        {
-            this.currentValue = value;
-        }
-    }
+        public RectTransform foreground;
+        public RectTransform thumb;
+        public Image.Type type;
+        private Image foreGroundImg;
 
-    private void Awake()
-    {
-        Transform fg = this.transform.Find("FG");
-        if (fg != null)
-            this.foreground = fg.GetComponent<RectTransform>();
-        this.foreGroundImg = this.foreground.GetComponent<Image>();
-        Transform fgThumb = this.transform.Find("FGThumb");
-        if (fgThumb != null)
-            this.foreground = fg.GetComponent<RectTransform>();
-        if (fgThumb != null)
-            this.thumb = fgThumb.GetComponent<RectTransform>();
-    }
+        [SerializeField]
+        private float maxWidth = 0;
 
-    public void UpdateValue(float value)
-    {
-        this.CurrentValue = value;
-        if (this.type == Image.Type.Filled)
+        [SerializeField]
+        [Range(0, 1)]
+        private float currentValue;
+
+        public float CurrentValue
         {
-            this.foreGroundImg.fillAmount = value;
-        }
-        else
-        {
-            var newWidth = value * this.maxWidth;
-            Vector2 newRect = this.foreground.sizeDelta;
-            newRect.x = newWidth;
-            this.foreground.sizeDelta = newRect;
+            get
+            {
+                return this.currentValue;
+            }
+            set
+            {
+                this.currentValue = value;
+            }
         }
 
-        if (this.thumb != null)
+        private void Awake()
         {
-            var newWidth = value * this.maxWidth;
-            Vector2 newRect = this.thumb.sizeDelta;
-            newRect.x = newWidth;
-            this.thumb.sizeDelta = newRect;
+            Transform fg = this.transform.Find("FG");
+            if (fg != null)
+                this.foreground = fg.GetComponent<RectTransform>();
+            this.foreGroundImg = this.foreground.GetComponent<Image>();
+            Transform fgThumb = this.transform.Find("FGThumb");
+            if (fgThumb != null)
+                this.foreground = fg.GetComponent<RectTransform>();
+            if (fgThumb != null)
+                this.thumb = fgThumb.GetComponent<RectTransform>();
         }
-    }
+
+        public void UpdateValue(float value)
+        {
+            this.CurrentValue = value;
+            if (this.type == Image.Type.Filled)
+            {
+                this.foreGroundImg.fillAmount = value;
+            }
+            else
+            {
+                var newWidth = value * this.maxWidth;
+                Vector2 newRect = this.foreground.sizeDelta;
+                newRect.x = newWidth;
+                this.foreground.sizeDelta = newRect;
+            }
+
+            if (this.thumb != null)
+            {
+                var newWidth = value * this.maxWidth;
+                Vector2 newRect = this.thumb.sizeDelta;
+                newRect.x = newWidth;
+                this.thumb.sizeDelta = newRect;
+            }
+        }
 
 #if UNITY_EDITOR
 
-    private void Update()
-    {
-        if (!Application.isPlaying)
+        private void Update()
         {
-            UpdateValue(this.currentValue);
+            if (!Application.isPlaying)
+            {
+                UpdateValue(this.currentValue);
+            }
         }
-    }
 
 #endif
+    }
 }
