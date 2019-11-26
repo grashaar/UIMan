@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 using UnuGames.MVVM;
 
 namespace UnuGames
 {
-    public static class ReflectUtils
+    public static class UIManReflection
     {
 #if !UNITY_EDITOR
 		private readonly static Dictionary<object, Type> _types = new Dictionary<object, Type>();
@@ -233,11 +234,19 @@ namespace UnuGames
         {
             if (type == null)
                 return null;
+
             var dict = new Dictionary<string, string> {
                 { "String", "string" },
                 { "Boolean", "bool" },
+                { "Byte", "byte" },
+                { "SByte", "sbyte" },
+                { "Char", "char" },
+                { "Int16", "short" },
                 { "Int32", "int" },
                 { "Int64", "long" },
+                { "UInt16", "ushort" },
+                { "UInt32", "uint" },
+                { "UInt64", "ulong" },
                 { "Single", "float" },
                 { "Double", "double" }
             };
@@ -277,9 +286,15 @@ namespace UnuGames
         {
             if (type == null)
                 return false;
+
             var listType = new List<string> {
-                "Color",
-                "Vector3"
+                nameof(Color),
+                nameof(Vector2),
+                nameof(Vector2Int),
+                nameof(Vector3),
+                nameof(Vector3Int),
+                nameof(Vector4),
+                nameof(LayerMask)
             };
 
             if (listType.Contains(type.Name))

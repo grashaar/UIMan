@@ -4,7 +4,7 @@ using UnuGames.MVVM;
 
 namespace UnuGames
 {
-    public static class ReflectionUtils
+    public static class UIManEditorReflection
     {
         private readonly static List<Type> _types = new List<Type>();
         private readonly static List<string> _assemblies = new List<string>();

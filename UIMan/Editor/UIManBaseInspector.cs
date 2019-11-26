@@ -131,7 +131,7 @@ namespace UnuGames
             }
             if (ColorButton.Draw("Edit View Logic (Handler)", CommonColor.LightGreen, GUILayout.Height(25)))
             {
-                var handler = CodeGenerationHelper.GetScriptPathByType(this.target.GetType());
+                var handler = UIManCodeGenerator.GetScriptPathByType(this.target.GetType());
                 handler = handler.Replace(".cs", ".Handler.cs");
                 UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(handler, 1);
             }

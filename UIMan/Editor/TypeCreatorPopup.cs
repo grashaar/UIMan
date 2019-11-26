@@ -138,8 +138,8 @@ namespace UnuGames
             if (this.baseType != this.arrSupportType[0])
                 config.generatingType = this.typeName;
 
-            var code = CodeGenerationHelper.GenerateScript(this.typeName, this.baseType);
-            CodeGenerationHelper.SaveScript(savePath, code, true);
+            var code = UIManCodeGenerator.GenerateScript(this.typeName, this.baseType);
+            UIManCodeGenerator.SaveScript(savePath, code, true);
 
             if (this.baseType != this.arrSupportType[0])
                 GenerateViewModelHandler(savePath);
@@ -156,15 +156,15 @@ namespace UnuGames
 
         public void GenerateViewModelHandler(string scriptPath)
         {
-            var handlerScriptPath = CodeGenerationHelper.GeneratPathWithSubfix(scriptPath, ".Handler.cs");
+            var handlerScriptPath = UIManCodeGenerator.GeneratPathWithSubfix(scriptPath, ".Handler.cs");
             var handlerCode = "";
 
             if (string.IsNullOrEmpty(handlerCode))
-                handlerCode = CodeGenerationHelper.GenerateViewModelHandler(this.typeName, this.baseType);
+                handlerCode = UIManCodeGenerator.GenerateViewModelHandler(this.typeName, this.baseType);
             else
                 handlerCode = handlerCode.Replace(": " + this.typeName, ": " + this.baseType);
 
-            CodeGenerationHelper.SaveScript(handlerScriptPath, handlerCode, false, this.typeName, this.baseType);
+            UIManCodeGenerator.SaveScript(handlerScriptPath, handlerCode, false, this.typeName, this.baseType);
         }
     }
 }

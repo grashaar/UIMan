@@ -191,7 +191,7 @@ namespace UnuGames
             this._onPropertyChanged = onPropertyChanged;
             this._onPropertyDelete = onPropertyDelete;
 
-            this.observableTypes = ReflectionUtils.GetAllObservableTypes(this._viewModelType);
+            this.observableTypes = UIManEditorReflection.GetAllObservableTypes(this._viewModelType);
             for (var i = 0; i < this.observableTypes.Length; i++)
             {
                 if (this._property.LastPropertyType.GetAllias() == this.observableTypes[i])
@@ -228,7 +228,7 @@ namespace UnuGames
 
             // Property type
             this.selectedType = EditorGUILayout.Popup(this.selectedType, this.observableTypes, typeWidth);
-            this._property.LastPropertyType = ReflectionUtils.GetTypeByName(this.observableTypes[this.selectedType]);
+            this._property.LastPropertyType = UIManEditorReflection.GetTypeByName(this.observableTypes[this.selectedType]);
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical();

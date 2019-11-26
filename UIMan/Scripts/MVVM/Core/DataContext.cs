@@ -72,7 +72,7 @@ namespace UnuGames.MVVM
             {
                 this.model = this.propertyInfo.GetValue(this.viewModel, null);
                 if (this.model == null && this.type == ContextType.Property)
-                    this.model = ReflectUtils.GetCachedTypeInstance(this.propertyInfo.PropertyType);
+                    this.model = UIManReflection.GetCachedTypeInstance(this.propertyInfo.PropertyType);
                 if (this.model != null)
                 {
                     this.viewModel.SubcriptObjectAction(this.model);

@@ -11,7 +11,7 @@ using UnuGames.MVVM;
 
 namespace UnuGames
 {
-    public class CodeGenerationHelper
+    public static class UIManCodeGenerator
     {
         #region TAGS and REGIONS
 
@@ -480,7 +480,7 @@ namespace UnuGames
             {
                 this.PropertyType = this.LastPropertyType;
                 if (this.PropertyType.IsAllias() && this.PropertyType.IsValueType)
-                    this.DefaltValue = ReflectUtils.GetDefaultValue(this.PropertyType);
+                    this.DefaltValue = UIManReflection.GetDefaultValue(this.PropertyType);
                 else
                     this.DefaltValue = null;
             }
@@ -505,8 +505,8 @@ namespace UnuGames
                 strDefaultValue = strDefaultValue.ToLower();
             }
 
-            var fieldName = CodeGenerationHelper.NormalizeFieldName(this.Name);
-            var propertyName = CodeGenerationHelper.NormalizePropertyName(this.Name);
+            var fieldName = UIManCodeGenerator.NormalizeFieldName(this.Name);
+            var propertyName = UIManCodeGenerator.NormalizePropertyName(this.Name);
             string field;
 
             if (this.PropertyType.IsAllias())

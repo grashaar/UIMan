@@ -51,8 +51,8 @@ namespace UnuGames
         [MenuItem("UIMan/UI Generator", false, -1)]
         private static void Init()
         {
-            ReflectionUtils.RefreshAssemblies(false);
-            _types = ReflectionUtils.GetAllUIManTypes();
+            UIManEditorReflection.RefreshAssemblies(false);
+            _types = UIManEditorReflection.GetAllUIManTypes();
             _container = EditorWindow.GetWindow<UIGenerator>(true, "UIMan - UI Generator");
             _container.minSize = new Vector2(800, 600);
             _container.maxSize = _container.minSize;
@@ -262,7 +262,7 @@ namespace UnuGames
                         GUILayout.BeginHorizontal();
                         if (ColorButton.Draw("Edit View Logic (Handler)", CommonColor.LightBlue, GUILayout.Height(30)))
                         {
-                            var handler = CodeGenerationHelper.GetScriptPathByType(_selectedType);
+                            var handler = UIManCodeGenerator.GetScriptPathByType(_selectedType);
                             handler = handler.Replace(".cs", ".Handler.cs");
                             UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(handler, 1);
                         }
@@ -298,7 +298,7 @@ namespace UnuGames
 
                         if (ColorButton.Draw("Delete", CommonColor.LightRed, GUILayout.Height(30)))
                         {
-                            var cs = CodeGenerationHelper.GetScriptPathByType(_selectedType);
+                            var cs = UIManCodeGenerator.GetScriptPathByType(_selectedType);
                             var handler = cs.Replace(".cs", ".Handler.cs");
                             AssetDatabase.DeleteAsset(cs);
                             AssetDatabase.DeleteAsset(handler);
@@ -326,7 +326,7 @@ namespace UnuGames
                         {
                             if (GUILayout.Button("Generate Handler"))
                             {
-                                var backupCode = CodeGenerationHelper.DeleteScript(_handlerScriptPath);
+                                var backupCode = UIManCodeGenerator.DeleteScript(_handlerScriptPath);
                                 GenerateViewModelHandler(backupCode, _selectedType.BaseType.Name);
                             }
                         }
@@ -467,11 +467,11 @@ namespace UnuGames
         public void OnSelecType(string typeName)
         {
             _config.selectedType = typeName;
-            _selectedType = ReflectionUtils.GetTypeByName(typeName);
+            _selectedType = UIManEditorReflection.GetTypeByName(typeName);
             _selectedProperties = _selectedType.GetUIManProperties();
             this.baseTypePopup = new EditablePopup(_arrSupportType, _selectedType.BaseType.Name, OnChangeBaseType);
-            _currentScriptPath = CodeGenerationHelper.GetScriptPathByType(_selectedType);
-            _handlerScriptPath = CodeGenerationHelper.GeneratPathWithSubfix(_currentScriptPath, ".Handler.cs");
+            _currentScriptPath = UIManCodeGenerator.GetScriptPathByType(_selectedType);
+            _handlerScriptPath = UIManCodeGenerator.GeneratPathWithSubfix(_currentScriptPath, ".Handler.cs");
             CachePropertiesDrawer();
         }
 
@@ -518,10 +518,10 @@ namespace UnuGames
 
             if (!string.IsNullOrEmpty(_currentScriptPath))
             {
-                var backupCode = CodeGenerationHelper.DeleteScript(_handlerScriptPath);
-                var code = CodeGenerationHelper.GenerateScript(_selectedType.Name, baseType, _selectedProperties);
+                var backupCode = UIManCodeGenerator.DeleteScript(_handlerScriptPath);
+                var code = UIManCodeGenerator.GenerateScript(_selectedType.Name, baseType, _selectedProperties);
 
-                var saved = CodeGenerationHelper.SaveScript(_currentScriptPath, code, true);
+                var saved = UIManCodeGenerator.SaveScript(_currentScriptPath, code, true);
 
                 if (baseType != "ObservableModel")
                 {
@@ -543,10 +543,10 @@ namespace UnuGames
 
             var handlerCode = backupCode;
             if (string.IsNullOrEmpty(handlerCode))
-                handlerCode = CodeGenerationHelper.GenerateViewModelHandler(_selectedType.Name, baseType);
+                handlerCode = UIManCodeGenerator.GenerateViewModelHandler(_selectedType.Name, baseType);
             else
                 handlerCode = handlerCode.Replace(": " + _selectedType.BaseType.Name, ": " + baseType);
-            var saved = CodeGenerationHelper.SaveScript(_handlerScriptPath, handlerCode, false, _selectedType.BaseType.Name, baseType);
+            var saved = UIManCodeGenerator.SaveScript(_handlerScriptPath, handlerCode, false, _selectedType.BaseType.Name, baseType);
             if (saved)
             {
                 AssetDatabase.Refresh(ImportAssetOptions.Default);
@@ -561,7 +561,7 @@ namespace UnuGames
                 if (prefabTemplate != null)
                 {
                     GameObject newPrefab = Instantiate(prefabTemplate);
-                    Type generatedType = ReflectionUtils.GetTypeByName(_config.generatingType);
+                    Type generatedType = UIManEditorReflection.GetTypeByName(_config.generatingType);
                     if (generatedType != null)
                     {
                         var newVM = (ViewModelBehaviour)newPrefab.AddComponent(generatedType);
@@ -626,7 +626,7 @@ namespace UnuGames
         [UnityEditor.Callbacks.DidReloadScripts]
         private static void OnScriptsReloaded()
         {
-            ReflectionUtils.RefreshAssemblies(true);
+            UIManEditorReflection.RefreshAssemblies(true);
         }
     }
 }
