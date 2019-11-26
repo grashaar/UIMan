@@ -62,11 +62,11 @@ namespace UnuGames.MVVM
             if (this.dataContext == null)
                 FindDataContext();
 
-            if (this.dataContext.type == ContextType.MONO_BEHAVIOR)
+            if (this.dataContext.type == ContextType.MonoBehaviour)
             {
                 return this.dataContext.viewModel.GetAllMembers(memberTypes);
             }
-            else if (this.dataContext.type == ContextType.PROPERTY)
+            else if (this.dataContext.type == ContextType.Property)
             {
                 return this.dataContext.GetPropertyInfo().GetAllMembers(memberTypes);
             }
@@ -80,11 +80,11 @@ namespace UnuGames.MVVM
                 FindDataContext();
 
             MemberInfo[] infos = null;
-            if (this.dataContext.type == ContextType.MONO_BEHAVIOR)
+            if (this.dataContext.type == ContextType.MonoBehaviour)
             {
                 infos = this.dataContext.viewModel.GetAllMembersInfo(memberTypes);
             }
-            else if (this.dataContext.type == ContextType.PROPERTY)
+            else if (this.dataContext.type == ContextType.Property)
             {
                 infos = this.dataContext.GetPropertyInfo().GetAllMembersInfo(memberTypes);
             }

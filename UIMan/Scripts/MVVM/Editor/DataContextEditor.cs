@@ -18,12 +18,12 @@ namespace UnuGames.MVVM
 
             context.type = (ContextType)EditorGUILayout.EnumPopup(this.lblType, context.type);
 
-            if (context.type == ContextType.NONE)
+            if (context.type == ContextType.None)
             {
                 context.Clear();
                 GUILayout.Label(BindingDefine.NO_CONTEXT_TYPE);
             }
-            else if (context.type == ContextType.MONO_BEHAVIOR)
+            else if (context.type == ContextType.MonoBehaviour)
             {
                 context.viewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, (Object)context.viewModel, typeof(ViewModelBehaviour), true);
                 if (context.viewModel.GetCachedType() != null)
@@ -34,7 +34,7 @@ namespace UnuGames.MVVM
                     GUILayout.EndHorizontal();
                 }
             }
-            else if (context.type == ContextType.PROPERTY)
+            else if (context.type == ContextType.Property)
             {
                 context.viewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, (Object)context.viewModel, typeof(ViewModelBehaviour), true);
 

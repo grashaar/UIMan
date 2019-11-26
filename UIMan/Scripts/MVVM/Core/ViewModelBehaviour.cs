@@ -223,12 +223,12 @@ namespace UnuGames.MVVM
     public enum ContextType
     {
         [Description("Nothing")]
-        NONE = 0,
+        None = 0,
 
         [Description("MonoBehaviour")]
-        MONO_BEHAVIOR,
+        MonoBehaviour,
 
         [Description("Type Instance")]
-        PROPERTY
+        Property
     }
 }
