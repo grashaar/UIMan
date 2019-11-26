@@ -16,13 +16,13 @@ namespace UnuGames
         private static Func<string, Callback, IEnumerator> _loadMethodSprite;
         private static Func<string, Callback, IEnumerator> _loadMethodTexture2D;
 
-        public static void RegisterLoadMethodGameObject(Func<string, Callback, IEnumerator> method)
+        public static void SetLoadMethodGameObject(Func<string, Callback, IEnumerator> method)
             => _loadMethodGameObject = method ?? throw new ArgumentNullException(nameof(method));
 
-        public static void RegisterLoadMethodSprite(Func<string, Callback, IEnumerator> method)
+        public static void SetLoadMethodSprite(Func<string, Callback, IEnumerator> method)
             => _loadMethodSprite = method ?? throw new ArgumentNullException(nameof(method));
 
-        public static void RegisterLoadMethodTexture2D(Func<string, Callback, IEnumerator> method)
+        public static void SetLoadMethodTexture2D(Func<string, Callback, IEnumerator> method)
             => _loadMethodTexture2D = method ?? throw new ArgumentNullException(nameof(method));
 
         internal static IEnumerator Load<T>(string key, Callback callback = null) where T : Result
