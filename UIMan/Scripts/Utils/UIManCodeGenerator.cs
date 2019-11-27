@@ -39,7 +39,7 @@ namespace UnuGames
             return "";
         }
 
-        public static string GenerateScript(string modelName, string baseType, params CustomPropertyInfo[] properties)
+        public static string GenerateScript(string modelName, string baseType, UIManConfig config, params CustomPropertyInfo[] properties)
         {
             var code = "";
             var text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(TYPE_PATH));
@@ -47,7 +47,7 @@ namespace UnuGames
             if (text != null)
             {
                 code = text.text;
-                code = Regex.Replace(code, NAME_SPACE_TAG, GetNamespace());
+                code = Regex.Replace(code, NAME_SPACE_TAG, GetNamespace(config));
                 code = Regex.Replace(code, NAME_TAG, modelName);
                 code = Regex.Replace(code, TYPE_TAG, baseType);
                 code = Regex.Replace(code, PROPERTIES_TAG, GeneratePropertiesBlock(properties));
@@ -61,7 +61,7 @@ namespace UnuGames
             return code;
         }
 
-        public static string GenerateViewModelHandler(string modelName, string viewModelType)
+        public static string GenerateViewModelHandler(string modelName, string viewModelType, UIManConfig config)
         {
             var code = "";
             var text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(VIEW_MODEL_HANDLER_PATH));
@@ -69,7 +69,7 @@ namespace UnuGames
             if (text != null)
             {
                 code = text.text;
-                code = Regex.Replace(code, NAME_SPACE_TAG, GetNamespace());
+                code = Regex.Replace(code, NAME_SPACE_TAG, GetNamespace(config));
                 code = Regex.Replace(code, NAME_TAG, modelName);
                 code = Regex.Replace(code, TYPE_TAG, viewModelType);
             }
@@ -81,9 +81,8 @@ namespace UnuGames
             return code;
         }
 
-        public static string GetNamespace()
+        public static string GetNamespace(UIManConfig config)
         {
-            var config = Resources.Load<UIManConfig>("UIManConfig");
             var result = DEFAULT_NAMESPACE;
 
             if (config && !string.IsNullOrEmpty(config.classNamespace))
@@ -247,7 +246,7 @@ namespace UnuGames
                 var ns = cpi.GetNamespace();
                 if (!string.IsNullOrEmpty(ns) && !namespaces.Contains(ns))
                 {
-                    if (ns != "System" && !cpi.PropertyType.IsAllias())
+                    if (ns != "System" && !cpi.PropertyType.IsPrimitive())
                         namespaces.Add(ns);
                 }
             }
@@ -479,7 +478,7 @@ namespace UnuGames
             if (this.PropertyType != this.LastPropertyType)
             {
                 this.PropertyType = this.LastPropertyType;
-                if (this.PropertyType.IsAllias() && this.PropertyType.IsValueType)
+                if (this.PropertyType.IsPrimitive() && this.PropertyType.IsValueType)
                     this.DefaltValue = UIManReflection.GetDefaultValue(this.PropertyType);
                 else
                     this.DefaltValue = null;
@@ -509,7 +508,7 @@ namespace UnuGames
             var propertyName = UIManCodeGenerator.NormalizePropertyName(this.Name);
             string field;
 
-            if (this.PropertyType.IsAllias())
+            if (this.PropertyType.IsPrimitive())
                 field     = $"        private {this.PropertyType.GetAllias()} m_{fieldName} = {strDefaultValue};";
             else
                 field     = $"        private {this.PropertyType.GetAllias()} m_{fieldName};";

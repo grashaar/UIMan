@@ -138,7 +138,7 @@ namespace UnuGames
             if (this.baseType != this.arrSupportType[0])
                 config.generatingType = this.typeName;
 
-            var code = UIManCodeGenerator.GenerateScript(this.typeName, this.baseType);
+            var code = UIManCodeGenerator.GenerateScript(this.typeName, this.baseType, config);
             UIManCodeGenerator.SaveScript(savePath, code, true);
 
             if (this.baseType != this.arrSupportType[0])
@@ -158,9 +158,10 @@ namespace UnuGames
         {
             var handlerScriptPath = UIManCodeGenerator.GeneratPathWithSubfix(scriptPath, ".Handler.cs");
             var handlerCode = "";
+            var config = Resources.Load<UIManConfig>("UIManConfig");
 
             if (string.IsNullOrEmpty(handlerCode))
-                handlerCode = UIManCodeGenerator.GenerateViewModelHandler(this.typeName, this.baseType);
+                handlerCode = UIManCodeGenerator.GenerateViewModelHandler(this.typeName, this.baseType, config);
             else
                 handlerCode = handlerCode.Replace(": " + this.typeName, ": " + this.baseType);
 

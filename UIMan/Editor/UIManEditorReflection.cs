@@ -84,17 +84,20 @@ namespace UnuGames
             return null;
         }
 
-        public static string[] GetAllObservableTypes(Type excludeType = null)
+        public static Type[] GetAllObservableTypes(Type excludeType = null, string @namespace = null)
         {
             var types = GetAllTypes();
-            var observableTypes = new List<string>();
+            var observableTypes = new List<Type>();
 
             for (var i = 0; i < types.Count; i++)
             {
-                if ((types[i].BaseType == typeof(ObservableModel) || types[i].IsAllias() || types[i].IsSupportType()) && types[i] != excludeType)
-                {
-                    observableTypes.Add(types[i].GetAllias());
-                }
+                if (types[i].BaseType != typeof(ObservableModel) && !types[i].IsPrimitive() && !types[i].IsSupportedType(@namespace) || types[i] == excludeType)
+                    continue;
+
+                if (observableTypes.Contains(types[i]))
+                    continue;
+
+                observableTypes.Add(types[i]);
             }
 
             return observableTypes.ToArray();

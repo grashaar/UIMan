@@ -1,9 +1,297 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace UnuGames
 {
+    public class NamePopupWindow : EditorWindow
+    {
+        public int selectedIndex { get; private set; }
+
+        public Type[] types { get; private set; }
+
+        private readonly List<SingleType> singleTypes = new List<SingleType>();
+
+        private readonly Dictionary<string, List<SingleType>> typeDict = new Dictionary<string, List<SingleType>>();
+
+        private Action<NamePopupWindow> onSelect;
+        private Vector2 scrollPosition;
+        private GUIStyle annotationStyle;
+        private GUIStyle typeNameStyle;
+        private GUIStyle selectedBackgroundStyle;
+        private GUIStyle normalBackgroundStyle;
+        private bool isInitedStype = false;
+        private bool isSelected = false;
+        private GUIStyle searchToobar;
+        private string searchText = string.Empty;
+        private SingleType? selectedType = null;
+
+        public void Initialize(int selectedIndex, Type[] types, Vector2 windowSize, Action<NamePopupWindow> onSelect)
+        {
+            this.selectedIndex = selectedIndex;
+            this.types = types;
+            this.onSelect = onSelect;
+            this.singleTypes.Clear();
+            this.typeDict.Clear();
+            this.selectedType = null;
+
+            for (var i = 0; i < types.Length; i++)
+            {
+                var name = types[i];
+                var single = new SingleType {
+                    type = name,
+                    index = i
+                };
+
+                if (i == selectedIndex)
+                {
+                    single.isSelect = true;
+                    this.selectedType = single;
+                }
+                else
+                {
+                    single.isSelect = false;
+                }
+
+                if (!this.typeDict.ContainsKey(single.type.Namespace))
+                {
+                    this.typeDict.Add(single.type.Namespace, new List<SingleType>());
+                }
+
+                var list = this.typeDict[single.type.Namespace];
+                list.Add(single);
+            }
+
+            foreach (var list in this.typeDict.Values)
+            {
+                list.Sort();
+                this.singleTypes.AddRange(list);
+            }
+
+            int realIndex;
+
+            if (!this.selectedType.HasValue)
+            {
+                realIndex = 0;
+            }
+            else
+            {
+                realIndex = this.singleTypes.IndexOf(this.selectedType.Value);
+            }
+
+            var itemPerPage = windowSize.y / 16;
+            var offset = 0f;
+
+            if (itemPerPage > 0f)
+            {
+                var page = realIndex / itemPerPage;
+                var floorPage = Mathf.FloorToInt(page);
+                var pageOffset = page - floorPage;
+
+                if (pageOffset > 0.5f)
+                {
+                    var middlePage = floorPage + 0.5f;
+                    var itemToMiddle = middlePage * itemPerPage;
+                    offset = (realIndex - itemToMiddle) * 1.5f;
+                }
+            }
+
+            this.scrollPosition.y = 16 * realIndex + offset * 16;
+            this.isSelected = false;
+
+            var type = typeof(EditorStyles);
+            var property = type.GetProperty(nameof(EditorStyles.toolbarSearchField), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            this.searchToobar = property.GetValue(null, null) as GUIStyle;
+            this.searchText = string.Empty;
+        }
+
+        private void OnGUI()
+        {
+            InitializeTextStyle();
+
+            GUILayout.BeginHorizontal(EditorStyles.toolbar);
+            GUI.backgroundColor = new Color(1f, 1f, 1f, 0.5f);
+            GUI.SetNextControlName("Search");
+            this.searchText = EditorGUILayout.TextField("", this.searchText, this.searchToobar, GUILayout.MinWidth(95));
+            EditorGUI.FocusTextInControl("Search");
+
+            if (GUILayout.Button("S", EditorStyles.toolbarButton, GUILayout.Width(16)))
+            {
+                int realIndex;
+
+                if (!this.selectedType.HasValue)
+                {
+                    realIndex = 0;
+                }
+                else
+                {
+                    realIndex = this.singleTypes.IndexOf(this.selectedType.Value);
+                }
+
+                this.scrollPosition.y = 16 * realIndex;
+            }
+
+            GUILayout.EndHorizontal();
+            GUI.backgroundColor = Color.white;
+
+            this.scrollPosition = EditorGUILayout.BeginScrollView(this.scrollPosition);
+
+            for (var i = 0; i < this.singleTypes.Count; i++)
+            {
+                var single = this.singleTypes[i];
+
+                if (!string.IsNullOrEmpty(this.searchText) && !single.type.FullName.ToLower().Contains(this.searchText))
+                {
+                    continue;
+                }
+
+                Rect rect;
+
+                if (single.isSelect)
+                {
+                    rect = EditorGUILayout.BeginHorizontal(this.selectedBackgroundStyle);
+                }
+                else
+                {
+                    rect = EditorGUILayout.BeginHorizontal(this.normalBackgroundStyle);
+                }
+
+                GUILayout.BeginHorizontal();
+
+                var annotation = "";
+
+                if (!single.type.IsPrimitive())
+                {
+                    if (single.type.IsEnum)
+                    {
+                        annotation = single.type.GetCustomAttribute<FlagsAttribute>() == null ? "enum" : "flag";
+                    }
+                    else
+                    {
+                        annotation = single.type.IsValueType ? "struct" : "class";
+                    }
+                }
+
+                GUILayout.Label(annotation, this.annotationStyle);
+                GUILayout.Label($"<b>{single.type.GetNiceName()}</b> : {single.type.Namespace}", this.typeNameStyle);
+
+                GUILayout.EndHorizontal();
+                GUILayout.FlexibleSpace();
+
+                if (rect.Contains(Event.current.mousePosition) && Event.current.type == EventType.MouseDown)
+                {
+                    this.selectedIndex = single.index;
+                    this.onSelect?.Invoke(this);
+                    this.isSelected = true;
+                }
+
+                EditorGUILayout.EndHorizontal();
+            }
+
+            EditorGUILayout.EndScrollView();
+
+            if (this.isSelected)
+            {
+                this.isSelected = false;
+                Close();
+            }
+        }
+
+        private void InitializeTextStyle()
+        {
+            if (!this.isInitedStype)
+            {
+                this.annotationStyle = new GUIStyle(EditorStyles.label) {
+                    fixedHeight = 16,
+                    alignment = TextAnchor.MiddleLeft,
+                };
+
+                var size = this.annotationStyle.CalcSize(new GUIContent("struct"));
+                this.annotationStyle.fixedWidth = size.x;
+
+                this.typeNameStyle = new GUIStyle(EditorStyles.label) {
+                    fixedHeight = 16,
+                    alignment = TextAnchor.MiddleLeft,
+                    richText = true
+                };
+
+                var selectedBg = new Texture2D(32, 32, TextureFormat.RGB24, false);
+                var hightLightBg = new Texture2D(32, 32, TextureFormat.RGB24, false);
+                if (EditorGUIUtility.isProSkin)
+                {
+                    selectedBg.LoadImage(Convert.FromBase64String(s_SelectedBg_Pro));
+                    hightLightBg.LoadImage(Convert.FromBase64String(s_HightLightBg_Pro));
+                }
+                else
+                {
+                    selectedBg.LoadImage(Convert.FromBase64String(s_SelectedBg_Light));
+                    hightLightBg.LoadImage(Convert.FromBase64String(s_HightLightBg_Light));
+                }
+                this.selectedBackgroundStyle = new GUIStyle();
+                this.selectedBackgroundStyle.normal.background = selectedBg;
+                this.normalBackgroundStyle = new GUIStyle();
+                this.normalBackgroundStyle.hover.background = hightLightBg;
+
+                this.isInitedStype = true;
+            }
+        }
+
+        private void Update()
+        {
+            Repaint();
+        }
+
+        private const string s_SelectedBg_Pro = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAQklEQVRIDe3SsQkAAAgDQXWN7L+nOMFXdm8dIhzpJPV581l+3T5AYYkkQgEMuCKJUAADrkgiFMCAK5IIBTDgipBoAWXpAJEoZnl3AAAAAElFTkSuQmCC";
+        private const string s_HightLightBg_Pro = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAQklEQVRIDe3SsQkAAAgDQXXD7L+MOMFXdm8dIhzpJPV581l+3T5AYYkkQgEMuCKJUAADrkgiFMCAK5IIBTDgipBoARFdATMHrayuAAAAAElFTkSuQmCC";
+        private const string s_SelectedBg_Light = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAQUlEQVRIDe3SsQkAAAgDQXV/yMriBF/ZvXWIcKST1OfNZ/l1+wCFJZIIBTDgiiRCAQy4IolQAAOuSCIUwIArQqIF36EB7diYDg8AAAAASUVORK5CYII=";
+        private const string s_HightLightBg_Light = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAQklEQVRIDe3SsQkAAAgDQXX/ETOMOMFXdm8dIhzpJPV581l+3T5AYYkkQgEMuCKJUAADrkgiFMCAK5IIBTDgipBoAc9YAtQLJ3kPAAAAAElFTkSuQmCC";
+
+        private struct SingleType : IEquatable<SingleType>, IEqualityComparer<SingleType>, IComparable<SingleType>
+        {
+            public Type type;
+
+            public int index;
+
+            public bool isSelect;
+
+            public override int GetHashCode()
+            {
+                return this.type == null ? 0 : this.type.GetHashCode();
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (obj is SingleType other)
+                    return object.ReferenceEquals(this.type, other.type);
+
+                return false;
+            }
+
+            public bool Equals(SingleType other)
+            {
+                return object.ReferenceEquals(this.type, other.type);
+            }
+
+            public bool Equals(SingleType x, SingleType y)
+            {
+                return object.ReferenceEquals(x.type, y.type);
+            }
+
+            public int GetHashCode(SingleType obj)
+            {
+                return obj.GetHashCode();
+            }
+
+            public int CompareTo(SingleType other)
+            {
+                return string.Compare(this.type.Name, other.type.Name);
+            }
+        }
+    }
+
     public class UISearchField
     {
         private string keyWord = "";
@@ -45,8 +333,7 @@ namespace UnuGames
             {
                 if (GUILayout.Button(this._leftButtonText, this.toolbarButtonStyle, GUILayout.Width(50)))
                 {
-                    if (this._onLeftButtonClick != null)
-                        this._onLeftButtonClick(null);
+                    this._onLeftButtonClick?.Invoke(null);
                 }
                 GUILayout.Label("", this.toolbarDropDownStyle, GUILayout.Width(6));
                 GUILayout.Space(5);
@@ -64,10 +351,7 @@ namespace UnuGames
 
             if (!this.oldKeyWord.Equals(this.KeyWord))
             {
-                if (this._onKeyWordChange != null)
-                {
-                    this._onKeyWordChange(this.KeyWord);
-                }
+                this._onKeyWordChange?.Invoke(this.KeyWord);
             }
 
             GUILayout.EndHorizontal();
@@ -180,25 +464,98 @@ namespace UnuGames
         private Type _viewModelType;
         private CustomPropertyInfo _property;
         private int selectedType = 0;
-        private string[] observableTypes;
+        private Type[] observableTypes;
         private Action<CustomPropertyInfo> _onPropertyChanged;
         private Action<CustomPropertyInfo> _onPropertyDelete;
 
-        public EditablePropertyDrawer(Type viewModelType, CustomPropertyInfo property, Action<CustomPropertyInfo> onPropertyChanged, Action<CustomPropertyInfo> onPropertyDelete)
+        public EditablePropertyDrawer(UIManConfig config, Type viewModelType, CustomPropertyInfo property, Action<CustomPropertyInfo> onPropertyChanged, Action<CustomPropertyInfo> onPropertyDelete)
         {
             this._viewModelType = viewModelType;
             this._property = property;
             this._onPropertyChanged = onPropertyChanged;
             this._onPropertyDelete = onPropertyDelete;
 
-            this.observableTypes = UIManEditorReflection.GetAllObservableTypes(this._viewModelType);
+            this.observableTypes = UIManEditorReflection.GetAllObservableTypes(this._viewModelType, config.classNamespace);
+
             for (var i = 0; i < this.observableTypes.Length; i++)
             {
-                if (this._property.LastPropertyType.GetAllias() == this.observableTypes[i])
+                if (this._property.LastPropertyType == this.observableTypes[i])
                 {
                     this.selectedType = i;
                     break;
                 }
+            }
+        }
+
+        private void Popup(int selectedIndex, Type[] types, Rect position, Action<NamePopupWindow> onSelect)
+        {
+            var max = 0;
+
+            for (var i = 0; i < types.Length; i++)
+            {
+                if (types[i].FullName.Length > types[max].FullName.Length)
+                    max = i;
+            }
+
+            Rect prefixPosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), GUIContent.none);
+            var type = types[selectedIndex];
+
+            var buttonStyle = new GUIStyle(EditorStyles.popup);
+            buttonStyle.padding.top = 2;
+            buttonStyle.padding.bottom = 2;
+            var baseSize = GUI.skin.textField.CalcSize(new GUIContent(types[max].FullName));
+            var popRect = new Rect(prefixPosition.x, position.y, position.x + position.width - prefixPosition.x, baseSize.y);
+
+            if (GUI.Button(popRect, UIManReflection.GetAllias(type, false), buttonStyle))
+            {
+                var window = ScriptableObject.CreateInstance<NamePopupWindow>();
+                var windowRect = prefixPosition;
+                var windowSize = new Vector2(windowRect.width + baseSize.x, 400);
+
+                window.Initialize(selectedIndex, types, windowSize, onSelect);
+                windowRect.position = GUIUtility.GUIToScreenPoint(windowRect.position);
+                windowRect.height = popRect.height + 1;
+                window.ShowAsDropDown(windowRect, windowSize);
+            }
+        }
+
+        // Converts the field value to a LayerMask
+        private static LayerMask FieldToLayerMask(int field)
+        {
+            LayerMask mask = 0;
+            var layers = InternalEditorUtility.layers;
+            for (var c = 0; c < layers.Length; c++)
+            {
+                if ((field & (1 << c)) != 0)
+                {
+                    mask |= 1 << LayerMask.NameToLayer(layers[c]);
+                }
+            }
+            return mask;
+        }
+        // Converts a LayerMask to a field value
+        private static int LayerMaskToField(LayerMask mask)
+        {
+            var field = 0;
+            var layers = InternalEditorUtility.layers;
+            for (var c = 0; c < layers.Length; c++)
+            {
+                if ((mask & (1 << LayerMask.NameToLayer(layers[c]))) != 0)
+                {
+                    field |= 1 << c;
+                }
+            }
+            return field;
+        }
+
+        private void OnSelectType(NamePopupWindow window)
+        {
+            this.selectedType = window.selectedIndex;
+            this._property.LastPropertyType = this.observableTypes[this.selectedType];
+
+            if (this._property.LastPropertyType.IsSubclassOf(typeof(UnityEngine.Object)))
+            {
+                this._property.SetLastValueAs<UnityEngine.Object>(null);
             }
         }
 
@@ -214,9 +571,9 @@ namespace UnuGames
             GUILayout.BeginVertical();
             GUILayout.Space(4);
 
-            GUILayoutOption nameWidth = GUILayout.Width(totalWidth * 1 / 3 - 10);
-            GUILayoutOption typeWidth = GUILayout.Width(totalWidth / 6 - 10);
-            GUILayoutOption defaultValWidth = GUILayout.Width(totalWidth * 1 / 3 - 10);
+            GUILayoutOption nameWidth = GUILayout.Width(totalWidth * 1 / 4 - 10);
+            GUILayoutOption typeWidth = GUILayout.Width(totalWidth / 5 - 10);
+            GUILayoutOption defaultValWidth = GUILayout.Width(totalWidth * 2 / 5 - 10);
             GUILayoutOption buttonWidth = GUILayout.Width(totalWidth / 16 - 5);
 
             // Property name
@@ -227,47 +584,151 @@ namespace UnuGames
             GUILayout.Space(4.5f);
 
             // Property type
-            this.selectedType = EditorGUILayout.Popup(this.selectedType, this.observableTypes, typeWidth);
-            this._property.LastPropertyType = UIManEditorReflection.GetTypeByName(this.observableTypes[this.selectedType]);
+            var rect = EditorGUILayout.GetControlRect(typeWidth);
+            Popup(this.selectedType, this.observableTypes, rect, OnSelectType);
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical();
             GUILayout.Space(4);
 
+            var type = this._property.LastPropertyType;
+
             // Default value
-            if (this._property.LastPropertyType == typeof(int))
+            if (type == typeof(bool))
             {
-                this._property.SetLastValueAs<int>(EditorGUILayout.IntField(this._property.GetLastValueAs<int>(), defaultValWidth));
+                this._property.SetLastValueAs(EditorGUILayout.Toggle(this._property.GetLastValueAs<bool>(), defaultValWidth));
             }
-            else if (this._property.LastPropertyType == typeof(long))
+            else if (type == typeof(byte))
             {
-                this._property.SetLastValueAs<long>(EditorGUILayout.LongField(this._property.GetLastValueAs<long>(), defaultValWidth));
+                this._property.SetLastValueAs(EditorGUILayout.IntField(this._property.GetLastValueAs<byte>(), defaultValWidth));
             }
-            else if (this._property.LastPropertyType == typeof(float))
+            else if (type == typeof(sbyte))
             {
-                this._property.SetLastValueAs<float>(EditorGUILayout.FloatField(this._property.GetLastValueAs<float>(), defaultValWidth));
+                this._property.SetLastValueAs(EditorGUILayout.IntField(this._property.GetLastValueAs<sbyte>(), defaultValWidth));
             }
-            else if (this._property.LastPropertyType == typeof(double))
+            else if (type == typeof(short))
             {
-                this._property.SetLastValueAs<double>(EditorGUILayout.DoubleField(this._property.GetLastValueAs<double>(), defaultValWidth));
+                this._property.SetLastValueAs(EditorGUILayout.IntField(this._property.GetLastValueAs<short>(), defaultValWidth));
             }
-            else if (this._property.LastPropertyType == typeof(string))
+            else if (type == typeof(ushort))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.IntField(this._property.GetLastValueAs<ushort>(), defaultValWidth));
+            }
+            else if (type == typeof(int))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.IntField(this._property.GetLastValueAs<int>(), defaultValWidth));
+            }
+            else if (type == typeof(uint))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.LongField(this._property.GetLastValueAs<uint>(), defaultValWidth));
+            }
+            else if (type == typeof(long))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.LongField(this._property.GetLastValueAs<long>(), defaultValWidth));
+            }
+            else if (type == typeof(float))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.FloatField(this._property.GetLastValueAs<float>(), defaultValWidth));
+            }
+            else if (type == typeof(double))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.DoubleField(this._property.GetLastValueAs<double>(), defaultValWidth));
+            }
+            else if (type == typeof(char))
             {
                 if (this._property.DefaltValue == null)
                 {
                     this._property.DefaltValue = string.Empty;
                     this._property.LastValue = string.Empty;
                 }
-                this._property.SetLastValueAs<string>(EditorGUILayout.TextField(this._property.GetLastValueAs<string>(), defaultValWidth));
+
+                var val = EditorGUILayout.TextField(this._property.GetLastValueAs<char>().ToString(), defaultValWidth);
+                this._property.SetLastValueAs(string.IsNullOrEmpty(val) ? (char)0 : val[0]);
             }
-            else if (this._property.LastPropertyType == typeof(bool))
+            else if (type == typeof(string))
             {
-                this._property.SetLastValueAs<bool>(EditorGUILayout.Toggle(this._property.GetLastValueAs<bool>(), defaultValWidth));
+                if (this._property.DefaltValue == null)
+                {
+                    this._property.DefaltValue = string.Empty;
+                    this._property.LastValue = string.Empty;
+                }
+
+                this._property.SetLastValueAs(EditorGUILayout.TextField(this._property.GetLastValueAs<string>(), defaultValWidth));
+            }
+            else if (type.IsEnum)
+            {
+                var mask = type.GetCustomAttribute<FlagsAttribute>();
+                var value = this._property.GetLastValueAs<Enum>();
+
+                if (value == null)
+                {
+                    value = type.GetEnumValues().GetValue(0) as Enum;
+                }
+
+                if (mask == null)
+                    this._property.SetLastValueAs(EditorGUILayout.EnumPopup(value, defaultValWidth));
+                else
+                    this._property.SetLastValueAs(EditorGUILayout.EnumFlagsField(value, defaultValWidth));
+            }
+            else if (type == typeof(Color))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.ColorField(this._property.GetLastValueAs<Color>(), defaultValWidth));
+            }
+            else if (type == typeof(Vector2))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.Vector2Field(string.Empty, this._property.GetLastValueAs<Vector2>(), defaultValWidth));
+            }
+            else if (type == typeof(Vector2Int))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.Vector2IntField(string.Empty, this._property.GetLastValueAs<Vector2Int>(), defaultValWidth));
+            }
+            else if (type == typeof(Vector3))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.Vector3Field(string.Empty, this._property.GetLastValueAs<Vector3>(), defaultValWidth));
+            }
+            else if (type == typeof(Vector3Int))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.Vector3IntField(string.Empty, this._property.GetLastValueAs<Vector3Int>(), defaultValWidth));
+            }
+            else if (type == typeof(Vector4))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.Vector4Field(string.Empty, this._property.GetLastValueAs<Vector4>(), defaultValWidth));
+            }
+            else if (type == typeof(Bounds))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.BoundsField(this._property.GetLastValueAs<Bounds>(), defaultValWidth));
+            }
+            else if (type == typeof(BoundsInt))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.BoundsIntField(this._property.GetLastValueAs<BoundsInt>(), defaultValWidth));
+            }
+            else if (type == typeof(Rect))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.RectField(this._property.GetLastValueAs<Rect>(), defaultValWidth));
+            }
+            else if (type == typeof(RectInt))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.RectIntField(this._property.GetLastValueAs<RectInt>(), defaultValWidth));
+            }
+            else if (type == typeof(LayerMask))
+            {
+                EditorGUI.BeginChangeCheck();
+                var maskField = EditorGUILayout.MaskField(LayerMaskToField(this._property.GetLastValueAs<LayerMask>()), InternalEditorUtility.layers, defaultValWidth);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    this._property.SetLastValueAs(FieldToLayerMask(maskField));
+                }
+            }
+            else if (type.IsSubclassOf(typeof(UnityEngine.Object)))
+            {
+                this._property.SetLastValueAs(EditorGUILayout.ObjectField(this._property.GetLastValueAs<UnityEngine.Object>(), type, false, defaultValWidth));
             }
             else
             {
                 GUILayout.Label("Undefined!", defaultValWidth);
             }
+
             GUILayout.EndVertical();
 
             Color textColor = Color.gray;
@@ -279,15 +740,13 @@ namespace UnuGames
                 if (this._property.HasChange)
                 {
                     this._property.CommitChange();
-                    if (this._onPropertyChanged != null)
-                        this._onPropertyChanged(this._property);
+                    this._onPropertyChanged?.Invoke(this._property);
                 }
             }
 
             if (ColorButton.Draw("X", CommonColor.LightRed, buttonWidth))
             {
-                if (this._onPropertyDelete != null)
-                    this._onPropertyDelete(this._property);
+                this._onPropertyDelete?.Invoke(this._property);
             }
 
             GUILayout.EndHorizontal();
@@ -332,8 +791,7 @@ namespace UnuGames
             {
                 if (GUILayout.Button("Save"))
                 {
-                    if (this._onSave != null)
-                        this._onSave(this._arrItems[this.selectedIndex]);
+                    this._onSave?.Invoke(this._arrItems[this.selectedIndex]);
                 }
             }
         }
@@ -577,13 +1035,11 @@ namespace UnuGames
             this.name = EditorGUILayout.TextField(this.name);
             if (GUILayout.Button("Create"))
             {
-                if (onCreate != null)
-                    onCreate(this.name);
+                onCreate?.Invoke(this.name);
             }
             if (GUILayout.Button("Cancel"))
             {
-                if (onCancel != null)
-                    onCancel();
+                onCancel?.Invoke();
             }
         }
     }

@@ -14,6 +14,68 @@ namespace UnuGames
 
         private readonly static Dictionary<Type, object> _cachedInstance = new Dictionary<Type, object>();
 
+        private readonly static Dictionary<Type, string> _primitiveTypes = new Dictionary<Type, string> {
+            { typeof(bool), "bool" },
+            { typeof(byte), "byte" },
+            { typeof(sbyte), "sbyte" },
+            { typeof(short), "short" },
+            { typeof(ushort), "ushort" },
+            { typeof(int), "int" },
+            { typeof(uint), "uint" },
+            { typeof(long), "long" },
+            { typeof(float), "float" },
+            { typeof(double), "double" },
+            { typeof(char), "char" },
+            { typeof(string), "string" }
+        };
+
+        private readonly static List<Type> _supportedTypes = new List<Type> {
+                typeof(Color),
+                typeof(Vector2),
+                typeof(Vector2Int),
+                typeof(Vector3),
+                typeof(Vector3Int),
+                typeof(Vector4),
+                typeof(Bounds),
+                typeof(BoundsInt),
+                typeof(Rect),
+                typeof(RectInt),
+                typeof(LayerMask)
+        };
+
+        private readonly static List<string> _supportedNamespaces = new List<string>();
+
+        public static void SupportNamespace(string @namespace)
+        {
+            if (string.IsNullOrEmpty(@namespace))
+            {
+                return;
+            }
+
+            if (_supportedNamespaces.Contains(@namespace))
+            {
+                return;
+            }
+
+            _supportedNamespaces.Add(@namespace);
+            _supportedNamespaces.Sort((x, y) => y.Length.CompareTo(x.Length));
+        }
+
+        public static void SupportType(Type type)
+        {
+            if (_supportedTypes.Contains(type))
+            {
+                return;
+            }
+
+            _supportedTypes.Add(type);
+        }
+
+        public static void SupportType<T>()
+        {
+            SupportType(typeof(T));
+        }
+
         /// <summary>
         /// Get all member with suitable type of current object
         /// </summary>
@@ -23,11 +85,16 @@ namespace UnuGames
         public static string[] GetAllMembers(this IObservable type, params MemberTypes[] memberTypes)
         {
             if (type == null)
+            {
                 return null;
+            }
+
             MemberInfo[] members = type.GetCachedType().GetMembers();
             var all = false;
             if (memberTypes == null || (memberTypes != null && memberTypes.Length == 0))
+            {
                 all = true;
+            }
 
             var results = new List<string>();
             for (var i = 0; i < members.Length; i++)
@@ -55,11 +122,16 @@ namespace UnuGames
         public static MemberInfo[] GetAllMembersInfo(this IObservable type, params MemberTypes[] memberTypes)
         {
             if (type == null)
+            {
                 return null;
+            }
+
             MemberInfo[] members = type.GetCachedType().GetMembers();
             var all = false;
             if (memberTypes == null || (memberTypes != null && memberTypes.Length == 0))
+            {
                 all = true;
+            }
 
             var results = new List<MemberInfo>();
             for (var i = 0; i < members.Length; i++)
@@ -87,11 +159,16 @@ namespace UnuGames
         public static string[] GetAllMembers(this PropertyInfo proInfo, params MemberTypes[] memberTypes)
         {
             if (proInfo == null)
+            {
                 return null;
+            }
+
             MemberInfo[] members = proInfo.PropertyType.GetMembers();
             var all = false;
             if (memberTypes == null || (memberTypes != null && memberTypes.Length == 0))
+            {
                 all = true;
+            }
 
             var results = new List<string>();
             for (var i = 0; i < members.Length; i++)
@@ -119,11 +196,16 @@ namespace UnuGames
         public static MemberInfo[] GetAllMembersInfo(this PropertyInfo proInfo, params MemberTypes[] memberTypes)
         {
             if (proInfo == null)
+            {
                 return null;
+            }
+
             MemberInfo[] members = proInfo.PropertyType.GetMembers();
             var all = false;
             if (memberTypes == null || (memberTypes != null && memberTypes.Length == 0))
+            {
                 all = true;
+            }
 
             var results = new List<MemberInfo>();
             for (var i = 0; i < members.Length; i++)
@@ -179,9 +261,13 @@ namespace UnuGames
 
 #if UNITY_EDITOR
             if (obj != null)
+            {
                 type = obj.GetType();
+            }
             else
+            {
                 return null;
+            }
 #else
 			if (!_types.TryGetValue(obj, out type))
             {
@@ -230,31 +316,25 @@ namespace UnuGames
 
 #endif
 
-        public static string GetAllias(this Type type)
+        public static string GetAllias(this Type type, bool fullName = true)
         {
             if (type == null)
+            {
                 return null;
+            }
 
-            var dict = new Dictionary<string, string> {
-                { "String", "string" },
-                { "Boolean", "bool" },
-                { "Byte", "byte" },
-                { "SByte", "sbyte" },
-                { "Char", "char" },
-                { "Int16", "short" },
-                { "Int32", "int" },
-                { "Int64", "long" },
-                { "UInt16", "ushort" },
-                { "UInt32", "uint" },
-                { "UInt64", "ulong" },
-                { "Single", "float" },
-                { "Double", "double" }
-            };
-
-            if (dict.ContainsKey(type.Name))
-                return dict[type.Name];
+            if (_primitiveTypes.ContainsKey(type))
+            {
+                return _primitiveTypes[type];
+            }
+            else if (fullName)
+            {
+                return type.FullName;
+            }
             else
+            {
                 return type.Name;
+            }
 
             /*object : System.Object
 			string : System.String
@@ -274,31 +354,76 @@ namespace UnuGames
 			void : System.Void*/
         }
 
-        public static bool IsAllias(this System.Type type)
+        public static bool IsSupportedPrimitive(this Type type)
         {
-            if (type.GetAllias() == type.Name)
+            if (!_primitiveTypes.ContainsKey(type))
+            {
                 return false;
+            }
             else
+            {
                 return true;
+            }
         }
 
-        public static bool IsSupportType(this System.Type type)
+        public static bool IsSupportedType(this Type type, string @namespace = null)
         {
             if (type == null)
+            {
                 return false;
+            }
 
-            var listType = new List<string> {
-                nameof(Color),
-                nameof(Vector2),
-                nameof(Vector2Int),
-                nameof(Vector3),
-                nameof(Vector3Int),
-                nameof(Vector4),
-                nameof(LayerMask)
-            };
-
-            if (listType.Contains(type.Name))
+            if (_supportedTypes.Contains(type))
+            {
                 return true;
+            }
+
+            return IsSupportedInNamespace(type, @namespace);
+        }
+
+        private static bool IsSupportedInNamespace(Type type, string @namespace)
+        {
+            var supported = false;
+
+            if (!string.IsNullOrEmpty(@namespace))
+            {
+                if (string.Equals(@namespace, type.Namespace))
+                {
+                    supported = true;
+                }
+            }
+
+            if (!supported)
+            {
+                foreach (var ns in _supportedNamespaces)
+                {
+                    if (string.Equals(ns, type.Namespace))
+                    {
+                        supported = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!supported)
+            {
+                return false;
+            }
+
+            if (type.IsEnum)
+            {
+                return type.GetEnumValues().Length > 0;
+            }
+
+            if (type.GetCustomAttribute<SerializableAttribute>() != null)
+            {
+                return true;
+            }
+
+            if (type.IsSubclassOf(typeof(UnityEngine.Object)))
+            {
+                return true;
+            }
 
             return false;
         }

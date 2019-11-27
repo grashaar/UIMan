@@ -15,7 +15,7 @@ namespace UnuGames
         private static UIGenerator _container;
         private static string[] _types;
         private static float _typeAreaWidth = 250f;
-        private static float _propertiesAreaWidth = 540f;
+        private static float _propertiesAreaWidth = 640f;
         private static Vector2 _propertiesScrollPos;
 
         private readonly static Dictionary<Type, EditablePropertyDrawer[]> _propertiesDrawerCache = new Dictionary<Type, EditablePropertyDrawer[]>();
@@ -54,7 +54,7 @@ namespace UnuGames
             UIManEditorReflection.RefreshAssemblies(false);
             _types = UIManEditorReflection.GetAllUIManTypes();
             _container = EditorWindow.GetWindow<UIGenerator>(true, "UIMan - UI Generator");
-            _container.minSize = new Vector2(800, 600);
+            _container.minSize = new Vector2(900, 600);
             _container.maxSize = _container.minSize;
             GetConfig();
         }
@@ -444,8 +444,8 @@ namespace UnuGames
             var drawers = new EditablePropertyDrawer[0];
             for (var i = 0; i < _selectedProperties.Length; i++)
             {
-                var drawer = new EditablePropertyDrawer(_selectedType, _selectedProperties[i], OnApplyPropertyChanged, OnPropertyDelete);
-                ArrayUtility.Add<EditablePropertyDrawer>(ref drawers, drawer);
+                var drawer = new EditablePropertyDrawer(_config, _selectedType, _selectedProperties[i], OnApplyPropertyChanged, OnPropertyDelete);
+                ArrayUtility.Add(ref drawers, drawer);
             }
             _propertiesDrawerCache[_selectedType] = drawers;
         }
@@ -519,7 +519,7 @@ namespace UnuGames
             if (!string.IsNullOrEmpty(_currentScriptPath))
             {
                 var backupCode = UIManCodeGenerator.DeleteScript(_handlerScriptPath);
-                var code = UIManCodeGenerator.GenerateScript(_selectedType.Name, baseType, _selectedProperties);
+                var code = UIManCodeGenerator.GenerateScript(_selectedType.Name, baseType, _config, _selectedProperties);
 
                 var saved = UIManCodeGenerator.SaveScript(_currentScriptPath, code, true);
 
@@ -543,7 +543,7 @@ namespace UnuGames
 
             var handlerCode = backupCode;
             if (string.IsNullOrEmpty(handlerCode))
-                handlerCode = UIManCodeGenerator.GenerateViewModelHandler(_selectedType.Name, baseType);
+                handlerCode = UIManCodeGenerator.GenerateViewModelHandler(_selectedType.Name, baseType, _config);
             else
                 handlerCode = handlerCode.Replace(": " + _selectedType.BaseType.Name, ": " + baseType);
             var saved = UIManCodeGenerator.SaveScript(_handlerScriptPath, handlerCode, false, _selectedType.BaseType.Name, baseType);
