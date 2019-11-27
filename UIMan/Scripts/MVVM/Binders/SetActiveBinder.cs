@@ -3,10 +3,10 @@ using UnityEngine;
 
 namespace UnuGames.MVVM
 {
-    public class VisibleBinder : BinderBase
+    public class SetActiveBinder : BinderBase
     {
-        public List<GameObject> enableOnTrue = new List<GameObject>();
-        public List<GameObject> disableOnTrue = new List<GameObject>();
+        public List<GameObject> activeOnTrue = new List<GameObject>();
+        public List<GameObject> inactiveOnTrue = new List<GameObject>();
 
         [HideInInspector]
         public BindingField value = new BindingField("bool");
@@ -26,19 +26,19 @@ namespace UnuGames.MVVM
 
             var valChange = (bool)val;
 
-            if (this.enableOnTrue != null && this.enableOnTrue.Count > 0)
+            if (this.activeOnTrue != null && this.activeOnTrue.Count > 0)
             {
-                for (var i = 0; i < this.enableOnTrue.Count; i++)
+                for (var i = 0; i < this.activeOnTrue.Count; i++)
                 {
-                    this.enableOnTrue[i].SetActive(valChange);
+                    this.activeOnTrue[i].SetActive(valChange);
                 }
             }
 
-            if (this.disableOnTrue != null && this.disableOnTrue.Count > 0)
+            if (this.inactiveOnTrue != null && this.inactiveOnTrue.Count > 0)
             {
-                for (var i = 0; i < this.disableOnTrue.Count; i++)
+                for (var i = 0; i < this.inactiveOnTrue.Count; i++)
                 {
-                    this.disableOnTrue[i].SetActive(!valChange);
+                    this.inactiveOnTrue[i].SetActive(!valChange);
                 }
             }
         }

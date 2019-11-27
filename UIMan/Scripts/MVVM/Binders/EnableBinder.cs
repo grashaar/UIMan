@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace UnuGames.MVVM
 {
     public class EnableBinder : BinderBase
     {
-        public List<Button> enableOnTrue = new List<Button>();
-        public List<Button> disableOnTrue = new List<Button>();
+        public List<Behaviour> enableOnTrue = new List<Behaviour>();
+        public List<Behaviour> disableOnTrue = new List<Behaviour>();
 
         [HideInInspector]
         public BindingField value = new BindingField("bool");
@@ -31,7 +30,7 @@ namespace UnuGames.MVVM
             {
                 for (var i = 0; i < this.enableOnTrue.Count; i++)
                 {
-                    this.enableOnTrue[i].interactable = valChange;
+                    this.enableOnTrue[i].enabled = valChange;
                 }
             }
 
@@ -39,7 +38,7 @@ namespace UnuGames.MVVM
             {
                 for (var i = 0; i < this.disableOnTrue.Count; i++)
                 {
-                    this.disableOnTrue[i].interactable = !valChange;
+                    this.disableOnTrue[i].enabled = !valChange;
                 }
             }
         }
