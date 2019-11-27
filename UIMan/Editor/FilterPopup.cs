@@ -22,7 +22,7 @@ namespace UnuGames
         /// </summary>
         private static void Popup()
         {
-            var fp = ScriptableObject.CreateInstance(typeof(FilterPopup)) as FilterPopup;
+            var fp = CreateInstance<FilterPopup>();
 
             var minHeight = mItems.Length * MEMBER_HEIGHT + MEMBER_HEIGHT * 2;
             var bestHeight = (int)(Screen.currentResolution.height / 2.5f);

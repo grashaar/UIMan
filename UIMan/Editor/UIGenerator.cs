@@ -89,7 +89,7 @@ namespace UnuGames
         private static void AttachVisibleBinder()
         {
             if (Selection.activeGameObject != null)
-                Selection.activeGameObject.AddComponent(typeof(VisibleBinder));
+                Selection.activeGameObject.AddComponent(typeof(SetActiveBinder));
         }
 
         [MenuItem("UIMan/Component/Input Binder", false, 2)]
@@ -124,7 +124,7 @@ namespace UnuGames
         private static void AttachEnableBinder()
         {
             if (Selection.activeGameObject != null)
-                Selection.activeGameObject.AddComponent(typeof(EnableBinder));
+                Selection.activeGameObject.AddComponent(typeof(InteractableBinder));
         }
 
         [MenuItem("UIMan/Component/Number Binder", false, 2)]

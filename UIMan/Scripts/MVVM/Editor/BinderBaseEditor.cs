@@ -64,7 +64,7 @@ namespace UnuGames.MVVM
                 curMemberName = BindingDefine.SELECT_MEMBER;
             }
 
-            var members = this.binder.GetMembers(MemberTypes.Field, MemberTypes.Property);
+            var members = this.binder.GetMembers(false, true, true, MemberTypes.Field, MemberTypes.Property);
             if (members == null)
             {
                 EditorGUILayout.LabelField("<color=red>No target context found!</color>", EditorGUIHelper.RichText());
@@ -99,7 +99,7 @@ namespace UnuGames.MVVM
 
                 if (EditorGUIHelper.QuickPickerButton())
                 {
-                    ContextBrowser.Browse(this, field);
+                    ContextBrowser.Browse(this, field, true, true, false);
                 }
 
                 GUILayout.EndHorizontal();

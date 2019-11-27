@@ -14,12 +14,12 @@ namespace UnuGames.MVVM
         /// </summary>
         /// <param name="binderEditor"></param>
         /// <param name="field"></param>
-        public static void Browse(BinderBaseEditor binderEditor, BindingField field)
+        public static void Browse(BinderBaseEditor binderEditor, BindingField field, bool boldName = false, bool withType = false, bool asPath = false)
         {
             curBinderEditor = binderEditor;
             curField = field;
 
-            members = binderEditor.binder.GetMembers(MemberTypes.Field, MemberTypes.Property);
+            members = binderEditor.binder.GetMembers(boldName, withType, asPath, MemberTypes.Field, MemberTypes.Property);
 
             FilterPopup.Browse(members, OnMemberSelected);
         }

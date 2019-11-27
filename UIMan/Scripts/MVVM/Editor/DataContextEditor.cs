@@ -38,7 +38,7 @@ namespace UnuGames.MVVM
             {
                 context.viewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, (Object)context.viewModel, typeof(ViewModelBehaviour), true);
 
-                var members = context.viewModel.GetAllMembers(MemberTypes.Field, MemberTypes.Property, MemberTypes.Field);
+                var members = context.viewModel.GetAllMembers(false, true, true, MemberTypes.Field, MemberTypes.Property, MemberTypes.Field);
                 if (members != null)
                 {
                     if (string.IsNullOrEmpty(context.propertyName))
@@ -76,7 +76,7 @@ namespace UnuGames.MVVM
                         ContextBrowser.Browse(members, selectedMember => {
                             context.propertyName = selectedMember;
                             FilterPopup.Close();
-                                                                         });
+                        });
                     }
 
                     GUILayout.EndHorizontal();

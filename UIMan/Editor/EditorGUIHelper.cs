@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace UnuGames
 {
-    public class NamePopupWindow : EditorWindow
+    public class TypePopupWindow : EditorWindow
     {
         public int selectedIndex { get; private set; }
 
@@ -17,7 +17,7 @@ namespace UnuGames
 
         private readonly Dictionary<string, List<SingleType>> typeDict = new Dictionary<string, List<SingleType>>();
 
-        private Action<NamePopupWindow> onSelect;
+        private Action<TypePopupWindow> onSelect;
         private Vector2 scrollPosition;
         private GUIStyle annotationStyle;
         private GUIStyle typeNameStyle;
@@ -29,7 +29,7 @@ namespace UnuGames
         private string searchText = string.Empty;
         private SingleType? selectedType = null;
 
-        public void Initialize(int selectedIndex, Type[] types, Vector2 windowSize, Action<NamePopupWindow> onSelect)
+        public void Initialize(int selectedIndex, Type[] types, Vector2 windowSize, Action<TypePopupWindow> onSelect)
         {
             this.selectedIndex = selectedIndex;
             this.types = types;
@@ -176,7 +176,7 @@ namespace UnuGames
                 }
 
                 GUILayout.Label(annotation, this.annotationStyle);
-                GUILayout.Label($"<b>{single.type.GetNiceName()}</b> : {single.type.Namespace}", this.typeNameStyle);
+                GUILayout.Label($"{single.type.Namespace}::<b>{single.type.GetNiceName()}</b>", this.typeNameStyle);
 
                 GUILayout.EndHorizontal();
                 GUILayout.FlexibleSpace();
@@ -380,7 +380,9 @@ namespace UnuGames
 
         public ListView()
         {
-            this.menuItemStyle = new GUIStyle(GUI.skin.FindStyle("MenuItem"));
+            this.menuItemStyle = new GUIStyle(GUI.skin.FindStyle("MenuItem")) {
+                richText = true
+            };
         }
 
         public void SetData(string[] items, bool selectOnMouseHover, Action<string> onSelected, string filterString, EditorWindow window, Action<int> onSelectedIndex = null)
@@ -487,7 +489,7 @@ namespace UnuGames
             }
         }
 
-        private void Popup(int selectedIndex, Type[] types, Rect position, Action<NamePopupWindow> onSelect)
+        private void Popup(int selectedIndex, Type[] types, Rect position, Action<TypePopupWindow> onSelect)
         {
             var max = 0;
 
@@ -508,7 +510,7 @@ namespace UnuGames
 
             if (GUI.Button(popRect, UIManReflection.GetAllias(type, false), buttonStyle))
             {
-                var window = ScriptableObject.CreateInstance<NamePopupWindow>();
+                var window = ScriptableObject.CreateInstance<TypePopupWindow>();
                 var windowRect = prefixPosition;
                 var windowSize = new Vector2(windowRect.width + baseSize.x, 400);
 
@@ -548,7 +550,7 @@ namespace UnuGames
             return field;
         }
 
-        private void OnSelectType(NamePopupWindow window)
+        private void OnSelectType(TypePopupWindow window)
         {
             this.selectedType = window.selectedIndex;
             this._property.LastPropertyType = this.observableTypes[this.selectedType];
@@ -952,7 +954,7 @@ namespace UnuGames
 
         public static bool QuickPickerButton()
         {
-            return GUILayout.Button("Browse...");
+            return GUILayout.Button("Browse");
         }
 
         public static Vector3 DrawVector3(string label, float x, float y, float z)

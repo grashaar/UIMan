@@ -76,13 +76,34 @@ namespace UnuGames
             SupportType(typeof(T));
         }
 
+        public static string GetName(this MemberInfo member, bool boldName, bool withType, bool asPath)
+        {
+            if (member == null)
+                return string.Empty;
+
+            var memberName = boldName ? $"<b>{member.Name}</b>" : member.Name;
+            var returnType = member is PropertyInfo ? ((PropertyInfo)member).PropertyType : ((FieldInfo)member).FieldType;
+
+            if (withType)
+            {
+                memberName = $"{memberName} : {returnType.GetNiceName()}";
+
+                if (asPath)
+                    memberName = $"{member.DeclaringType.GetNiceName()}/{memberName}";
+                else
+                    memberName = $"{member.DeclaringType.GetNiceName()} . {memberName}";
+            }
+
+            return memberName;
+        }
+
         /// <summary>
         /// Get all member with suitable type of current object
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="memberTypes"></param>
         /// <returns></returns>
-        public static string[] GetAllMembers(this IObservable type, params MemberTypes[] memberTypes)
+        public static string[] GetAllMembers(this IObservable type, bool boldName, bool withType, bool asPath, params MemberTypes[] memberTypes)
         {
             if (type == null)
             {
@@ -101,7 +122,7 @@ namespace UnuGames
             {
                 if (all)
                 {
-                    results.Add(members[i].Name);
+                    results.Add(members[i].GetName(boldName, withType, asPath));
                 }
                 else
                 {
@@ -109,7 +130,7 @@ namespace UnuGames
                     {
                         if (all || members[i].MemberType == memberTypes[j])
                         {
-                            results.Add(members[i].Name);
+                            results.Add(members[i].GetName(boldName, withType, asPath));
                             break;
                         }
                     }
@@ -156,7 +177,7 @@ namespace UnuGames
             return results.ToArray();
         }
 
-        public static string[] GetAllMembers(this PropertyInfo proInfo, params MemberTypes[] memberTypes)
+        public static string[] GetAllMembers(this PropertyInfo proInfo, bool boldName, bool withType, bool asPath, params MemberTypes[] memberTypes)
         {
             if (proInfo == null)
             {
@@ -175,7 +196,7 @@ namespace UnuGames
             {
                 if (all)
                 {
-                    results.Add(members[i].Name);
+                    results.Add(members[i].GetName(boldName, withType, asPath));
                 }
                 else
                 {
@@ -183,7 +204,7 @@ namespace UnuGames
                     {
                         if (members[i].MemberType == memberTypes[j])
                         {
-                            results.Add(members[i].Name);
+                            results.Add(members[i].GetName(boldName, withType, asPath));
                             break;
                         }
                     }
