@@ -10,14 +10,14 @@ namespace UnuGames.MVVM
         public List<Selectable> disableOnTrue = new List<Selectable>();
 
         [HideInInspector]
-        public BindingField value = new BindingField("bool");
+        public BindingField valueField = new BindingField("bool");
 
         public override void Initialize(bool forceInit)
         {
             if (!CheckInitialize(forceInit))
                 return;
 
-            SubscribeOnChangedEvent(this.value, OnUpdateValue);
+            SubscribeOnChangedEvent(this.valueField, OnUpdateValue);
         }
 
         public void OnUpdateValue(object val)
@@ -25,7 +25,8 @@ namespace UnuGames.MVVM
             if (val == null)
                 return;
 
-            var valChange = (bool)val;
+            if (!(val is bool valChange))
+                return;
 
             if (this.enableOnTrue != null && this.enableOnTrue.Count > 0)
             {

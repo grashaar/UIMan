@@ -9,13 +9,13 @@ namespace UnuGames.MVVM
         protected CanvasGroup canvasGroup;
 
         [HideInInspector]
-        public BindingField alpha = new BindingField("Alpha");
+        public BindingField alphaField = new BindingField("Alpha");
 
         [HideInInspector]
-        public BindingField interactable = new BindingField("Interactable");
+        public BindingField interactableField = new BindingField("Interactable");
 
         [HideInInspector]
-        public BindingField blockRaycasts = new BindingField("Block Raycasts");
+        public BindingField blockRaycastsField = new BindingField("Block Raycasts");
 
         public override void Initialize(bool forceInit)
         {
@@ -24,9 +24,9 @@ namespace UnuGames.MVVM
 
             this.canvasGroup = GetComponent<CanvasGroup>();
 
-            SubscribeOnChangedEvent(this.alpha, OnUpdateAlpha);
-            SubscribeOnChangedEvent(this.interactable, OnUpdateInteractable);
-            SubscribeOnChangedEvent(this.blockRaycasts, OnUpdateInteractable);
+            SubscribeOnChangedEvent(this.alphaField, OnUpdateAlpha);
+            SubscribeOnChangedEvent(this.interactableField, OnUpdateInteractable);
+            SubscribeOnChangedEvent(this.blockRaycastsField, OnUpdateInteractable);
         }
 
         public void OnUpdateAlpha(object val)

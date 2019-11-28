@@ -10,10 +10,10 @@ namespace UnuGames.MVVM
         protected Image image;
 
         [HideInInspector]
-        public BindingField value = new BindingField("Image");
+        public BindingField imageField = new BindingField("Image");
 
         [HideInInspector]
-        public BindingField color = new BindingField("Color");
+        public BindingField colorField = new BindingField("Color");
 
         public string resourcePath = "/Images/";
 
@@ -24,16 +24,22 @@ namespace UnuGames.MVVM
 
             this.image = GetComponent<Image>();
 
-            SubscribeOnChangedEvent(this.value, OnUpdateImage);
-            SubscribeOnChangedEvent(this.color, OnUpdateColor);
+            SubscribeOnChangedEvent(this.imageField, OnUpdateImage);
+            SubscribeOnChangedEvent(this.colorField, OnUpdateColor);
         }
 
         public void OnUpdateImage(object newImage)
         {
-            if (newImage == null)
-                return;
+            var key = newImage == null ? string.Empty : newImage.ToString();
 
-            ExternalImageLoader.Instance.Load("file:///" + Application.persistentDataPath + this.resourcePath + newImage.ToString(), OnLoadComplete);
+            if (string.IsNullOrEmpty(key))
+            {
+                this.image.sprite = null;
+            }
+            else
+            {
+                ExternalImageLoader.Instance.Load("file:///" + Application.persistentDataPath + this.resourcePath + newImage.ToString(), OnLoadComplete);
+            }
         }
 
         private void OnLoadComplete(Sprite sprite)
@@ -41,18 +47,15 @@ namespace UnuGames.MVVM
             this.image.sprite = sprite;
         }
 
-        public void OnUpdateColor(object newColor)
+        public void OnUpdateColor(object val)
         {
-            if (newColor == null)
+            if (val == null)
                 return;
-            try
-            {
-                this.image.color = (Color)newColor;
-            }
-            catch
-            {
-                UnuLogger.LogWarning("Binding field is not a color!");
-            }
+
+            if (!(val is Color valChange))
+                return;
+
+            this.image.color = valChange;
         }
     }
 }

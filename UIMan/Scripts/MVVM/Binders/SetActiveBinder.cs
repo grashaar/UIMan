@@ -9,14 +9,14 @@ namespace UnuGames.MVVM
         public List<GameObject> inactiveOnTrue = new List<GameObject>();
 
         [HideInInspector]
-        public BindingField value = new BindingField("bool");
+        public BindingField valueField = new BindingField("bool");
 
         public override void Initialize(bool forceInit)
         {
             if (!CheckInitialize(forceInit))
                 return;
 
-            SubscribeOnChangedEvent(this.value, OnUpdateValue);
+            SubscribeOnChangedEvent(this.valueField, OnUpdateValue);
         }
 
         public void OnUpdateValue(object val)
@@ -24,7 +24,8 @@ namespace UnuGames.MVVM
             if (val == null)
                 return;
 
-            var valChange = (bool)val;
+            if (!(val is bool valChange))
+                return;
 
             if (this.activeOnTrue != null && this.activeOnTrue.Count > 0)
             {

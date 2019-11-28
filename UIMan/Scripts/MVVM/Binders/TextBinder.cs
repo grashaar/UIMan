@@ -10,10 +10,10 @@ namespace UnuGames.MVVM
         protected Text text;
 
         [HideInInspector]
-        public BindingField value = new BindingField("Text");
+        public BindingField textField = new BindingField("Text");
 
         [HideInInspector]
-        public BindingField color = new BindingField("Color", true);
+        public BindingField colorField = new BindingField("Color", true);
 
         public string format;
 
@@ -24,37 +24,33 @@ namespace UnuGames.MVVM
 
             this.text = GetComponent<Text>();
 
-            SubscribeOnChangedEvent(this.value, OnUpdateText);
-            SubscribeOnChangedEvent(this.color, OnUpdateColor);
+            SubscribeOnChangedEvent(this.textField, OnUpdateText);
+            SubscribeOnChangedEvent(this.colorField, OnUpdateColor);
         }
 
-        public void OnUpdateText(object newText)
+        public void OnUpdateText(object val)
         {
-            if (newText == null)
-                return;
+            var newText = val == null ? string.Empty : val.ToString();
 
             if (string.IsNullOrEmpty(this.format))
             {
-                this.text.text = newText.ToString();
+                this.text.text = newText;
             }
             else
             {
-                this.text.text = string.Format(this.format, newText.ToString());
+                this.text.text = string.Format(this.format, newText);
             }
         }
 
-        public void OnUpdateColor(object newColor)
+        public void OnUpdateColor(object val)
         {
-            if (newColor == null)
+            if (val == null)
                 return;
-            try
-            {
-                this.text.color = (Color)newColor;
-            }
-            catch
-            {
-                UnuLogger.LogWarning("Binding field is not a color!");
-            }
+
+            if (!(val is Color valChange))
+                return;
+
+            this.text.color = valChange;
         }
     }
 }

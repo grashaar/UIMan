@@ -10,7 +10,7 @@ namespace UnuGames.MVVM
         protected Image image;
 
         [HideInInspector]
-        public BindingField value = new BindingField("float");
+        public BindingField valueField = new BindingField("float");
 
         private readonly float timeChangeValue = 0.75f;
 
@@ -21,7 +21,7 @@ namespace UnuGames.MVVM
 
             this.image = GetComponent<Image>();
 
-            SubscribeOnChangedEvent(this.value, OnUpdateValue);
+            SubscribeOnChangedEvent(this.valueField, OnUpdateValue);
         }
 
         public void OnUpdateValue(object val)
@@ -29,7 +29,8 @@ namespace UnuGames.MVVM
             if (val == null)
                 return;
 
-            var valChange = (float)val;
+            if (!(val is float valChange))
+                return;
 
             UITweener.Value(this.gameObject, this.timeChangeValue, this.image.fillAmount, valChange).SetOnUpdate(UpdateValue);
         }

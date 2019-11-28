@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.U2D;
 
 namespace UnuGames
 {
@@ -12,58 +12,83 @@ namespace UnuGames
     {
         private readonly static Dictionary<string, Request> _requests = new Dictionary<string, Request>();
 
-        private static Func<string, Callback, IEnumerator> _loadMethodGameObject;
-        private static Func<string, Callback, IEnumerator> _loadMethodSprite;
-        private static Func<string, Callback, IEnumerator> _loadMethodTexture2D;
+        private static Action<string, Callback> _loadMethodGameObject;
+        private static Action<string, Callback> _loadMethodSprite;
+        private static Action<string, Callback> _loadMethodTexture2D;
+        private static Action<string, Callback> _loadMethodSpriteAtlas;
+        private static Action<string, Callback> _loadMethodFallback;
 
-        public static void SetLoadMethodGameObject(Func<string, Callback, IEnumerator> method)
+        public static void SetLoadMethodGameObject(Action<string, Callback> method)
             => _loadMethodGameObject = method ?? throw new ArgumentNullException(nameof(method));
 
-        public static void SetLoadMethodSprite(Func<string, Callback, IEnumerator> method)
+        public static void SetLoadMethodSprite(Action<string, Callback> method)
             => _loadMethodSprite = method ?? throw new ArgumentNullException(nameof(method));
 
-        public static void SetLoadMethodTexture2D(Func<string, Callback, IEnumerator> method)
+        public static void SetLoadMethodTexture2D(Action<string, Callback> method)
             => _loadMethodTexture2D = method ?? throw new ArgumentNullException(nameof(method));
 
-        public static IEnumerator Load<T>(string key, Callback callback = null) where T : Result
+        public static void SetLoadMethodSpriteAtlas(Action<string, Callback> method)
+            => _loadMethodSpriteAtlas = method ?? throw new ArgumentNullException(nameof(method));
+
+        public static void SetLoadMethodFallback(Action<string, Callback> method)
+            => _loadMethodFallback = method ?? throw new ArgumentNullException(nameof(method));
+
+        public static void Load<T>(string key, Callback callback = null) where T : Result
         {
-            if (!string.IsNullOrEmpty(key))
+            if (string.IsNullOrEmpty(key))
             {
-                var exist = _requests.ContainsKey(key) && _requests[key] != null;
+                Debug.LogWarning("Key is null or empty.");
+                return;
+            }
 
-                if (!exist)
-                {
-                    _requests[key] = new Request(key);
-                }
+            var exist = _requests.ContainsKey(key) && _requests[key] != null;
 
-                _requests[key].Handle(callback);
+            if (!exist)
+            {
+                _requests[key] = new Request(key);
+            }
 
-                if (!exist)
-                {
-                    var type = typeof(T);
+            _requests[key].Handle(callback);
 
-                    if (type == typeof(GameObject))
-                    {
-                        yield return _loadMethodGameObject(key, Handle);
-                    }
-                    else if (type == typeof(Sprite))
-                    {
-                        yield return _loadMethodSprite(key, Handle);
-                    }
-                    else if (type == typeof(Texture2D))
-                    {
-                        yield return _loadMethodTexture2D(key, Handle);
-                    }
-                    else
-                    {
-                        Debug.LogError($"Type {type} is not supported.");
-                    }
-                }
+            if (exist)
+                return;
+
+            var type = typeof(T);
+
+            if (type == typeof(GameObject))
+            {
+                Load(key, _loadMethodGameObject, _loadMethodFallback);
+            }
+            else if (type == typeof(SpriteAtlas))
+            {
+                Load(key, _loadMethodSpriteAtlas, _loadMethodFallback);
+            }
+            else if (type == typeof(Sprite))
+            {
+                Load(key, _loadMethodSprite, _loadMethodFallback);
+            }
+            else if (type == typeof(Texture2D))
+            {
+                Load(key, _loadMethodTexture2D, _loadMethodFallback);
             }
             else
             {
-                Debug.LogWarning("Key is null or empty.");
+                Load(key, null, _loadMethodFallback);
             }
+        }
+
+        private static void Load(string key, Action<string, Callback> method, Action<string, Callback> fallbackMethod)
+        {
+            if (method == null && fallbackMethod == null)
+            {
+                Debug.LogError("No load method is set.");
+                return;
+            }
+
+            if (method == null)
+                fallbackMethod(key, Handle);
+            else
+                method(key, Handle);
         }
 
         private static void Handle(string key, Result result)

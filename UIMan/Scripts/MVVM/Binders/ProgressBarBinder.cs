@@ -9,7 +9,7 @@ namespace UnuGames.MVVM
         protected UIProgressBar bar;
 
         [HideInInspector]
-        public BindingField value = new BindingField("float");
+        public BindingField valueField = new BindingField("float");
 
         public bool tweenValueChange;
         public float changeTime = 0.1f;
@@ -20,7 +20,7 @@ namespace UnuGames.MVVM
                 return;
 
             this.bar = GetComponent<UIProgressBar>();
-            SubscribeOnChangedEvent(this.value, OnUpdateValue);
+            SubscribeOnChangedEvent(this.valueField, OnUpdateValue);
         }
 
         public void OnUpdateValue(object val)
@@ -30,12 +30,14 @@ namespace UnuGames.MVVM
 
             var tempValue = val.ToString();
 
-            var valChange = float.Parse(tempValue);
-            float time = 0;
+            float.TryParse(tempValue, out var valChange);
+            var time = 0f;
+
             if (this.tweenValueChange)
             {
                 time = this.changeTime;
             }
+
             UITweener.Value(this.gameObject, time, this.bar.CurrentValue, valChange).SetOnUpdate(UpdateValue);
         }
 

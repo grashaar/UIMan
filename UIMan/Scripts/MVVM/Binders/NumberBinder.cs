@@ -10,7 +10,7 @@ namespace UnuGames.MVVM
         protected Text text;
 
         [HideInInspector]
-        public BindingField value = new BindingField("Text");
+        public BindingField valueField = new BindingField("Text");
 
         public string format;
         public float timeChange = 0.25f;
@@ -21,7 +21,7 @@ namespace UnuGames.MVVM
                 return;
 
             this.text = GetComponent<Text>();
-            SubscribeOnChangedEvent(this.value, OnUpdateText);
+            SubscribeOnChangedEvent(this.valueField, OnUpdateText);
         }
 
         public void OnUpdateText(object newText)
@@ -30,7 +30,6 @@ namespace UnuGames.MVVM
                 return;
 
             double.TryParse(this.text.text, out var val);
-
             double.TryParse(newText.ToString(), out var change);
 
             UITweener.Value(this.gameObject, this.timeChange, (float)val, (float)change).SetOnUpdate(UpdateText).SetOnComplete(() => {
