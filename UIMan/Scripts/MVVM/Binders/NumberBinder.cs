@@ -32,12 +32,12 @@ namespace UnuGames.MVVM
             double.TryParse(this.text.text, out var val);
             double.TryParse(newText.ToString(), out var change);
 
-            UITweener.Value(this.gameObject, this.timeChange, (float)val, (float)change).SetOnUpdate(UpdateText).SetOnComplete(() => {
-                this.text.text = newText.ToString();
-            });
+            UITweener.Value(this.gameObject, this.timeChange, (float)val, (float)change)
+                     .SetOnUpdate(OnUpdate)
+                     .SetOnComplete(() => OnComplete(newText));
         }
 
-        private void UpdateText(float val)
+        private void OnUpdate(float val)
         {
             if (string.IsNullOrEmpty(this.format))
             {
@@ -46,6 +46,20 @@ namespace UnuGames.MVVM
             else
             {
                 this.text.text = string.Format(this.format, val);
+            }
+        }
+
+        private void OnComplete(object newText)
+        {
+            var text = newText.ToString();
+
+            if (string.IsNullOrEmpty(this.format))
+            {
+                this.text.text = text;
+            }
+            else
+            {
+                this.text.text = string.Format(this.format, text);
             }
         }
     }
