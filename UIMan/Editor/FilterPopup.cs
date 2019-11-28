@@ -6,16 +6,17 @@ namespace UnuGames
 {
     public class FilterPopup : EditorWindow
     {
-        private static string[] mItems;
+        private static string[] mViewItems;
+        private static string[] mDataItems;
 
         private static Action<string> OnSelected { get; set; }
 
         private const int MEMBER_HEIGHT = 37;
         private static Rect inspectorRect;
         private static Vector2 inspectorPos;
-        private static Vector2 scrollPosition;
         private static UISearchField searchField;
         private static ListView listView;
+        private static int selected;
 
         /// <summary>
         /// Show window as dropdown popup
@@ -24,8 +25,9 @@ namespace UnuGames
         {
             var fp = CreateInstance<FilterPopup>();
 
-            var minHeight = mItems.Length * MEMBER_HEIGHT + MEMBER_HEIGHT * 2;
+            var minHeight = mViewItems.Length * MEMBER_HEIGHT + MEMBER_HEIGHT * 2;
             var bestHeight = (int)(Screen.currentResolution.height / 2.5f);
+
             if (minHeight > bestHeight)
                 minHeight = bestHeight;
 
@@ -38,13 +40,32 @@ namespace UnuGames
         /// </summary>
         /// <param name="binderEditor"></param>
         /// <param name="field"></param>
-        public static void Browse(string[] items, Action<string> onSelected)
+        public static void Browse(int selectedIndex, string[] items, Action<string> onSelected)
         {
+            selected = selectedIndex;
             searchField = new UISearchField(Filter, null, null);
             OnSelected = onSelected;
-            mItems = items;
+            mDataItems = items;
+            mViewItems = items;
 
             if (items != null && items.Length > 0)
+                Popup();
+        }
+
+        /// <summary>
+        /// Browse for field/property
+        /// </summary>
+        /// <param name="binderEditor"></param>
+        /// <param name="field"></param>
+        public static void Browse(int selectedIndex, string[] dataItems, string[] viewItems, Action<string> onSelected)
+        {
+            selected = selectedIndex;
+            searchField = new UISearchField(Filter, null, null);
+            OnSelected = onSelected;
+            mDataItems = dataItems;
+            mViewItems = viewItems;
+
+            if (dataItems != null && dataItems.Length > 0)
                 Popup();
         }
 
@@ -53,7 +74,7 @@ namespace UnuGames
             if (Event.current.keyCode == KeyCode.Escape)
                 Close();
 
-            if (mItems == null)
+            if (mViewItems == null)
                 return;
 
             if (listView == null)
@@ -61,7 +82,7 @@ namespace UnuGames
 
             //Search field
             searchField.Draw();
-            listView.SetData(mItems, true, OnSelected, searchField.KeyWord, this);
+            listView.SetData(selected, mDataItems, mViewItems, true, OnSelected, searchField.KeyWord, this);
             listView.Draw();
         }
 

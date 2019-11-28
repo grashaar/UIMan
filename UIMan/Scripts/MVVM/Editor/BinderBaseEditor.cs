@@ -64,20 +64,24 @@ namespace UnuGames.MVVM
                 curMemberName = BindingDefine.SELECT_MEMBER;
             }
 
-            var members = this.binder.GetMembers(false, true, true, MemberTypes.Field, MemberTypes.Property);
-            if (members == null)
+            var viewMembers = this.binder.GetMembers(false, true, false, false, MemberTypes.Field, MemberTypes.Property);
+            var dataMembers = this.binder.GetMembers(false, false, false, false, MemberTypes.Field, MemberTypes.Property);
+
+            if (dataMembers == null)
             {
                 EditorGUILayout.LabelField("<color=red>No target context found!</color>", EditorGUIHelper.RichText());
                 GUILayout.EndHorizontal();
             }
             else
             {
-                ArrayUtility.Insert(ref members, 0, "<None>");
+                ArrayUtility.Insert(ref dataMembers, 0, "<None>");
+                ArrayUtility.Insert(ref viewMembers, 0, "<None>");
 
                 var selectedIndex = 0;
-                for (var i = 0; i < members.Length; i++)
+
+                for (var i = 0; i < dataMembers.Length; i++)
                 {
-                    if (curMemberName == members[i])
+                    if (curMemberName == dataMembers[i])
                     {
                         selectedIndex = i;
                         break;
@@ -87,11 +91,12 @@ namespace UnuGames.MVVM
                 GUILayout.Space(-7);
                 EditorGUILayout.BeginVertical();
                 GUILayout.Space(5);
-                var newSelectedIndex = EditorGUILayout.Popup(selectedIndex, members);
+                var newSelectedIndex = EditorGUILayout.Popup(selectedIndex, viewMembers);
                 if (newSelectedIndex != selectedIndex)
                 {
+                    Undo.RecordObject(this.target, "Select Binder Member");
                     selectedIndex = newSelectedIndex;
-                    field.member = members[selectedIndex];
+                    field.member = dataMembers[selectedIndex];
                     Apply();
                 }
 
@@ -99,12 +104,12 @@ namespace UnuGames.MVVM
 
                 if (EditorGUIHelper.QuickPickerButton())
                 {
-                    ContextBrowser.Browse(this, field, true, true, false);
+                    ContextBrowser.Browse(this, field, selectedIndex, true, true, false);
                 }
 
                 GUILayout.EndHorizontal();
 
-                MemberInfo curMember = this.binder.GetMemberInfo(members[selectedIndex], MemberTypes.Property, MemberTypes.Field);
+                MemberInfo curMember = this.binder.GetMemberInfo(dataMembers[selectedIndex], MemberTypes.Property, MemberTypes.Field);
                 if (curMember != null)
                 {
                     var attributes = curMember.GetCustomAttributes(typeof(UIManProperty), false);

@@ -7,30 +7,33 @@ namespace UnuGames.MVVM
     {
         private static BinderBaseEditor curBinderEditor;
         private static BindingField curField;
-        private static string[] members;
+        private static string[] viewMembers;
+        private static string[] dataMembers;
 
         /// <summary>
         /// Browse for field/property
         /// </summary>
         /// <param name="binderEditor"></param>
         /// <param name="field"></param>
-        public static void Browse(BinderBaseEditor binderEditor, BindingField field, bool boldName = false, bool withType = false, bool asPath = false)
+        public static void Browse(BinderBaseEditor binderEditor, BindingField field, int selectedIndex, bool boldName = false, bool withReturnType = false, bool withDeclaringType = false, bool asPath = false)
         {
             curBinderEditor = binderEditor;
             curField = field;
 
-            members = binderEditor.binder.GetMembers(boldName, withType, asPath, MemberTypes.Field, MemberTypes.Property);
+            dataMembers = binderEditor.binder.GetMembers(false, false, false, false, MemberTypes.Field, MemberTypes.Property);
+            viewMembers = binderEditor.binder.GetMembers(boldName, withReturnType, withDeclaringType, asPath, MemberTypes.Field, MemberTypes.Property);
 
-            FilterPopup.Browse(members, OnMemberSelected);
+            FilterPopup.Browse(selectedIndex, dataMembers, viewMembers, OnMemberSelected);
         }
 
-        public static void Browse(string[] members, Action<string> onSelected)
+        public static void Browse(int selectedIndex, string[] dataMembers, string[] viewMembers, Action<string> onSelected)
         {
-            FilterPopup.Browse(members, onSelected);
+            FilterPopup.Browse(selectedIndex, dataMembers, viewMembers, onSelected);
         }
 
         public static void OnMemberSelected(string member)
         {
+            UnityEditor.Undo.RecordObject(curBinderEditor.target, "Select Binder Member");
             curField.member = member;
             curBinderEditor.Apply();
             FilterPopup.Close();

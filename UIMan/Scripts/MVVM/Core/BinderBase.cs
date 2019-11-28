@@ -57,18 +57,18 @@ namespace UnuGames.MVVM
             return this.dataContext.viewModel;
         }
 
-        public string[] GetMembers(bool boldName, bool withType, bool asPath, params MemberTypes[] memberTypes)
+        public string[] GetMembers(bool boldName, bool withReturnType, bool withDeclaringType, bool asPath, params MemberTypes[] memberTypes)
         {
             if (this.dataContext == null)
                 FindDataContext();
 
             if (this.dataContext.type == ContextType.MonoBehaviour)
             {
-                return this.dataContext.viewModel.GetAllMembers(boldName, withType, asPath, memberTypes);
+                return this.dataContext.viewModel.GetAllMembers(boldName, withReturnType, withDeclaringType, asPath, memberTypes);
             }
             else if (this.dataContext.type == ContextType.Property)
             {
-                return this.dataContext.GetPropertyInfo().GetAllMembers(boldName, withType, asPath, memberTypes);
+                return this.dataContext.GetPropertyInfo().GetAllMembers(boldName, withReturnType, withDeclaringType, asPath, memberTypes);
             }
 
             return new string[0];

@@ -38,18 +38,20 @@ namespace UnuGames.MVVM
             {
                 context.viewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, (Object)context.viewModel, typeof(ViewModelBehaviour), true);
 
-                var members = context.viewModel.GetAllMembers(false, true, true, MemberTypes.Field, MemberTypes.Property, MemberTypes.Field);
-                if (members != null)
+                var viewMembers = context.viewModel.GetAllMembers(false, true, false, false, MemberTypes.Field, MemberTypes.Property);
+                var dataMembers = context.viewModel.GetAllMembers(false, false, false, false, MemberTypes.Field, MemberTypes.Property);
+
+                if (dataMembers != null)
                 {
                     if (string.IsNullOrEmpty(context.propertyName))
                     {
-                        context.propertyName = members[0];
+                        context.propertyName = dataMembers[0];
                     }
                     else
                     {
-                        for (var i = 0; i < members.Length; i++)
+                        for (var i = 0; i < dataMembers.Length; i++)
                         {
-                            if (members[i] == context.propertyName)
+                            if (dataMembers[i] == context.propertyName)
                             {
                                 this.selected = i;
                                 break;
@@ -62,18 +64,20 @@ namespace UnuGames.MVVM
 
                     GUILayout.BeginVertical();
                     GUILayout.Space(5);
-                    var newSelected = EditorGUILayout.Popup("Field/Property", this.selected, members);
+                    var newSelected = EditorGUILayout.Popup("Field/Property", this.selected, viewMembers);
                     GUILayout.EndVertical();
 
                     if (this.selected != newSelected)
                     {
-                        context.propertyName = members[newSelected];
+                        Undo.RecordObject(this.target, "Select Contenxt Member");
+                        context.propertyName = dataMembers[newSelected];
                         this.selected = newSelected;
                     }
 
                     if (EditorGUIHelper.QuickPickerButton())
                     {
-                        ContextBrowser.Browse(members, selectedMember => {
+                        ContextBrowser.Browse(this.selected, dataMembers, viewMembers, selectedMember => {
+                            Undo.RecordObject(this.target, "Select Context Member");
                             context.propertyName = selectedMember;
                             FilterPopup.Close();
                         });
@@ -81,7 +85,7 @@ namespace UnuGames.MVVM
 
                     GUILayout.EndHorizontal();
 
-                    MemberInfo curMember = context.viewModel.GetMemberInfo(members[this.selected], MemberTypes.Property, MemberTypes.Field);
+                    MemberInfo curMember = context.viewModel.GetMemberInfo(dataMembers[this.selected], MemberTypes.Property, MemberTypes.Field);
                     if (curMember != null)
                     {
                         var attributes = curMember.GetCustomAttributes(typeof(UIManProperty), false);

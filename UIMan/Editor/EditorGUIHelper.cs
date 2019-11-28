@@ -361,36 +361,57 @@ namespace UnuGames
     public class ListView
     {
         private GUIStyle menuItemStyle;
-        private string[] _items;
+        private GUIStyle buttonStyle;
+        private int _selected;
+        private string[] _viewItems;
+        private string[] _dataItems;
         private bool _selectOnMouseHover;
         private string _filter;
         private Vector2 _scrollPosition;
-        private EditorWindow _window;
-
-        public EditorWindow Window
-        {
-            get { return this._window; }
-        }
 
         private Action<string> _onSelected;
         private Action<int> _onSelectedIndex;
 
         private int selectedIndex = -1;
-        public string SelectedItem { get; set; }
+
+        public EditorWindow Window { get; private set; }
+
+        public string SelectedViewItem { get; private set; }
+
+        public string SelectedDataItem { get; private set; }
 
         public ListView()
         {
             this.menuItemStyle = new GUIStyle(GUI.skin.FindStyle("MenuItem")) {
+                fixedHeight = 16,
+                richText = true
+            };
+
+            this.buttonStyle = new GUIStyle(GUI.skin.button) {
                 richText = true
             };
         }
 
-        public void SetData(string[] items, bool selectOnMouseHover, Action<string> onSelected, string filterString, EditorWindow window, Action<int> onSelectedIndex = null)
+        public void SetData(int selectedIndex, string[] items, bool selectOnMouseHover, Action<string> onSelected, string filterString, EditorWindow window, Action<int> onSelectedIndex = null)
         {
+            this._selected = selectedIndex;
             this._selectOnMouseHover = selectOnMouseHover;
             this._filter = filterString;
-            this._items = items;
-            this._window = window;
+            this._dataItems = items;
+            this._viewItems = items;
+            this.Window = window;
+            this._onSelected = onSelected;
+            this._onSelectedIndex = onSelectedIndex;
+        }
+
+        public void SetData(int selectedIndex, string[] dataItems, string[] viewItems, bool selectOnMouseHover, Action<string> onSelected, string filterString, EditorWindow window, Action<int> onSelectedIndex = null)
+        {
+            this._selected = selectedIndex;
+            this._selectOnMouseHover = selectOnMouseHover;
+            this._filter = filterString;
+            this._dataItems = dataItems;
+            this._viewItems = viewItems;
+            this.Window = window;
             this._onSelected = onSelected;
             this._onSelectedIndex = onSelectedIndex;
         }
@@ -399,20 +420,33 @@ namespace UnuGames
         {
             //List of items
             this._scrollPosition = GUILayout.BeginScrollView(this._scrollPosition, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            var defaultMenuColor = this.menuItemStyle.normal.textColor;
+            var defaultButtonColor = this.buttonStyle.normal.textColor;
 
-            for (var i = 0; i < this._items.Length; i++)
+            for (var i = 0; i < this._viewItems.Length; i++)
             {
+                if (i == this._selected)
+                {
+                    this.menuItemStyle.normal.textColor = Color.blue;
+                    this.buttonStyle.normal.textColor = Color.blue;
+                }
+                else
+                {
+                    this.menuItemStyle.normal.textColor = defaultMenuColor;
+                    this.buttonStyle.normal.textColor = defaultButtonColor;
+                }
+
                 // Filter item by keyword
                 if (!string.IsNullOrEmpty(this._filter))
                 {
-                    if (this._items[i].ToLower().IndexOf(this._filter.ToLower(), StringComparison.Ordinal) < 0)
+                    if (this._viewItems[i].ToLower().IndexOf(this._filter.ToLower(), StringComparison.Ordinal) < 0)
                         continue;
                 }
 
                 // Draw suitable items
                 if (this._selectOnMouseHover)
                 {
-                    if (GUILayout.Button(this._items[i], this.menuItemStyle))
+                    if (GUILayout.Button(this._viewItems[i], this.menuItemStyle))
                     {
                         DoSelect(i);
                     }
@@ -420,7 +454,7 @@ namespace UnuGames
                 else
                 {
                     var val = i == this.selectedIndex ? true : false;
-                    var newVal = GUILayout.Toggle(val, this._items[i], "Button");
+                    var newVal = GUILayout.Toggle(val, this._viewItems[i], this.buttonStyle);
                     if (val != newVal && newVal == true)
                     {
                         DoSelect(i);
@@ -429,7 +463,7 @@ namespace UnuGames
 
                 // Update button's status (for hover event)
                 if (this._selectOnMouseHover)
-                    this._window.Repaint();
+                    this.Window.Repaint();
             }
 
             GUILayout.EndScrollView();
@@ -440,23 +474,17 @@ namespace UnuGames
             if (i > -1)
             {
                 this.selectedIndex = i;
-                if (this._onSelected != null)
-                {
-                    this.SelectedItem = this._items[i];
-                    this._onSelected(this._items[i]);
-                }
+                this.SelectedViewItem = this._viewItems[i];
+                this.SelectedDataItem = this._dataItems[i];
 
-                if (this._onSelectedIndex != null)
-                {
-                    this.SelectedItem = this._items[i];
-                    this._onSelectedIndex(i);
-                }
+                this._onSelected?.Invoke(this._dataItems[i]);
+                this._onSelectedIndex?.Invoke(i);
             }
         }
 
         public void Select(string item)
         {
-            var itemIndex = ArrayUtility.IndexOf(this._items, item);
+            var itemIndex = ArrayUtility.IndexOf(this._viewItems, item);
             DoSelect(itemIndex);
         }
     }

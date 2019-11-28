@@ -224,7 +224,8 @@ namespace UnuGames
 
             if (this.listTypes == null)
                 this.listTypes = new ListView();
-            this.listTypes.SetData(_types, false, OnSelecType, this.searchField.KeyWord, this);
+
+            this.listTypes.SetData(-1, _types, false, OnSelecType, this.searchField.KeyWord, this);
             this.listTypes.Draw();
 
             if (_reload && _config != null)
@@ -247,7 +248,7 @@ namespace UnuGames
         {
             GUILayout.BeginVertical();
 
-            if (this.listTypes != null && !string.IsNullOrEmpty(this.listTypes.SelectedItem))
+            if (this.listTypes != null && !string.IsNullOrEmpty(this.listTypes.SelectedViewItem))
             {
                 if (_selectedType != null)
                 {
