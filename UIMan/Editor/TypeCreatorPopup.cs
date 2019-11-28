@@ -9,6 +9,7 @@ namespace UnuGames
     {
         private string baseType = "UIManDialog";
 
+        private TextFieldHelper namespaceField;
         private EditablePopup baseTypePopup;
 
         private readonly string[] arrSupportType = new string[3] {
@@ -20,15 +21,16 @@ namespace UnuGames
         private bool inited = false;
         private string typeName = "NewViewModel";
 
-        private void Init()
+        private void Initialize()
         {
             if (!this.inited)
             {
                 if (this.baseTypePopup == null)
                 {
+                    this.namespaceField = new TextFieldHelper(Resources.Load<UIManConfig>("UIManConfig").classNamespace);
                     this.baseTypePopup = new EditablePopup(this.arrSupportType, "UIManDialog", null);
                 }
-                this.minSize = new Vector2(300, 80);
+                this.minSize = new Vector2(300, 160);
                 this.maxSize = this.minSize;
                 this.inited = true;
             }
@@ -36,10 +38,18 @@ namespace UnuGames
 
         private void OnGUI()
         {
-            Init();
+            Initialize();
+
             GUILayout.Space(10);
+            LabelHelper.HeaderLabel("Type");
+            LineHelper.Draw(Color.gray);
             this.baseTypePopup.Draw();
-            LineHelper.Draw(Color.black);
+
+            GUILayout.Space(10);
+            LabelHelper.HeaderLabel("Namespace");
+            LineHelper.Draw(Color.gray);
+            this.namespaceField.Draw(GUIContent.none, 0);
+
             GUILayout.Space(10);
 
             if (ColorButton.Draw("Create", CommonColor.LightGreen, GUILayout.Height(30)))
@@ -138,7 +148,7 @@ namespace UnuGames
             if (this.baseType != this.arrSupportType[0])
                 config.generatingType = this.typeName;
 
-            var code = UIManCodeGenerator.GenerateScript(this.typeName, this.baseType, config);
+            var code = UIManCodeGenerator.GenerateScript(this.typeName, this.baseType, config, this.namespaceField.Text);
             UIManCodeGenerator.SaveScript(savePath, code, true);
 
             if (this.baseType != this.arrSupportType[0])
@@ -161,7 +171,7 @@ namespace UnuGames
             var config = Resources.Load<UIManConfig>("UIManConfig");
 
             if (string.IsNullOrEmpty(handlerCode))
-                handlerCode = UIManCodeGenerator.GenerateViewModelHandler(this.typeName, this.baseType, config);
+                handlerCode = UIManCodeGenerator.GenerateViewModelHandler(this.typeName, this.baseType, config, this.namespaceField.Text);
             else
                 handlerCode = handlerCode.Replace(": " + this.typeName, ": " + this.baseType);
 

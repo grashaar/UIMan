@@ -36,6 +36,7 @@ namespace UnuGames
 
         private UISearchField searchField;
         private ListView listTypes;
+        private TextFieldHelper namespaceField;
         private EditablePopup baseTypePopup;
 
         public static string GetSupportTypeName(int index)
@@ -332,6 +333,18 @@ namespace UnuGames
                         }
                     }
 
+                    // Namespace
+                    GUILayout.Space(10);
+                    LabelHelper.HeaderLabel("Namespace");
+                    LineHelper.Draw(Color.gray);
+                    this.namespaceField.Draw(GUIContent.none, 0);
+
+                    if (this.baseTypePopup.SelectedItem != "ObservableModel" &&
+                        !string.Equals(_selectedType.Namespace, this.namespaceField.Text))
+                    {
+                        EditorGUILayout.HelpBox($"Must manually change the namespace in {_selectedType.Name}.Handler.cs", MessageType.Warning);
+                    }
+
                     // Properties
                     GUILayout.Space(10);
                     LabelHelper.HeaderLabel("Properties");
@@ -373,6 +386,7 @@ namespace UnuGames
                 //Save all change
                 var changeList = new CustomPropertyInfo[0];
                 var selectedList = new CustomPropertyInfo[0];
+
                 for (var i = 0; i < _selectedProperties.Length; i++)
                 {
                     if (_selectedProperties[i].HasChange)
@@ -385,7 +399,7 @@ namespace UnuGames
                 LineHelper.Draw(Color.gray);
                 GUILayout.Space(5);
 
-                if (changeList.Length > 0)
+                if (changeList.Length > 0 || !string.Equals(_selectedType.Namespace, this.namespaceField.Text))
                 {
                     if (ColorButton.Draw("Save All Changes", CommonColor.LightGreen, GUILayout.Height(30)))
                     {
@@ -469,6 +483,7 @@ namespace UnuGames
             _config.selectedType = typeName;
             _selectedType = UIManEditorReflection.GetTypeByName(typeName);
             _selectedProperties = _selectedType.GetUIManProperties();
+            this.namespaceField = new TextFieldHelper(_selectedType.Namespace);
             this.baseTypePopup = new EditablePopup(_arrSupportType, _selectedType.BaseType.Name, OnChangeBaseType);
             _currentScriptPath = UIManCodeGenerator.GetScriptPathByType(_selectedType);
             _handlerScriptPath = UIManCodeGenerator.GeneratPathWithSubfix(_currentScriptPath, ".Handler.cs");
@@ -519,7 +534,7 @@ namespace UnuGames
             if (!string.IsNullOrEmpty(_currentScriptPath))
             {
                 var backupCode = UIManCodeGenerator.DeleteScript(_handlerScriptPath);
-                var code = UIManCodeGenerator.GenerateScript(_selectedType.Name, baseType, _config, _selectedProperties);
+                var code = UIManCodeGenerator.GenerateScript(_selectedType.Name, baseType, _config, this.namespaceField.Text, _selectedProperties);
 
                 var saved = UIManCodeGenerator.SaveScript(_currentScriptPath, code, true);
 
@@ -543,7 +558,7 @@ namespace UnuGames
 
             var handlerCode = backupCode;
             if (string.IsNullOrEmpty(handlerCode))
-                handlerCode = UIManCodeGenerator.GenerateViewModelHandler(_selectedType.Name, baseType, _config);
+                handlerCode = UIManCodeGenerator.GenerateViewModelHandler(_selectedType.Name, baseType, _config, this.namespaceField.Text);
             else
                 handlerCode = handlerCode.Replace(": " + _selectedType.BaseType.Name, ": " + baseType);
             var saved = UIManCodeGenerator.SaveScript(_handlerScriptPath, handlerCode, false, _selectedType.BaseType.Name, baseType);

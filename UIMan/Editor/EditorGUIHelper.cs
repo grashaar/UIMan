@@ -869,10 +869,10 @@ namespace UnuGames
     {
         public string Text { get; set; }
 
-        public string Draw(GUIContent label)
+        public string Draw(GUIContent label, float width = 100f)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(label, GUILayout.Width(100));
+            GUILayout.Label(label, GUILayout.Width(width));
             this.Text = EditorGUILayout.TextField(this.Text);
 
             GUILayout.EndHorizontal();
