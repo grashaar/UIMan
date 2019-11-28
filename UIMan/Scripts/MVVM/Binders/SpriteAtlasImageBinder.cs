@@ -34,7 +34,7 @@ namespace UnuGames.MVVM
             this.image = GetComponent<Image>();
             this.loadedAtlas = this.atlas;
 
-            SubscribeOnChangedEvent(this.atlasField, OnUpdateImage);
+            SubscribeOnChangedEvent(this.atlasField, OnUpdateAtlas);
             SubscribeOnChangedEvent(this.valueField, OnUpdateImage);
             SubscribeOnChangedEvent(this.colorField, OnUpdateColor);
         }
