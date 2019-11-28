@@ -39,15 +39,13 @@ namespace UnuGames.MVVM
 
         private void UpdateText(float val)
         {
-            var valueChange = (long)val;
-
             if (string.IsNullOrEmpty(this.format))
             {
-                this.text.text = valueChange.ToString();
+                this.text.text = val.ToString();
             }
             else
             {
-                this.text.text = string.Format(this.format, valueChange.ToString());
+                this.text.text = string.Format(this.format, val);
             }
         }
     }
