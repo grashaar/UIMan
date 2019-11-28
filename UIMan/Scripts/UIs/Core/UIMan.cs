@@ -505,7 +505,7 @@ namespace UnuGames
         /// <param name="callback">Callback.</param>
         public void RegisterOnBack(Action<UIManBase, UIManBase, object[]> callback)
         {
-            UIEventDispatcher.AddEventListener<UIManBase, UIManBase, object[]>(UIManEvents.UIMan.OnBack, callback);
+            UIEventDispatcher.AddEventListener(UIManEvents.UIMan.OnBack, callback);
         }
 
         /// <summary>
@@ -514,7 +514,7 @@ namespace UnuGames
         /// <param name="callback">Callback.</param>
         public void RegisterOnShowUI(Action<UIManBase, object[]> callback)
         {
-            UIEventDispatcher.AddEventListener<UIManBase, object[]>(UIManEvents.UIMan.OnShowUI, callback);
+            UIEventDispatcher.AddEventListener(UIManEvents.UIMan.OnShowUI, callback);
         }
 
         /// <summary>
@@ -523,7 +523,7 @@ namespace UnuGames
         /// <param name="callback">Callback.</param>
         public void RegisterOnShowUIComplete(Action<UIManBase, object[]> callback)
         {
-            UIEventDispatcher.AddEventListener<UIManBase, object[]>(UIManEvents.UIMan.OnShowUIComplete, callback);
+            UIEventDispatcher.AddEventListener(UIManEvents.UIMan.OnShowUIComplete, callback);
         }
 
         /// <summary>
@@ -532,7 +532,7 @@ namespace UnuGames
         /// <param name="callback">Callback.</param>
         public void RegisterOnHideUI(Action<UIManBase> callback)
         {
-            UIEventDispatcher.AddEventListener<UIManBase>(UIManEvents.UIMan.OnHideUI, callback);
+            UIEventDispatcher.AddEventListener(UIManEvents.UIMan.OnHideUI, callback);
         }
 
         /// <summary>
@@ -541,7 +541,7 @@ namespace UnuGames
         /// <param name="callback">Callback.</param>
         public void RegisterOnHideUIComplete(Action<UIManBase> callback)
         {
-            UIEventDispatcher.AddEventListener<UIManBase>(UIManEvents.UIMan.OnHideUIComplete, callback);
+            UIEventDispatcher.AddEventListener(UIManEvents.UIMan.OnHideUIComplete, callback);
         }
 
         #endregion Features
@@ -556,7 +556,7 @@ namespace UnuGames
         /// <param name="args">Arguments.</param>
         private void OnBack(UIManBase handlerBefore, UIManBase handlerAfter, params object[] args)
         {
-            UIEventDispatcher.TriggerEvent<UIManBase, UIManBase, object[]>(UIManEvents.UIMan.OnBack, handlerBefore, handlerAfter, args);
+            UIEventDispatcher.TriggerEvent(UIManEvents.UIMan.OnBack, handlerBefore, handlerAfter, args);
         }
 
         /// <summary>
@@ -566,7 +566,7 @@ namespace UnuGames
         /// <param name="args">Arguments.</param>
         private void OnShowUI(UIManBase handler, params object[] args)
         {
-            UIEventDispatcher.TriggerEvent<UIManBase, object[]>(UIManEvents.UIMan.OnShowUI, handler, args);
+            UIEventDispatcher.TriggerEvent(UIManEvents.UIMan.OnShowUI, handler, args);
         }
 
         /// <summary>
@@ -576,7 +576,7 @@ namespace UnuGames
         /// <param name="args">Arguments.</param>
         private void OnShowUIComplete(UIManBase handler, params object[] args)
         {
-            UIEventDispatcher.TriggerEvent<UIManBase, object[]>(UIManEvents.UIMan.OnShowUIComplete, handler, args);
+            UIEventDispatcher.TriggerEvent(UIManEvents.UIMan.OnShowUIComplete, handler, args);
         }
 
         /// <summary>
@@ -585,7 +585,7 @@ namespace UnuGames
         /// <param name="ui">User interface.</param>
         private void OnHideUI(UIManBase handler)
         {
-            UIEventDispatcher.TriggerEvent<UIManBase>(UIManEvents.UIMan.OnHideUI, handler);
+            UIEventDispatcher.TriggerEvent(UIManEvents.UIMan.OnHideUI, handler);
         }
 
         /// <summary>
@@ -594,7 +594,7 @@ namespace UnuGames
         /// <param name="ui">User interface.</param>
         private void OnHideUIComplete(UIManBase handler)
         {
-            UIEventDispatcher.TriggerEvent<UIManBase>(UIManEvents.UIMan.OnHideUIComplete, handler);
+            UIEventDispatcher.TriggerEvent(UIManEvents.UIMan.OnHideUIComplete, handler);
         }
 
         #endregion Events

@@ -15,11 +15,16 @@ namespace UnuGames.MVVM
 
             this.binder = this.target as BinderBase;
 
+            GUILayout.Space(4);
+            GUILayout.BeginVertical(GUI.skin.box);
+            GUILayout.Space(4);
+
             var context = EditorGUILayout.ObjectField(new GUIContent("Data Context"), this.binder.dataContext, typeof(DataContext), true) as DataContext;
 
             if (context == null)
             {
-                GUILayout.Label(BindingDefine.FIND_CONTEXT_AUTO);
+                GUILayout.Space(4);
+
                 if (GUILayout.Button(BindingDefine.FIND_CONTEXT))
                 {
                     context = this.binder.FindDataContext();
@@ -33,7 +38,11 @@ namespace UnuGames.MVVM
             }
 
             if (this.binder.dataContext == null)
+            {
+                GUILayout.Space(4);
+                GUILayout.EndVertical();
                 return;
+            }
 
             BindingField[] arrFields = this.binder.GetBindingFields();
 
@@ -44,6 +53,8 @@ namespace UnuGames.MVVM
                 DrawBindingField(arrFields[i]);
             }
 
+            GUILayout.EndVertical();
+            GUILayout.Space(4);
             GUILayout.EndVertical();
 
             if (Event.current.type == EventType.Repaint)
@@ -112,7 +123,7 @@ namespace UnuGames.MVVM
                 MemberInfo curMember = this.binder.GetMemberInfo(dataMembers[selectedIndex], MemberTypes.Property, MemberTypes.Field);
                 if (curMember != null)
                 {
-                    var attributes = curMember.GetCustomAttributes(typeof(UIManProperty), false);
+                    var attributes = curMember.GetCustomAttributes(typeof(UIManPropertyAttribute), false);
                     if (attributes == null || attributes.Length == 0)
                     {
                         GUILayout.BeginHorizontal();

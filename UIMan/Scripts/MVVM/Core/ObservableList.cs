@@ -92,14 +92,6 @@ namespace UnuGames.MVVM
             }
         }
 
-        private Action<T> onAdd = delegate { };
-
-        private Action<int, T> onInsert = delegate { };
-
-        private Action<T> onRemove = delegate { };
-
-        private Action onClear = delegate { };
-
         public int Count
         {
             get
@@ -133,7 +125,6 @@ namespace UnuGames.MVVM
         public void Add(T o)
         {
             this.list.Add(o);
-            this.onAdd?.Invoke(o);
             this.onAddObject?.Invoke(o);
         }
 
@@ -149,7 +140,6 @@ namespace UnuGames.MVVM
         public void Clear()
         {
             this.list.Clear();
-            this.onClear?.Invoke();
             this.onClearObjects();
         }
 
@@ -176,7 +166,6 @@ namespace UnuGames.MVVM
         public void Insert(int index, T o)
         {
             this.list.Insert(index, o);
-            this.onInsert?.Invoke(index, o);
             this.onInsertObject?.Invoke(index, o);
         }
 
@@ -184,7 +173,6 @@ namespace UnuGames.MVVM
         {
             if (this.list.Remove(o))
             {
-                this.onRemove?.Invoke(o);
                 this.onRemoveObject?.Invoke(o);
             }
         }
@@ -193,7 +181,6 @@ namespace UnuGames.MVVM
         {
             T o = this.list[index];
             this.list.RemoveAt(index);
-            this.onRemove?.Invoke(o);
             this.onRemoveAt?.Invoke(index);
         }
 

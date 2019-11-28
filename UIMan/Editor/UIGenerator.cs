@@ -380,7 +380,7 @@ namespace UnuGames
                     var newProperty = new CustomPropertyInfo("", typeof(string)) {
                         LastName = "NewProperty" + strNewIndex
                     };
-                    ArrayUtility.Add<CustomPropertyInfo>(ref _selectedProperties, newProperty);
+                    ArrayUtility.Add(ref _selectedProperties, newProperty);
                     CachePropertiesDrawer();
                 }
 
@@ -498,7 +498,7 @@ namespace UnuGames
 
         public void OnPropertyDelete(CustomPropertyInfo property)
         {
-            ArrayUtility.Remove<CustomPropertyInfo>(ref _selectedProperties, property);
+            ArrayUtility.Remove(ref _selectedProperties, property);
             SaveCurrentType();
             CachePropertiesDrawer();
         }
@@ -618,11 +618,11 @@ namespace UnuGames
 
         private string GetUIPrefabPath(Type uiType, bool isDialog)
         {
-            var attributes = uiType.GetCustomAttributes(typeof(UIDescriptor), true);
+            var attributes = uiType.GetCustomAttributes(typeof(UIDescriptorAttribute), true);
             string url;
             if (attributes != null && attributes.Length > 0)
             {
-                url = ((UIDescriptor)attributes[0]).url;
+                url = ((UIDescriptorAttribute)attributes[0]).Url;
             }
             else
             {

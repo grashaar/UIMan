@@ -48,18 +48,20 @@ namespace UnuGames.MVVM
 
         private const int BOUND_BUFFERS = 3;
 
+        public GameObject contentPrefab;
         public RectTransform contentRect;
         public RectTransform viewPort;
 
-        [HideInInspector]
-        public Rect viewPortRect;
-
-        private ScrollRect scrollRect;
+        [Space]
         public float contentWidth;
         public float contentHeight;
         public Vector2 contentSpacing;
         public Vector2 padding;
         public Vector2 grouping;
+
+        [Space]
+        public bool usePoolRectToHide;
+        public RectTransform poolRect;
 
         [HideInInspector]
         public BindingField observableList = new BindingField("Data Source");
@@ -72,7 +74,9 @@ namespace UnuGames.MVVM
         private readonly Dictionary<Cell, object> dataDict = new Dictionary<Cell, object>();
         private readonly List<object> orgDataList = new List<object>();
 
-        public GameObject contentPrefab;
+        [HideInInspector]
+        public Rect viewPortRect;
+        private ScrollRect scrollRect;
         private int poolSize = 10;
         private IObservaleCollection dataList;
         private MemberInfo sourceMember;
@@ -153,25 +157,37 @@ namespace UnuGames.MVVM
 
             for (var i = 0; i < this.poolSize; i++)
             {
-                var obj = Instantiate(this.contentPrefab, _hidePosition, Quaternion.identity) as GameObject;
+                var position = this.usePoolRectToHide ? Vector3.zero : _hidePosition;
+
+                var obj = Instantiate(this.contentPrefab, position, Quaternion.identity) as GameObject;
                 ViewModelBehaviour vm = obj.GetComponent<ViewModelBehaviour>();
-                var module = (IModule)vm;
-                this.modulesPool.Enqueue(module);
                 vm.RectTransform.SetParent(this.contentRect, true);
                 vm.RectTransform.localScale = Vector3.one;
+
+                PoolModule((IModule)vm);
             }
         }
 
         private IModule GetModuleFromPool()
         {
-            if (this.modulesPool.Count > 0)
-                return this.modulesPool.Dequeue();
-            return null;
+            if (this.modulesPool.Count <= 0)
+                return null;
+
+            var module = this.modulesPool.Dequeue();
+
+            if (this.usePoolRectToHide)
+                module.ViewModel.RectTransform.SetParent(this.contentRect);
+
+            return module;
         }
 
-        private void ReleaseModule(IModule module)
+        private void PoolModule(IModule module)
         {
-            module.ViewModel.transform.position = _hidePosition;
+            if (this.usePoolRectToHide)
+                module.ViewModel.RectTransform.SetParent(this.poolRect);
+            else
+                module.ViewModel.transform.position = _hidePosition;
+
             this.modulesPool.Enqueue(module);
         }
 
@@ -187,7 +203,7 @@ namespace UnuGames.MVVM
             {
                 if (!IsVisible(cell.Key, rectBounds))
                 {
-                    ReleaseModule(cell.Value);
+                    PoolModule(cell.Value);
                     this.listModules.Remove(cell.Value);
                     releaseCells.Add(cell.Key);
                 }
@@ -359,7 +375,7 @@ namespace UnuGames.MVVM
         {
             foreach (var cell in this.activeCells)
             {
-                ReleaseModule(cell.Value);
+                PoolModule(cell.Value);
             }
             this.listModules.Clear();
             this.dataDict.Clear();
@@ -390,8 +406,10 @@ namespace UnuGames.MVVM
             Cell cell = GetCellByIndex(this.orgDataList.Count - 1);
             if (this.activeCells.ContainsKey(cell))
             {
-                ReleaseModule((IModule)this.activeCells[cell].ViewModel);
-                this.activeCells[cell].ViewModel.RectTransform.anchoredPosition = _hidePosition;
+                PoolModule((IModule)this.activeCells[cell].ViewModel);
+
+                if (!this.usePoolRectToHide)
+                    this.activeCells[cell].ViewModel.RectTransform.anchoredPosition = _hidePosition;
             }
             this.listModules.RemoveAt(index);
             this.dataDict.Remove(cell);

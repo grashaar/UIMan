@@ -55,20 +55,20 @@ namespace UnuGames
         }
     }
 
-    public class UIManProperty : Attribute
+    public class UIManPropertyAttribute : Attribute
     {
-        public UIManProperty()
+        public UIManPropertyAttribute()
         {
         }
     }
 
-    public class UIDescriptor : Attribute
+    public class UIDescriptorAttribute : Attribute
     {
-        public string url { get; set; }
+        public string Url { get; set; }
 
-        public UIDescriptor(string url)
+        public UIDescriptorAttribute(string url)
         {
-            this.url = url;
+            this.Url = url;
         }
     }
 }

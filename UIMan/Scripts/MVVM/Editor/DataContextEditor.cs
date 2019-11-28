@@ -110,7 +110,7 @@ namespace UnuGames.MVVM
                     MemberInfo curMember = context.viewModel.GetMemberInfo(dataMembers[this.selected], MemberTypes.Property, MemberTypes.Field);
                     if (curMember != null)
                     {
-                        var attributes = curMember.GetCustomAttributes(typeof(UIManProperty), false);
+                        var attributes = curMember.GetCustomAttributes(typeof(UIManPropertyAttribute), false);
                         if (attributes == null || attributes.Length == 0)
                         {
                             GUILayout.BeginHorizontal();

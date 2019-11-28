@@ -113,7 +113,7 @@ namespace UnuGames
             if (ColorButton.Draw("Edit View (UI)", CommonColor.LightGreen, GUILayout.Height(25)))
             {
                 GameObject prefabInstance;
-                UnityEngine.Object obj = FindObjectOfType(uiManBase.UIType);
+                Object obj = FindObjectOfType(uiManBase.UIType);
                 if (obj != null)
                 {
                     prefabInstance = ((MonoBehaviour)obj).gameObject;

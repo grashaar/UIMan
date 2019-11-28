@@ -328,7 +328,7 @@ namespace UnuGames
             var customProperties = new List<CustomPropertyInfo>();
             foreach (PropertyInfo property in properties)
             {
-                if (property.IsDefined(typeof(UIManProperty), true))
+                if (property.IsDefined(typeof(UIManPropertyAttribute), true))
                 {
                     var instance = GetCachedTypeInstance(uiManType);
                     customProperties.Add(new CustomPropertyInfo(property.Name, property.PropertyType, property.GetValue(instance, null)));
