@@ -36,7 +36,13 @@ namespace UnuGames.MVVM
 
             public override int GetHashCode()
             {
-                return base.GetHashCode();
+                unchecked
+                {
+                    var hash = (int)2166136261;
+                    hash = (hash * 16777619) ^ this.column;
+                    hash = (hash * 16777619) ^ this.row;
+                    return hash;
+                }
             }
         }
 
