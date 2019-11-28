@@ -124,7 +124,8 @@ namespace UnuGames.MVVM
             }
             this.scrollRect.onValueChanged.AddListener(OnScroll);
 
-            this.contentPrefab.SetActive(false);
+            if (!string.IsNullOrEmpty(this.contentPrefab.scene.name))
+                this.contentPrefab.SetActive(false);
         }
 
         #region Pooling
