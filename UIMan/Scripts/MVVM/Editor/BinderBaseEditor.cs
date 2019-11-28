@@ -72,7 +72,7 @@ namespace UnuGames.MVVM
             }
             else
             {
-                ArrayUtility.Insert(ref members, 0, "Null");
+                ArrayUtility.Insert(ref members, 0, "<None>");
 
                 var selectedIndex = 0;
                 for (var i = 0; i < members.Length; i++)
