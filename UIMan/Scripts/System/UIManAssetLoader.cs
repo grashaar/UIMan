@@ -25,7 +25,7 @@ namespace UnuGames
         public static void SetLoadMethodTexture2D(Func<string, Callback, IEnumerator> method)
             => _loadMethodTexture2D = method ?? throw new ArgumentNullException(nameof(method));
 
-        internal static IEnumerator Load<T>(string key, Callback callback = null) where T : Result
+        public static IEnumerator Load<T>(string key, Callback callback = null) where T : Result
         {
             if (!string.IsNullOrEmpty(key))
             {
