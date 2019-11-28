@@ -28,8 +28,8 @@ namespace UnuGames.MVVM
 
             if (this.binder.dataContext != context)
             {
+                Undo.RecordObject(this.target, "Select Data Context");
                 this.binder.dataContext = context;
-                EditorUtility.SetDirty(this.target);
             }
 
             if (this.binder.dataContext == null)

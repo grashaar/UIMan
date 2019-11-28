@@ -16,7 +16,14 @@ namespace UnuGames.MVVM
         {
             var context = (DataContext)this.target;
 
-            context.type = (ContextType)EditorGUILayout.EnumPopup(this.lblType, context.type);
+            EditorGUI.BeginChangeCheck();
+            var contextType = (ContextType)EditorGUILayout.EnumPopup(this.lblType, context.type);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(this.target, "Select Context Type");
+                context.type = contextType;
+            }
 
             if (context.type == ContextType.None)
             {
@@ -25,7 +32,15 @@ namespace UnuGames.MVVM
             }
             else if (context.type == ContextType.MonoBehaviour)
             {
-                context.viewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, (Object)context.viewModel, typeof(ViewModelBehaviour), true);
+                EditorGUI.BeginChangeCheck();
+                var contextViewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, (Object)context.viewModel, typeof(ViewModelBehaviour), true);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(this.target, "Select ViewModel");
+                    context.viewModel = contextViewModel;
+                }
+
                 if (context.viewModel.GetCachedType() != null)
                 {
                     GUILayout.BeginHorizontal();
@@ -36,7 +51,14 @@ namespace UnuGames.MVVM
             }
             else if (context.type == ContextType.Property)
             {
-                context.viewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, (Object)context.viewModel, typeof(ViewModelBehaviour), true);
+                EditorGUI.BeginChangeCheck();
+                var contextViewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, (Object)context.viewModel, typeof(ViewModelBehaviour), true);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(this.target, "Select ViewModel");
+                    context.viewModel = contextViewModel;
+                }
 
                 var viewMembers = context.viewModel.GetAllMembers(false, true, false, false, MemberTypes.Field, MemberTypes.Property);
                 var dataMembers = context.viewModel.GetAllMembers(false, false, false, false, MemberTypes.Field, MemberTypes.Property);
