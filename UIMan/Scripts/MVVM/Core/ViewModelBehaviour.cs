@@ -16,6 +16,11 @@ namespace UnuGames.MVVM
         private readonly Dictionary<string, PropertyInfo> propertyCache = new Dictionary<string, PropertyInfo>();
         private readonly List<MemberInfo> notifiableMembers = new List<MemberInfo>();
 
+        /// <summary>
+        /// Invoke when any property has been changed.
+        /// </summary>
+        public event Action<ViewModelBehaviour> PropertyChanged;
+
         private RectTransform rectTransform;
 
         public RectTransform RectTransform
@@ -43,25 +48,17 @@ namespace UnuGames.MVVM
         /// <param name="value"></param>
         public virtual void NotifyPropertyChanged(string propertyName, object value)
         {
-            if (this.actions.TryGetValue(propertyName, out Action<object> actions))
-            {
-                try
-                {
-                    actions?.Invoke(value);
-                }
-                catch (Exception e)
-                {
-                    UnuLogger.LogError(e.Message);
-                }
-            }
-            else
-            {
-                //UnuLogger.LogWarning(BindingDefine.NO_BINDER_REGISTERED);
-            }
-        }
+            if (!this.actions.TryGetValue(propertyName, out Action<object> actions))
+                return;
 
-        private void SafeInvoke(Action<object> actions, object value)
-        {
+            try
+            {
+                actions?.Invoke(value);
+            }
+            catch (Exception e)
+            {
+                UnuLogger.LogException(e, this);
+            }
         }
 
         /// <summary>
@@ -76,6 +73,16 @@ namespace UnuGames.MVVM
                 var newValue = property.GetValue(this, null);
                 NotifyPropertyChanged(propertyName, newValue);
             }
+        }
+
+        /// <summary>
+        /// Raise the change event automatically,
+        /// only use this function in property getter
+        /// </summary>
+        public void OnPropertyChanged(string propertyName, object value)
+        {
+            this.PropertyChanged?.Invoke(this);
+            NotifyPropertyChanged(propertyName, value);
         }
 
         /// <summary>
@@ -143,6 +150,7 @@ namespace UnuGames.MVVM
         {
             if (this.notifiableMembers == null)
                 return;
+
             for (var i = 0; i < this.notifiableMembers.Count; i++)
             {
                 object value;
@@ -156,6 +164,22 @@ namespace UnuGames.MVVM
                     PropertyInfo property = this.notifiableMembers[i].ToProperty();
                     value = property.GetValue(obj, null);
                 }
+
+                NotifyPropertyChanged("set_" + this.notifiableMembers[i].Name, value);
+            }
+        }
+
+        /// <summary>
+        /// Notifies the model change with the changed value.
+        /// </summary>
+        /// <param name="value">Changed value.</param>
+        public void NotifyModelChangedValue(object value)
+        {
+            if (this.notifiableMembers == null)
+                return;
+
+            for (var i = 0; i < this.notifiableMembers.Count; i++)
+            {
                 NotifyPropertyChanged("set_" + this.notifiableMembers[i].Name, value);
             }
         }

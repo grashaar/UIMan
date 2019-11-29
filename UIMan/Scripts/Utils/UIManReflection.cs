@@ -405,6 +405,34 @@ namespace UnuGames
             return IsSupportedInNamespace(type, @namespace);
         }
 
+        public static bool IsSupportedArray(this Type type, Type excludeType, string @namespace)
+        {
+            if (type.IsArray)
+            {
+                if (type.GetArrayRank() == 1)
+                {
+                    var element = type.GetElementType();
+
+                    return (element.IsSupportedPrimitive() || element.IsSupportedType(@namespace)) &&
+                            element != excludeType;
+                }
+            }
+            else if (type.IsGenericType)
+            {
+                var generic = type.GetGenericTypeDefinition();
+
+                if (generic == typeof(List<>) || generic == typeof(ObservableList<>))
+                {
+                    var argument = type.GetGenericArguments()[0];
+
+                    return (argument.IsSupportedPrimitive() || argument.IsSupportedType(@namespace)) &&
+                            argument != excludeType;
+                }
+            }
+
+            return false;
+        }
+
         private static bool IsSupportedInNamespace(Type type, string @namespace)
         {
             var supported = false;

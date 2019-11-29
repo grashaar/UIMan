@@ -6,6 +6,8 @@ namespace UnuGames.MVVM
     {
         void OnPropertyChanged();
 
+        void OnPropertyChanged(string propertyName, object value);
+
         void NotifyPropertyChanged(string propertyName, object value);
 
         void SubscribeAction(string propertyName, Action<object> updateAction);

@@ -91,7 +91,8 @@ namespace UnuGames
 
             for (var i = 0; i < types.Count; i++)
             {
-                if (types[i].BaseType != typeof(ObservableModel) && !types[i].IsPrimitive() && !types[i].IsSupportedType(@namespace) || types[i] == excludeType)
+                if ((types[i].BaseType != typeof(ObservableModel) && !types[i].IsSupportedPrimitive() && !types[i].IsSupportedType(@namespace)) ||
+                    types[i] == excludeType)
                     continue;
 
                 if (observableTypes.Contains(types[i]))

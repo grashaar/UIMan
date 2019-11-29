@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace UnuGames.MVVM
 {
+    [Serializable]
     public class ObservableList<T> : IEnumerable<T>, IEnumerable, IObservaleCollection
     {
-        private readonly List<T> list = new List<T>();
+        [SerializeField]
+        private List<T> list = new List<T>();
 
         private Action<object> onAddObject = delegate { };
 

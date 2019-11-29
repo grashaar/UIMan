@@ -11,6 +11,11 @@ namespace UnuGames.MVVM
         private readonly Dictionary<string, PropertyInfo> propertyCache = new Dictionary<string, PropertyInfo>();
 
         /// <summary>
+        /// Invoke when any property has been changed.
+        /// </summary>
+        public event Action<ObservableModel> PropertyChanged;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="UnuGames.ObservableModel"/> class.
         /// </summary>
         public static T New<T>() where T : ObservableModel
@@ -49,20 +54,16 @@ namespace UnuGames.MVVM
         /// <param name="value"></param>
         public virtual void NotifyPropertyChanged(string propertyName, object value)
         {
-            if (this.actions.TryGetValue(propertyName, out Action<object> actions))
+            if (!this.actions.TryGetValue(propertyName, out Action<object> actions))
+                return;
+
+            try
             {
-                try
-                {
-                    actions?.Invoke(value);
-                }
-                catch (Exception e)
-                {
-                    UnuLogger.LogError(e.Message);
-                }
+                actions?.Invoke(value);
             }
-            else
+            catch (Exception e)
             {
-                UnuLogger.LogWarning(BindingDefine.NO_BINDER_REGISTERED);
+                UnuLogger.LogException(e);
             }
         }
 
@@ -73,6 +74,29 @@ namespace UnuGames.MVVM
         public void OnPropertyChanged()
         {
             DataContext.NotifyObjectChange(this);
+        }
+
+        /// <summary>
+        /// Raise the change event automatically,
+        /// only use this function in property getter
+        /// </summary>
+        public void OnPropertyChanged(string propertyName, object value)
+        {
+            this.PropertyChanged?.Invoke(this);
+
+            if (this.actions.TryGetValue($"set_{propertyName}", out Action<object> actions))
+            {
+                try
+                {
+                    actions?.Invoke(value);
+                }
+                catch (Exception e)
+                {
+                    UnuLogger.LogException(e);
+                }
+            }
+
+            DataContext.NotifyObjectChange(this, propertyName, value);
         }
 
         /// <summary>

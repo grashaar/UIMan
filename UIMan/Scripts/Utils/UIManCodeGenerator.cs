@@ -350,7 +350,7 @@ namespace UnuGames
             }
             catch (IOException ex)
             {
-                UnuLogger.LogError(ex);
+                UnuLogger.LogException(ex);
             }
 
             return code;
@@ -393,7 +393,7 @@ namespace UnuGames
             }
             catch (IOException ex)
             {
-                UnuLogger.LogError(ex);
+                UnuLogger.LogException(ex);
                 return false;
             }
         }
@@ -494,10 +494,26 @@ namespace UnuGames
 
             if (this.PropertyType == typeof(string))
                 strDefaultValue = this.DefaltValue == null ? "\"null\"" : $"\"{this.DefaltValue}\"";
-            else if (this.PropertyType.BaseType == typeof(ObservableModel))
+            else if (typeof(ObservableModel).IsAssignableFrom(this.PropertyType))
                 strDefaultValue = $"new {this.PropertyType.Name}()";
             else
-                strDefaultValue = this.DefaltValue.ToString();
+            {
+                var constructors = this.PropertyType.GetConstructors();
+                var parameterless = false;
+
+                foreach (var c in constructors)
+                {
+                    parameterless = c.GetParameters().Length <= 0;
+                    UnuLogger.Log(c.GetParameters().Length);
+                    if (parameterless)
+                        break;
+                }
+
+                if (parameterless)
+                    strDefaultValue = $"new {this.PropertyType.Name}()";
+                else
+                    strDefaultValue = this.DefaltValue.ToString();
+            }
 
             if (this.PropertyType == typeof(bool))
             {
@@ -510,14 +526,17 @@ namespace UnuGames
 
             if (this.PropertyType.IsPrimitive())
                 field     = $"        private {this.PropertyType.GetAllias()} m_{fieldName} = {strDefaultValue};";
-            else
+            else if (string.IsNullOrEmpty(strDefaultValue))
                 field     = $"        private {this.PropertyType.GetAllias()} m_{fieldName};";
+            else
+                field     = $"        private {this.PropertyType.GetAllias()} m_{fieldName} = {strDefaultValue};";
 
             var attribute =  "        [UIManProperty]";
             var property  = $"        public {this.PropertyType.GetAllias()} {propertyName}";
             //                        {
             var getter    = $"            get {{ return this.m_{fieldName}; }}";
-            var setter    = $"            set {{ this.m_{fieldName} = value; OnPropertyChanged(); }}";
+            var setter    = $"            set {{ this.m_{fieldName} = value; OnPropertyChanged(nameof(this.{propertyName}) , value); }}";
+
             //                        }
 
             var sb = new StringBuilder();

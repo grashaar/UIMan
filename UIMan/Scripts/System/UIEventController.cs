@@ -151,7 +151,7 @@ namespace UnuGames
                     }
                     catch (Exception ex)
                     {
-                        UnuLogger.LogError(ex.StackTrace);
+                        UnuLogger.LogException(ex);
                     }
                 }
             }
@@ -174,7 +174,7 @@ namespace UnuGames
                     }
                     catch (Exception ex)
                     {
-                        UnuLogger.LogError(ex.StackTrace);
+                        UnuLogger.LogException(ex);
                     }
                 }
             }
@@ -197,7 +197,7 @@ namespace UnuGames
                     }
                     catch (Exception ex)
                     {
-                        UnuLogger.LogError(ex.StackTrace);
+                        UnuLogger.LogException(ex);
                     }
                 }
             }
@@ -220,7 +220,7 @@ namespace UnuGames
                     }
                     catch (Exception ex)
                     {
-                        UnuLogger.LogError(ex.StackTrace);
+                        UnuLogger.LogException(ex);
                     }
                 }
             }
@@ -243,7 +243,7 @@ namespace UnuGames
                     }
                     catch (Exception ex)
                     {
-                        UnuLogger.LogError(ex.StackTrace);
+                        UnuLogger.LogException(ex);
                     }
                 }
             }

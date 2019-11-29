@@ -29,6 +29,22 @@ namespace UnuGames.MVVM
             }
         }
 
+        public static void NotifyObjectChange(object modelInstance, string propertyName, object value)
+        {
+            for (var i = 0; i < contextsList.Count; i++)
+            {
+                DataContext context = contextsList[i];
+                if (context.model != null && context.model is ObservableModel)
+                {
+                    PropertyInfo propertyInfo = context.viewModel.IsBindingTo(modelInstance);
+                    if (propertyInfo != null && propertyInfo.Name.Equals(propertyName))
+                    {
+                        context.viewModel.NotifyModelChangedValue(value);
+                    }
+                }
+            }
+        }
+
         #endregion DataContext Factory
 
         #region Instance
