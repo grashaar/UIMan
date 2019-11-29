@@ -250,193 +250,7 @@ namespace UnuGames
 
             if (this.listTypes != null && !string.IsNullOrEmpty(this.listTypes.SelectedViewItem))
             {
-                if (_selectedType != null)
-                {
-                    // Title
-                    GUILayout.Space(2);
-                    LabelHelper.TitleLabel(_selectedType.Name);
-                    LineHelper.Draw(Color.gray);
-
-                    // Common
-                    GUILayout.Space(2);
-                    if (_selectedType.BaseType != typeof(ObservableModel))
-                    {
-                        GUILayout.BeginHorizontal();
-                        if (ColorButton.Draw("Edit View Logic (Handler)", CommonColor.LightBlue, GUILayout.Height(30)))
-                        {
-                            var handler = UIManCodeGenerator.GetScriptPathByType(_selectedType);
-                            handler = handler.Replace(".cs", ".Handler.cs");
-                            UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(handler, 1);
-                        }
-
-                        if (ColorButton.Draw("Edit View (UI)", CommonColor.LightBlue, GUILayout.Height(30)))
-                        {
-                            GameObject prefabInstance;
-                            UnityEngine.Object obj = FindObjectOfType(_selectedType);
-                            if (obj != null)
-                            {
-                                prefabInstance = ((MonoBehaviour)obj).gameObject;
-                            }
-                            else
-                            {
-                                var isDialog = _selectedType.BaseType == typeof(UIManDialog);
-                                var prefabFolder = GetUIPrefabPath(_selectedType, isDialog);
-                                var prefabFile = _selectedType.Name + PREFAB_EXT;
-                                var prefabPath = Path.Combine(prefabFolder, prefabFile);
-                                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-                                if (prefab == null)
-                                {
-                                    prefab = FindAssetObject<GameObject>(_selectedType.Name, PREFAB_EXT);
-                                }
-
-                                prefabInstance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
-                                if (isDialog)
-                                    prefabInstance.transform.SetParent(UIMan.Instance.dialogRoot, false);
-                                else
-                                    prefabInstance.transform.SetParent(UIMan.Instance.screenRoot, false);
-                            }
-                            Selection.activeGameObject = prefabInstance;
-                        }
-
-                        if (ColorButton.Draw("Delete", CommonColor.LightRed, GUILayout.Height(30)))
-                        {
-                            var cs = UIManCodeGenerator.GetScriptPathByType(_selectedType);
-                            var handler = cs.Replace(".cs", ".Handler.cs");
-                            AssetDatabase.DeleteAsset(cs);
-                            AssetDatabase.DeleteAsset(handler);
-
-                            var isDialog = _selectedType.BaseType == typeof(UIManDialog);
-                            var prefabFolder = GetUIPrefabPath(_selectedType, isDialog);
-                            var prefabFile = _selectedType.Name + PREFAB_EXT;
-                            var prefabPath = UIManDefine.ASSETS_FOLDER + prefabFolder + prefabFile;
-                            AssetDatabase.DeleteAsset(prefabPath);
-                            AssetDatabase.Refresh();
-                        }
-                        GUILayout.EndHorizontal();
-                        LineHelper.Draw(Color.gray);
-                    }
-
-                    // Base type
-                    GUILayout.Space(10);
-                    LabelHelper.HeaderLabel("Type");
-                    LineHelper.Draw(Color.gray);
-                    this.baseTypePopup.Draw();
-
-                    if (this.baseTypePopup.SelectedItem != "ObservableModel")
-                    {
-                        if (!System.IO.File.Exists(_handlerScriptPath))
-                        {
-                            if (GUILayout.Button("Generate Handler"))
-                            {
-                                var backupCode = UIManCodeGenerator.DeleteScript(_handlerScriptPath);
-                                GenerateViewModelHandler(backupCode, _selectedType.BaseType.Name);
-                            }
-                        }
-                    }
-
-                    // Namespace
-                    GUILayout.Space(10);
-                    LabelHelper.HeaderLabel("Namespace");
-                    LineHelper.Draw(Color.gray);
-                    this.namespaceField.Draw(GUIContent.none, 0);
-
-                    if (this.baseTypePopup.SelectedItem != "ObservableModel" &&
-                        !string.Equals(_selectedType.Namespace, this.namespaceField.Text))
-                    {
-                        EditorGUILayout.HelpBox($"Must manually change the namespace in {_selectedType.Name}.Handler.cs", MessageType.Warning);
-                    }
-
-                    // Properties
-                    GUILayout.Space(10);
-                    LabelHelper.HeaderLabel("Properties");
-                    LineHelper.Draw(Color.gray);
-
-                    _propertiesScrollPos = EditorGUILayout.BeginScrollView(_propertiesScrollPos, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-                    if (_propertiesDrawerCache.ContainsKey(_selectedType))
-                    {
-                        EditablePropertyDrawer[] props = _propertiesDrawerCache[_selectedType];
-                        for (var i = 0; i < props.Length; i++)
-                        {
-                            props[i].Draw(_propertiesAreaWidth);
-                        }
-                    }
-                    EditorGUILayout.EndScrollView();
-                }
-
-                GUILayout.Space(10);
-
-                // Add property
-                if (ColorButton.Draw("Add New Property", CommonColor.LightGreen, GUILayout.Height(30)))
-                {
-                    var newIndex = 0;
-                    var strNewIndex = "";
-                    for (var i = 0; i < _selectedProperties.Length; i++)
-                    {
-                        if (_selectedProperties[i].LastName.Contains("NewProperty"))
-                            newIndex++;
-                    }
-                    if (newIndex > 0)
-                        strNewIndex = newIndex.ToString();
-                    var newProperty = new CustomPropertyInfo("", typeof(string)) {
-                        LastName = "NewProperty" + strNewIndex
-                    };
-                    ArrayUtility.Add(ref _selectedProperties, newProperty);
-                    CachePropertiesDrawer();
-                }
-
-                //Save all change
-                var changeList = new CustomPropertyInfo[0];
-                var selectedList = new CustomPropertyInfo[0];
-
-                for (var i = 0; i < _selectedProperties.Length; i++)
-                {
-                    if (_selectedProperties[i].HasChange)
-                        ArrayUtility.Add(ref changeList, _selectedProperties[i]);
-                    if (_selectedProperties[i].IsSelected)
-                        ArrayUtility.Add(ref selectedList, _selectedProperties[i]);
-                }
-
-                GUILayout.Space(10);
-                LineHelper.Draw(Color.gray);
-                GUILayout.Space(5);
-
-                if (changeList.Length > 0 || !string.Equals(_selectedType.Namespace, this.namespaceField.Text))
-                {
-                    if (ColorButton.Draw("Save All Changes", CommonColor.LightGreen, GUILayout.Height(30)))
-                    {
-                        for (var i = 0; i < changeList.Length; i++)
-                        {
-                            changeList[i].CommitChange();
-                        }
-                        SaveCurrentType(true, this.baseTypePopup.SelectedItem);
-                    }
-                }
-
-                if (selectedList.Length > 0)
-                {
-                    if (ColorButton.Draw("Delete Selected Properties", CommonColor.LightRed, GUILayout.Height(30)))
-                    {
-                        for (var i = 0; i < selectedList.Length; i++)
-                        {
-                            ArrayUtility.Remove(ref _selectedProperties, selectedList[i]);
-                        }
-                        SaveCurrentType(true, this.baseTypePopup.SelectedItem);
-                        CachePropertiesDrawer(true);
-                    }
-                }
-
-                if (_selectedProperties.Length > 0)
-                {
-                    if (ColorButton.Draw("Delete All Properties", CommonColor.LightRed, GUILayout.Height(30)))
-                    {
-                        while (_selectedProperties.Length > 0)
-                        {
-                            ArrayUtility.Clear(ref _selectedProperties);
-                            SaveCurrentType();
-                            CachePropertiesDrawer(true);
-                        }
-                    }
-                }
+                DrawSelectedType(id);
             }
             else
             {
@@ -444,6 +258,230 @@ namespace UnuGames
             }
 
             GUILayout.EndVertical();
+        }
+
+        private void DrawSelectedType(int id)
+        {
+            if (_selectedType != null)
+            {
+                DrawSelectedTypeHeader();
+            }
+
+            GUILayout.Space(10);
+
+            // Add property
+            if (ColorButton.Draw("Add New Property", CommonColor.LightGreen, GUILayout.Height(30)))
+            {
+                var newIndex = 0;
+                var strNewIndex = "";
+                for (var i = 0; i < _selectedProperties.Length; i++)
+                {
+                    if (_selectedProperties[i].LastName.Contains("NewProperty"))
+                        newIndex++;
+                }
+                if (newIndex > 0)
+                    strNewIndex = newIndex.ToString();
+                var newProperty = new CustomPropertyInfo("", typeof(string)) {
+                    LastName = "NewProperty" + strNewIndex
+                };
+                ArrayUtility.Add(ref _selectedProperties, newProperty);
+                CachePropertiesDrawer();
+            }
+
+            //Save all change
+            var changeList = new CustomPropertyInfo[0];
+            var selectedList = new CustomPropertyInfo[0];
+
+            for (var i = 0; i < _selectedProperties.Length; i++)
+            {
+                if (_selectedProperties[i].HasChange)
+                    ArrayUtility.Add(ref changeList, _selectedProperties[i]);
+                if (_selectedProperties[i].IsSelected)
+                    ArrayUtility.Add(ref selectedList, _selectedProperties[i]);
+            }
+
+            GUILayout.Space(10);
+            LineHelper.Draw(Color.gray);
+            GUILayout.Space(5);
+
+            if (changeList.Length > 0 || !string.Equals(_selectedType.Namespace, this.namespaceField.Text))
+            {
+                if (ColorButton.Draw("Save All Changes", CommonColor.LightGreen, GUILayout.Height(30)))
+                {
+                    for (var i = 0; i < changeList.Length; i++)
+                    {
+                        changeList[i].CommitChange();
+                    }
+                    SaveCurrentType(true, this.baseTypePopup.SelectedItem);
+                }
+            }
+
+            if (selectedList.Length > 0)
+            {
+                if (ColorButton.Draw("Delete Selected Properties", CommonColor.LightRed, GUILayout.Height(30)))
+                {
+                    for (var i = 0; i < selectedList.Length; i++)
+                    {
+                        ArrayUtility.Remove(ref _selectedProperties, selectedList[i]);
+                    }
+                    SaveCurrentType(true, this.baseTypePopup.SelectedItem);
+                    CachePropertiesDrawer(true);
+                }
+            }
+
+            if (_selectedProperties.Length > 0)
+            {
+                if (ColorButton.Draw("Delete All Properties", CommonColor.LightRed, GUILayout.Height(30)))
+                {
+                    while (_selectedProperties.Length > 0)
+                    {
+                        ArrayUtility.Clear(ref _selectedProperties);
+                        SaveCurrentType();
+                        CachePropertiesDrawer(true);
+                    }
+                }
+            }
+        }
+
+        private void DrawSelectedTypeHeader()
+        {
+            // Title
+            GUILayout.Space(2);
+            LabelHelper.TitleLabel(_selectedType.Name);
+            LineHelper.Draw(Color.gray);
+
+            // Common
+            GUILayout.Space(2);
+
+            if (_selectedType.BaseType != typeof(ObservableModel))
+            {
+                DrawHeaderButtons();
+            }
+            else
+            {
+                DrawHeaderButtonsObservableModel();
+            }
+
+            // Base type
+            GUILayout.Space(10);
+            LabelHelper.HeaderLabel("Type");
+            LineHelper.Draw(Color.gray);
+            this.baseTypePopup.Draw();
+
+            if (this.baseTypePopup.SelectedItem != "ObservableModel")
+            {
+                if (!System.IO.File.Exists(_handlerScriptPath))
+                {
+                    if (GUILayout.Button("Generate Handler"))
+                    {
+                        var backupCode = UIManCodeGenerator.DeleteScript(_handlerScriptPath);
+                        GenerateViewModelHandler(backupCode, _selectedType.BaseType.Name);
+                    }
+                }
+            }
+
+            // Namespace
+            GUILayout.Space(10);
+            LabelHelper.HeaderLabel("Namespace");
+            LineHelper.Draw(Color.gray);
+            this.namespaceField.Draw(GUIContent.none, 0);
+
+            if (this.baseTypePopup.SelectedItem != "ObservableModel" &&
+                !string.Equals(_selectedType.Namespace, this.namespaceField.Text))
+            {
+                EditorGUILayout.HelpBox($"Must manually change the namespace in {_selectedType.Name}.Handler.cs", MessageType.Warning);
+            }
+
+            // Properties
+            GUILayout.Space(10);
+            LabelHelper.HeaderLabel("Properties");
+            LineHelper.Draw(Color.gray);
+
+            _propertiesScrollPos = EditorGUILayout.BeginScrollView(_propertiesScrollPos, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            if (_propertiesDrawerCache.ContainsKey(_selectedType))
+            {
+                EditablePropertyDrawer[] props = _propertiesDrawerCache[_selectedType];
+                for (var i = 0; i < props.Length; i++)
+                {
+                    props[i].Draw(_propertiesAreaWidth);
+                }
+            }
+            EditorGUILayout.EndScrollView();
+        }
+
+        private void DrawHeaderButtonsObservableModel()
+        {
+            if (ColorButton.Draw("Migrate To New Version", CommonColor.LightOrange, GUILayout.Height(30)))
+            {
+                SaveCurrentType(true, this.baseTypePopup.SelectedItem);
+                CachePropertiesDrawer(true);
+            }
+
+            LineHelper.Draw(Color.gray);
+        }
+
+        private void DrawHeaderButtons()
+        {
+            GUILayout.BeginHorizontal();
+            if (ColorButton.Draw("Edit View Logic (Handler)", CommonColor.LightBlue, GUILayout.Height(30)))
+            {
+                var handler = UIManCodeGenerator.GetScriptPathByType(_selectedType);
+                handler = handler.Replace(".cs", ".Handler.cs");
+                UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(handler, 1);
+            }
+
+            if (ColorButton.Draw("Edit View (UI)", CommonColor.LightBlue, GUILayout.Height(30)))
+            {
+                GameObject prefabInstance;
+                UnityEngine.Object obj = FindObjectOfType(_selectedType);
+                if (obj != null)
+                {
+                    prefabInstance = ((MonoBehaviour)obj).gameObject;
+                }
+                else
+                {
+                    var isDialog = _selectedType.BaseType == typeof(UIManDialog);
+                    var prefabFolder = GetUIPrefabPath(_selectedType, isDialog);
+                    var prefabFile = _selectedType.Name + PREFAB_EXT;
+                    var prefabPath = Path.Combine(prefabFolder, prefabFile);
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+                    if (prefab == null)
+                    {
+                        prefab = FindAssetObject<GameObject>(_selectedType.Name, PREFAB_EXT);
+                    }
+
+                    prefabInstance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+                    if (isDialog)
+                        prefabInstance.transform.SetParent(UIMan.Instance.dialogRoot, false);
+                    else
+                        prefabInstance.transform.SetParent(UIMan.Instance.screenRoot, false);
+                }
+                Selection.activeGameObject = prefabInstance;
+            }
+
+            if (ColorButton.Draw("Migrate To New Version", CommonColor.LightOrange, GUILayout.Height(30)))
+            {
+                SaveCurrentType(true, this.baseTypePopup.SelectedItem);
+                CachePropertiesDrawer(true);
+            }
+
+            if (ColorButton.Draw("Delete", CommonColor.LightRed, GUILayout.Height(30)))
+            {
+                var cs = UIManCodeGenerator.GetScriptPathByType(_selectedType);
+                var handler = cs.Replace(".cs", ".Handler.cs");
+                AssetDatabase.DeleteAsset(cs);
+                AssetDatabase.DeleteAsset(handler);
+
+                var isDialog = _selectedType.BaseType == typeof(UIManDialog);
+                var prefabFolder = GetUIPrefabPath(_selectedType, isDialog);
+                var prefabFile = _selectedType.Name + PREFAB_EXT;
+                var prefabPath = UIManDefine.ASSETS_FOLDER + prefabFolder + prefabFile;
+                AssetDatabase.DeleteAsset(prefabPath);
+                AssetDatabase.Refresh();
+            }
+
+            GUILayout.EndHorizontal();
+            LineHelper.Draw(Color.gray);
         }
 
         private void CachePropertiesDrawer(bool clearCurrentCache = false)

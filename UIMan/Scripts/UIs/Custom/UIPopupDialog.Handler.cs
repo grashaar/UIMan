@@ -1,4 +1,4 @@
-﻿namespace UnuGames
+namespace UnuGames
 {
     [UIDescriptor("Dialogs/")]
     public partial class UIPopupDialog : UIManDialog

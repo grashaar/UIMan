@@ -539,7 +539,7 @@ namespace UnuGames
             var property  = $"        public {this.PropertyType.GetAllias(false)} {propertyName}";
             //                        {
             var getter    = $"            get {{ return this.m_{fieldName}; }}";
-            var setter    = $"            set {{ this.m_{fieldName} = value; OnPropertyChanged(nameof(this.{propertyName}) , value); }}";
+            var setter    = $"            set {{ this.m_{fieldName} = value; OnPropertyChanged(nameof(this.{propertyName}), value); }}";
 
             //                        }
 

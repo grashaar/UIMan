@@ -1,4 +1,8 @@
-﻿// This code is generated automatically by UIMan ViewModelGerenrator, please do not modify!
+
+using UnuGames;
+using UnuGames.MVVM;
+
+// This code is generated automatically by UIMan - UI Generator, please do not modify!
 
 namespace UnuGames
 {
@@ -40,7 +44,7 @@ namespace UnuGames
             set { this.m_labelButtonNo = value; OnPropertyChanged(nameof(this.LabelButtonNo), value); }
         }
 
-        private bool m_isConfirmDialog = false;
+        private bool m_isConfirmDialog = default;
 
         [UIManProperty]
         public bool IsConfirmDialog
