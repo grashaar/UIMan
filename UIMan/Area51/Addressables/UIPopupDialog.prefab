@@ -94,11 +94,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dataContext: {fileID: 11439306}
-  value:
+  textField:
     label: Text
     member: Content
     isNullable: 0
-  color:
+  colorField:
     label: Color
     member: 
     isNullable: 1
@@ -360,11 +360,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dataContext: {fileID: 11439306}
-  value:
+  textField:
     label: Text
     member: LabelButtonNo
     isNullable: 0
-  color:
+  colorField:
     label: Color
     member: 
     isNullable: 1
@@ -478,11 +478,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dataContext: {fileID: 11439306}
-  value:
+  textField:
     label: Text
     member: LabelButtonYes
     isNullable: 0
-  color:
+  colorField:
     label: Color
     member: 
     isNullable: 1
@@ -802,7 +802,7 @@ MonoBehaviour:
   - {fileID: 153868}
   inactiveOnTrue:
   - {fileID: 183160}
-  value:
+  valueField:
     label: bool
     member: IsConfirmDialog
     isNullable: 0
@@ -1324,11 +1324,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dataContext: {fileID: 11439306}
-  value:
+  textField:
     label: Text
     member: LabelButtonYes
     isNullable: 0
-  color:
+  colorField:
     label: Color
     member: 
     isNullable: 1
@@ -1442,11 +1442,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dataContext: {fileID: 11439306}
-  value:
+  textField:
     label: Text
     member: Title
     isNullable: 0
-  color:
+  colorField:
     label: Color
     member: 
     isNullable: 1
