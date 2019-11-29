@@ -1,3 +1,6 @@
+# Breaking Changes
+* Various fields and types had been renamed, therefore this fork is incompatible with minhdu/uiman. If you are using the minhdu/uiman, DO NOT upgrade to this fork.
+
 <p align="center">
 <img src="https://cloud.githubusercontent.com/assets/5210346/20105222/5ec0b97c-a603-11e6-8bf9-717b9d0163bb.png"><img />
 </p>
