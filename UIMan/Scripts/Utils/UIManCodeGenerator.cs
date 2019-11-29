@@ -496,6 +496,10 @@ namespace UnuGames
                 strDefaultValue = this.DefaltValue == null ? "\"null\"" : $"\"{this.DefaltValue}\"";
             else if (typeof(ObservableModel).IsAssignableFrom(this.PropertyType))
                 strDefaultValue = $"new {this.PropertyType.Name}()";
+            else if (this.PropertyType.IsEnum)
+                strDefaultValue = $"{this.PropertyType.Name}.{this.DefaltValue.ToString()}";
+            else if (this.PropertyType.IsValueType)
+                strDefaultValue = "default";
             else
             {
                 var constructors = this.PropertyType.GetConstructors();
@@ -512,7 +516,7 @@ namespace UnuGames
                 if (parameterless)
                     strDefaultValue = $"new {this.PropertyType.Name}()";
                 else
-                    strDefaultValue = this.DefaltValue.ToString();
+                    strDefaultValue = "default";
             }
 
             if (this.PropertyType == typeof(bool))
@@ -525,14 +529,14 @@ namespace UnuGames
             string field;
 
             if (this.PropertyType.IsPrimitive())
-                field     = $"        private {this.PropertyType.GetAllias()} m_{fieldName} = {strDefaultValue};";
+                field     = $"        private {this.PropertyType.GetAllias(false)} m_{fieldName} = {strDefaultValue};";
             else if (string.IsNullOrEmpty(strDefaultValue))
-                field     = $"        private {this.PropertyType.GetAllias()} m_{fieldName};";
+                field     = $"        private {this.PropertyType.GetAllias(false)} m_{fieldName};";
             else
-                field     = $"        private {this.PropertyType.GetAllias()} m_{fieldName} = {strDefaultValue};";
+                field     = $"        private {this.PropertyType.GetAllias(false)} m_{fieldName} = {strDefaultValue};";
 
             var attribute =  "        [UIManProperty]";
-            var property  = $"        public {this.PropertyType.GetAllias()} {propertyName}";
+            var property  = $"        public {this.PropertyType.GetAllias(false)} {propertyName}";
             //                        {
             var getter    = $"            get {{ return this.m_{fieldName}; }}";
             var setter    = $"            set {{ this.m_{fieldName} = value; OnPropertyChanged(nameof(this.{propertyName}) , value); }}";
