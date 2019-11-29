@@ -10,7 +10,7 @@ namespace UnuGames
         public string Title
         {
             get { return this.m_title; }
-            set { this.m_title = value; OnPropertyChanged(); }
+            set { this.m_title = value; OnPropertyChanged(nameof(this.Title), value); }
         }
 
         private string m_content = "";
@@ -19,7 +19,7 @@ namespace UnuGames
         public string Content
         {
             get { return this.m_content; }
-            set { this.m_content = value; OnPropertyChanged(); }
+            set { this.m_content = value; OnPropertyChanged(nameof(this.Content), value); }
         }
 
         private string m_labelButtonYes = "";
@@ -28,7 +28,7 @@ namespace UnuGames
         public string LabelButtonYes
         {
             get { return this.m_labelButtonYes; }
-            set { this.m_labelButtonYes = value; OnPropertyChanged(); }
+            set { this.m_labelButtonYes = value; OnPropertyChanged(nameof(this.LabelButtonYes), value); }
         }
 
         private string m_labelButtonNo = "";
@@ -37,7 +37,7 @@ namespace UnuGames
         public string LabelButtonNo
         {
             get { return this.m_labelButtonNo; }
-            set { this.m_labelButtonNo = value; OnPropertyChanged(); }
+            set { this.m_labelButtonNo = value; OnPropertyChanged(nameof(this.LabelButtonNo), value); }
         }
 
         private bool m_isConfirmDialog = false;
@@ -46,7 +46,7 @@ namespace UnuGames
         public bool IsConfirmDialog
         {
             get { return this.m_isConfirmDialog; }
-            set { this.m_isConfirmDialog = value; OnPropertyChanged(); }
+            set { this.m_isConfirmDialog = value; OnPropertyChanged(nameof(this.IsConfirmDialog), value); }
         }
     }
 }
