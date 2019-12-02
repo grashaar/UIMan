@@ -16,6 +16,8 @@ namespace UnuGames.MVVM
         public BindingField colorField = new BindingField("Color");
 
         public string resourcePath = "/Images/";
+        public bool autoCorrectSize;
+        public bool zeroAlphaOnImageNull;
 
         public override void Initialize(bool forceInit)
         {
@@ -35,6 +37,7 @@ namespace UnuGames.MVVM
             if (string.IsNullOrEmpty(key))
             {
                 this.image.sprite = null;
+                SetAlpha();
             }
             else
             {
@@ -45,6 +48,11 @@ namespace UnuGames.MVVM
         private void OnLoadComplete(Sprite sprite)
         {
             this.image.sprite = sprite;
+
+            if (sprite && this.autoCorrectSize)
+                this.image.SetNativeSize();
+
+            SetAlpha();
         }
 
         public void OnUpdateColor(object val)
@@ -56,6 +64,22 @@ namespace UnuGames.MVVM
                 return;
 
             this.image.color = valChange;
+        }
+
+        private void SetAlpha()
+        {
+            var color = this.image.color;
+
+            if (!this.image.sprite && this.zeroAlphaOnImageNull)
+            {
+                color.a = 0;
+            }
+            else
+            {
+                color.a = 1f;
+            }
+
+            this.image.color = color;
         }
     }
 }

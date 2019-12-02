@@ -47,6 +47,7 @@ namespace UnuGames.MVVM
             if (string.IsNullOrEmpty(key))
             {
                 this.image.sprite = null;
+                SetAlpha();
             }
             else
             {
@@ -56,17 +57,36 @@ namespace UnuGames.MVVM
 
         private void OnLoadedImage(string key, Object asset)
         {
-            if (!(asset is Sprite sprite))
+            if (asset is Sprite sprite)
+            {
+                this.image.sprite = sprite;
+
+                if (this.autoCorrectSize)
+                    this.image.SetNativeSize();
+            }
+            else
             {
                 Debug.LogError($"Asset of key={key} is not a Sprite.");
                 this.image.sprite = null;
-                return;
             }
 
-            this.image.sprite = sprite;
+            SetAlpha();
+        }
 
-            if (this.autoCorrectSize)
-                this.image.SetNativeSize();
+        private void SetAlpha()
+        {
+            var color = this.image.color;
+
+            if (!this.image.sprite && this.zeroAlphaOnImageNull)
+            {
+                color.a = 0;
+            }
+            else
+            {
+                color.a = 1f;
+            }
+
+            this.image.color = color;
         }
     }
 }

@@ -91,13 +91,32 @@ namespace UnuGames.MVVM
             if (string.IsNullOrEmpty(this.imageKey) || !this.loadedAtlas)
             {
                 this.image.sprite = null;
-                return;
+            }
+            else
+            {
+                this.image.sprite = this.loadedAtlas.GetSprite(this.imageKey);
+
+                if (this.autoCorrectSize)
+                    this.image.SetNativeSize();
             }
 
-            this.image.sprite = this.loadedAtlas.GetSprite(this.imageKey);
+            SetAlpha();
+        }
 
-            if (this.autoCorrectSize)
-                this.image.SetNativeSize();
+        private void SetAlpha()
+        {
+            var color = this.image.color;
+
+            if (!this.image.sprite && this.zeroAlphaOnImageNull)
+            {
+                color.a = 0;
+            }
+            else
+            {
+                color.a = 1f;
+            }
+
+            this.image.color = color;
         }
     }
 }
