@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace UnuGames
 {
     [ExecuteInEditMode]
-    public class UIProgressBar : MonoBehaviour
+    public class UIProgressBar : MonoBehaviour, IProgressBar
     {
         [SerializeField]
         private RectTransform foreground;

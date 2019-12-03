@@ -2,11 +2,10 @@
 
 namespace UnuGames.MVVM
 {
-    [RequireComponent(typeof(UIProgressBar))]
     [DisallowMultipleComponent]
     public class ProgressBarBinder : BinderBase
     {
-        protected UIProgressBar bar;
+        protected IProgressBar bar;
 
         [HideInInspector]
         public BindingField valueField = new BindingField("float");
@@ -19,13 +18,16 @@ namespace UnuGames.MVVM
             if (!CheckInitialize(forceInit))
                 return;
 
-            this.bar = GetComponent<UIProgressBar>();
+            this.bar = GetComponent<IProgressBar>();
             SubscribeOnChangedEvent(this.valueField, OnUpdateValue);
         }
 
         public void OnUpdateValue(object val)
         {
             if (val == null)
+                return;
+
+            if (this.bar == null)
                 return;
 
             var tempValue = val.ToString();
@@ -38,7 +40,8 @@ namespace UnuGames.MVVM
                 time = this.changeTime;
             }
 
-            UITweener.Value(this.gameObject, time, this.bar.CurrentValue, valChange).SetOnUpdate(UpdateValue);
+            UITweener.Value(this.gameObject, time, this.bar.Value, valChange)
+                     .SetOnUpdate(UpdateValue);
         }
 
         private void UpdateValue(float val)
