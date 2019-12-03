@@ -30,7 +30,42 @@ namespace UnuGames
             return _defaultDictionary.ContainsKey(type);
         }
 
+        public static string GetNiceName(this Type type, bool fullName = false)
+        {
+            return type.GetNiceName(_defaultDictionary, fullName);
+        }
+
         public static string GetNiceName(this Type type, Dictionary<Type, string> translations, bool fullName = false)
+        {
+            var name = GetNiceName(type, translations);
+
+            if (type.IsNested)
+            {
+                var nestedType = type.DeclaringType;
+
+                do
+                {
+                    var outerName = GetNiceName(type.DeclaringType, fullName);
+                    name = string.Format("{0}.{1}", outerName, name);
+
+                    nestedType = nestedType.DeclaringType;
+                }
+                while (nestedType != null && nestedType.IsNested);
+            }
+
+            if (!fullName)
+                return name;
+
+            if (string.IsNullOrEmpty(type.Namespace))
+                return name;
+
+            if (string.Equals(type.Namespace, "System"))
+                return name;
+
+            return string.Format("{0}.{1}", type.Namespace, name);
+        }
+
+        private static string GetNiceName(Type type, Dictionary<Type, string> translations)
         {
             string name;
 
@@ -55,21 +90,7 @@ namespace UnuGames
                 name = type.Name;
             }
 
-            if (!fullName)
-                return name;
-
-            if (string.IsNullOrEmpty(type.Namespace))
-                return name;
-
-            if (string.Equals(type.Namespace, "System"))
-                return name;
-
-            return string.Format("{0}.{1}", type.Namespace, name);
-        }
-
-        public static string GetNiceName(this Type type, bool fullName = false)
-        {
-            return type.GetNiceName(_defaultDictionary, fullName);
+            return name;
         }
     }
 }

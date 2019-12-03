@@ -43,7 +43,17 @@ namespace UnuGames
                 typeof(LayerMask)
         };
 
+        public static IReadOnlyList<Type> SupportedTypes
+        {
+            get { return _supportedTypes; }
+        }
+
         private readonly static List<string> _supportedNamespaces = new List<string>();
+
+        public static IReadOnlyList<string> SupportedNamespaces
+        {
+            get { return _supportedNamespaces; }
+        }
 
         public static void SupportNamespace(string @namespace)
         {
@@ -74,6 +84,21 @@ namespace UnuGames
         public static void SupportType<T>()
         {
             SupportType(typeof(T));
+        }
+
+        public static void SupportNestedTypesOf(Type type)
+        {
+            var nestedTypes = type.GetNestedTypes();
+
+            for (var i = 0; i < nestedTypes.Length; i++)
+            {
+                SupportType(nestedTypes[i]);
+            }
+        }
+
+        public static void SupportNestedTypesOf<T>()
+        {
+            SupportNestedTypesOf(typeof(T));
         }
 
         public static string GetName(this MemberInfo member, bool boldName, bool withReturnType, bool withDeclaringType, bool asPath)

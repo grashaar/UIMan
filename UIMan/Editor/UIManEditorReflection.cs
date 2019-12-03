@@ -101,6 +101,16 @@ namespace UnuGames
                 observableTypes.Add(types[i]);
             }
 
+            for (var i = 0; i < UIManReflection.SupportedTypes.Count; i++)
+            {
+                var type = UIManReflection.SupportedTypes[i];
+
+                if (!observableTypes.Contains(type))
+                {
+                    observableTypes.Add(type);
+                }
+            }
+
             return observableTypes.ToArray();
         }
 

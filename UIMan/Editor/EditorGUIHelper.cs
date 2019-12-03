@@ -40,9 +40,8 @@ namespace UnuGames
 
             for (var i = 0; i < types.Length; i++)
             {
-                var name = types[i];
                 var single = new SingleType {
-                    type = name,
+                    type = types[i],
                     index = i
                 };
 
