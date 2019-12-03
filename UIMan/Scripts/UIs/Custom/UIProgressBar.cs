@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace UnuGames
@@ -6,65 +6,70 @@ namespace UnuGames
     [ExecuteInEditMode]
     public class UIProgressBar : MonoBehaviour
     {
-        public RectTransform foreground;
-        public RectTransform thumb;
-        public Image.Type type;
-        private Image foreGroundImg;
+        [SerializeField]
+        private RectTransform foreground;
+
+        [SerializeField]
+        private RectTransform thumb;
+
+        [SerializeField]
+        private Image.Type type;
 
         [SerializeField]
         private float maxWidth = 0;
 
         [SerializeField]
         [Range(0, 1)]
-        private float currentValue;
+        private float value;
 
-        public float CurrentValue
+        private Image forgroundImage;
+
+        public float Value
         {
-            get
-            {
-                return this.currentValue;
-            }
-            set
-            {
-                this.currentValue = value;
-            }
+            get { return this.value; }
+            set { this.value = value; }
         }
 
         private void Awake()
         {
-            Transform fg = this.transform.Find("FG");
-            if (fg != null)
-                this.foreground = fg.GetComponent<RectTransform>();
-            this.foreGroundImg = this.foreground.GetComponent<Image>();
-            Transform fgThumb = this.transform.Find("FGThumb");
-            if (fgThumb != null)
-                this.foreground = fg.GetComponent<RectTransform>();
-            if (fgThumb != null)
-                this.thumb = fgThumb.GetComponent<RectTransform>();
+            if (this.foreground)
+                this.forgroundImage = this.foreground.GetComponentInChildren<Image>();
         }
 
         public void UpdateValue(float value)
         {
-            this.CurrentValue = value;
+            this.Value = value;
+            UpdateForeground();
+            UpdateThumb();
+        }
+
+        private void UpdateForeground()
+        {
+            if (!this.foreground)
+                return;
+
             if (this.type == Image.Type.Filled)
             {
-                this.foreGroundImg.fillAmount = value;
+                this.forgroundImage.fillAmount = this.value;
             }
             else
             {
-                var newWidth = value * this.maxWidth;
+                var newWidth = this.value * this.maxWidth;
                 Vector2 newRect = this.foreground.sizeDelta;
                 newRect.x = newWidth;
                 this.foreground.sizeDelta = newRect;
             }
+        }
 
-            if (this.thumb != null)
-            {
-                var newWidth = value * this.maxWidth;
-                Vector2 newRect = this.thumb.sizeDelta;
-                newRect.x = newWidth;
-                this.thumb.sizeDelta = newRect;
-            }
+        private void UpdateThumb()
+        {
+            if (!this.thumb)
+                return;
+
+            var newWidth = this.value * this.maxWidth;
+            Vector2 newRect = this.thumb.sizeDelta;
+            newRect.x = newWidth;
+            this.thumb.sizeDelta = newRect;
         }
 
 #if UNITY_EDITOR
@@ -73,7 +78,7 @@ namespace UnuGames
         {
             if (!Application.isPlaying)
             {
-                UpdateValue(this.currentValue);
+                UpdateValue(this.value);
             }
         }
 
