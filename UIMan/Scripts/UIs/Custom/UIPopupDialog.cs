@@ -6,11 +6,11 @@ using UnuGames.MVVM;
 
 namespace UnuGames
 {
-    public partial class UIPopupDialog : UIManDialog
+    public partial class UIPopupDialog
     {
         private string m_title = "";
 
-        [UIManProperty]
+        [UIManAutoProperty]
         public string Title
         {
             get { return this.m_title; }
@@ -19,7 +19,7 @@ namespace UnuGames
 
         private string m_content = "";
 
-        [UIManProperty]
+        [UIManAutoProperty]
         public string Content
         {
             get { return this.m_content; }
@@ -28,7 +28,7 @@ namespace UnuGames
 
         private string m_labelButtonYes = "";
 
-        [UIManProperty]
+        [UIManAutoProperty]
         public string LabelButtonYes
         {
             get { return this.m_labelButtonYes; }
@@ -37,7 +37,7 @@ namespace UnuGames
 
         private string m_labelButtonNo = "";
 
-        [UIManProperty]
+        [UIManAutoProperty]
         public string LabelButtonNo
         {
             get { return this.m_labelButtonNo; }
@@ -46,7 +46,7 @@ namespace UnuGames
 
         private bool m_isConfirmDialog = default;
 
-        [UIManProperty]
+        [UIManAutoProperty]
         public bool IsConfirmDialog
         {
             get { return this.m_isConfirmDialog; }

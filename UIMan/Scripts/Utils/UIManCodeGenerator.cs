@@ -535,7 +535,7 @@ namespace UnuGames
             else
                 field     = $"        private {this.PropertyType.GetAllias(false)} m_{fieldName} = {strDefaultValue};";
 
-            var attribute =  "        [UIManProperty]";
+            var attribute =  "        [UIManAutoProperty]";
             var property  = $"        public {this.PropertyType.GetAllias(false)} {propertyName}";
             //                        {
             var getter    = $"            get {{ return this.m_{fieldName}; }}";

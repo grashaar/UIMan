@@ -347,13 +347,15 @@ namespace UnuGames
 
 #if UNITY_EDITOR
 
-        public static CustomPropertyInfo[] GetUIManProperties(this Type uiManType)
+        public static CustomPropertyInfo[] GetUIManProperties(this Type uiManType, bool onlyAutoProperties = false)
         {
+            var propertyType = onlyAutoProperties ? typeof(UIManAutoPropertyAttribute) : typeof(UIManPropertyAttribute);
+
             PropertyInfo[] properties = uiManType.GetProperties();
             var customProperties = new List<CustomPropertyInfo>();
             foreach (PropertyInfo property in properties)
             {
-                if (property.IsDefined(typeof(UIManPropertyAttribute), true))
+                if (property.IsDefined(propertyType, true))
                 {
                     var instance = GetCachedTypeInstance(uiManType);
                     customProperties.Add(new CustomPropertyInfo(property.Name, property.PropertyType, property.GetValue(instance, null)));

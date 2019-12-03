@@ -57,9 +57,15 @@ namespace UnuGames
 
     public class UIManPropertyAttribute : Attribute
     {
-        public UIManPropertyAttribute()
-        {
-        }
+        public UIManPropertyAttribute() { }
+    }
+
+    /// <summary>
+    /// Should only use by code generator to indicate fields that are automatically generated.
+    /// </summary>
+    public class UIManAutoPropertyAttribute : UIManPropertyAttribute
+    {
+        public UIManAutoPropertyAttribute() { }
     }
 
     public class UIDescriptorAttribute : Attribute

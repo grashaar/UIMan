@@ -521,7 +521,7 @@ namespace UnuGames
         {
             _config.selectedType = typeName;
             _selectedType = UIManEditorReflection.GetTypeByName(typeName);
-            _selectedProperties = _selectedType.GetUIManProperties();
+            _selectedProperties = _selectedType.GetUIManProperties(true);
             this.namespaceField = new TextFieldHelper(_selectedType.Namespace);
             this.baseTypePopup = new EditablePopup(_arrSupportType, _selectedType.BaseType.Name, OnChangeBaseType);
             _currentScriptPath = UIManCodeGenerator.GetScriptPathByType(_selectedType);
