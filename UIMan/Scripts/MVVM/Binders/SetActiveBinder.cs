@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace UnuGames.MVVM
 {
+    [DisallowMultipleComponent]
     public class SetActiveBinder : BinderBase
     {
         public List<GameObject> activeOnTrue = new List<GameObject>();
