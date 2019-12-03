@@ -6,7 +6,7 @@ using UnuGames.MVVM;
 
 namespace <#NAME_SPACE#>
 {
-    public partial class <#CNAME#> : <#CTYPE#>
+    public partial class <#CNAME#><#CTYPE#>
     {
 <#PROPERTIES#>
     }

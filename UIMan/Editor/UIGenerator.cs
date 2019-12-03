@@ -26,9 +26,9 @@ namespace UnuGames
         private static string _handlerScriptPath = null;
 
         private readonly static string[] _arrSupportType = new string[3] {
-            "ObservableModel",
-            "UIManScreen",
-            "UIManDialog"
+            nameof(ObservableModel),
+            nameof(UIManScreen),
+            nameof(UIManDialog)
         };
 
         private static bool _reload = true;
@@ -368,7 +368,7 @@ namespace UnuGames
             LineHelper.Draw(Color.gray);
             this.baseTypePopup.Draw();
 
-            if (this.baseTypePopup.SelectedItem != "ObservableModel")
+            if (this.baseTypePopup.SelectedItem != nameof(ObservableModel))
             {
                 if (!System.IO.File.Exists(_handlerScriptPath))
                 {
@@ -386,7 +386,7 @@ namespace UnuGames
             LineHelper.Draw(Color.gray);
             this.namespaceField.Draw(GUIContent.none, 0);
 
-            if (this.baseTypePopup.SelectedItem != "ObservableModel" &&
+            if (this.baseTypePopup.SelectedItem != nameof(ObservableModel) &&
                 !string.Equals(_selectedType.Namespace, this.namespaceField.Text))
             {
                 EditorGUILayout.HelpBox($"Must manually change the namespace in {_selectedType.Name}.Handler.cs", MessageType.Warning);
@@ -570,14 +570,16 @@ namespace UnuGames
             if (baseType == null)
                 baseType = _selectedType.BaseType.Name;
 
+            var inheritance = baseType == nameof(ObservableModel) ? $": {baseType}" : string.Empty;
+
             if (!string.IsNullOrEmpty(_currentScriptPath))
             {
                 var backupCode = UIManCodeGenerator.DeleteScript(_handlerScriptPath);
-                var code = UIManCodeGenerator.GenerateScript(_selectedType.Name, baseType, _config, this.namespaceField.Text, _selectedProperties);
+                var code = UIManCodeGenerator.GenerateScript(_selectedType.Name, inheritance, _config, this.namespaceField.Text, _selectedProperties);
 
                 var saved = UIManCodeGenerator.SaveScript(_currentScriptPath, code, true);
 
-                if (baseType != "ObservableModel")
+                if (baseType != nameof(ObservableModel))
                 {
                     GenerateViewModelHandler(backupCode, baseType);
                     saved = false;
@@ -596,11 +598,14 @@ namespace UnuGames
                 baseType = _selectedType.BaseType.Name;
 
             var handlerCode = backupCode;
+
             if (string.IsNullOrEmpty(handlerCode))
                 handlerCode = UIManCodeGenerator.GenerateViewModelHandler(_selectedType.Name, baseType, _config, this.namespaceField.Text);
             else
-                handlerCode = handlerCode.Replace(": " + _selectedType.BaseType.Name, ": " + baseType);
+                handlerCode = handlerCode.Replace($": {_selectedType.BaseType.Name}", $": {baseType}");
+
             var saved = UIManCodeGenerator.SaveScript(_handlerScriptPath, handlerCode, false, _selectedType.BaseType.Name, baseType);
+
             if (saved)
             {
                 AssetDatabase.Refresh(ImportAssetOptions.Default);

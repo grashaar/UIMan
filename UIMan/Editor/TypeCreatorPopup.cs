@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
+using UnuGames.MVVM;
 
 namespace UnuGames
 {
@@ -13,9 +14,9 @@ namespace UnuGames
         private EditablePopup baseTypePopup;
 
         private readonly string[] arrSupportType = new string[3] {
-            "ObservableModel",
-            "UIManScreen",
-            "UIManDialog"
+            nameof(ObservableModel),
+            nameof(UIManScreen),
+            nameof(UIManDialog)
         };
 
         private bool inited = false;
@@ -144,11 +145,14 @@ namespace UnuGames
 
             var paths = Regex.Split(savePath, "/");
             var scriptName = paths[paths.Length - 1].Replace(".cs", "");
+            var inheritance = string.Empty;
 
             if (this.baseType != this.arrSupportType[0])
                 config.generatingType = this.typeName;
+            else
+                inheritance = $": {this.baseType}";
 
-            var code = UIManCodeGenerator.GenerateScript(this.typeName, this.baseType, config, this.namespaceField.Text);
+            var code = UIManCodeGenerator.GenerateScript(this.typeName, inheritance, config, this.namespaceField.Text);
             UIManCodeGenerator.SaveScript(savePath, code, true);
 
             if (this.baseType != this.arrSupportType[0])
@@ -167,13 +171,8 @@ namespace UnuGames
         public void GenerateViewModelHandler(string scriptPath)
         {
             var handlerScriptPath = UIManCodeGenerator.GeneratPathWithSubfix(scriptPath, ".Handler.cs");
-            var handlerCode = "";
             var config = Resources.Load<UIManConfig>("UIManConfig");
-
-            if (string.IsNullOrEmpty(handlerCode))
-                handlerCode = UIManCodeGenerator.GenerateViewModelHandler(this.typeName, this.baseType, config, this.namespaceField.Text);
-            else
-                handlerCode = handlerCode.Replace(": " + this.typeName, ": " + this.baseType);
+            var handlerCode = UIManCodeGenerator.GenerateViewModelHandler(this.typeName, this.baseType, config, this.namespaceField.Text);
 
             UIManCodeGenerator.SaveScript(handlerScriptPath, handlerCode, false, this.typeName, this.baseType);
         }
