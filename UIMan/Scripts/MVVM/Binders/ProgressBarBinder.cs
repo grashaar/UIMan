@@ -46,7 +46,7 @@ namespace UnuGames.MVVM
 
         private void UpdateValue(float val)
         {
-            this.bar.UpdateValue(val);
+            this.bar.Value = val;
         }
     }
 }

@@ -3,7 +3,6 @@ using UnityEngine.UI;
 
 namespace UnuGames
 {
-    [ExecuteInEditMode]
     public class UIProgressBar : MonoBehaviour, IProgressBar
     {
         [SerializeField]
@@ -13,7 +12,13 @@ namespace UnuGames
         private RectTransform thumb = null;
 
         [SerializeField]
+        private bool horizontalThumb = true;
+
+        [SerializeField]
         private Image.Type type = Image.Type.Simple;
+
+        [SerializeField]
+        private bool autoMaxWidth = true;
 
         [SerializeField]
         private float maxWidth = 0;
@@ -22,23 +27,48 @@ namespace UnuGames
         [Range(0, 1)]
         private float value = 0;
 
-        private Image forgroundImage;
+        public bool HorizontalThumb
+        {
+            get { return this.horizontalThumb; }
+            set { this.horizontalThumb = value; }
+        }
+
+        public bool AutoMaxWidth
+        {
+            get { return this.autoMaxWidth; }
+            set { this.autoMaxWidth = value; }
+        }
+
+        public float MaxWidth
+        {
+            get { return this.maxWidth; }
+            set { this.maxWidth = value; }
+        }
 
         public float Value
         {
             get { return this.value; }
-            set { this.value = value; }
+
+            set
+            {
+                this.value = value;
+                UpdateVisual();
+            }
         }
+
+        private Image forgroundImage;
 
         private void Awake()
         {
             if (this.foreground)
-                this.forgroundImage = this.foreground.GetComponentInChildren<Image>();
+                this.forgroundImage = this.foreground.GetComponent<Image>();
+
+            if (this.autoMaxWidth)
+                this.maxWidth = GetComponent<RectTransform>().rect.width;
         }
 
-        public void UpdateValue(float value)
+        private void UpdateVisual()
         {
-            this.Value = value;
             UpdateForeground();
             UpdateThumb();
         }
@@ -50,12 +80,13 @@ namespace UnuGames
 
             if (this.type == Image.Type.Filled)
             {
-                this.forgroundImage.fillAmount = this.value;
+                if (this.forgroundImage)
+                    this.forgroundImage.fillAmount = this.value;
             }
             else
             {
                 var newWidth = this.value * this.maxWidth;
-                Vector2 newRect = this.foreground.sizeDelta;
+                var newRect = this.foreground.sizeDelta;
                 newRect.x = newWidth;
                 this.foreground.sizeDelta = newRect;
             }
@@ -66,20 +97,26 @@ namespace UnuGames
             if (!this.thumb)
                 return;
 
-            var newWidth = this.value * this.maxWidth;
-            Vector2 newRect = this.thumb.sizeDelta;
-            newRect.x = newWidth;
-            this.thumb.sizeDelta = newRect;
+            var halfWidth = this.thumb.rect.width / 2f;
+            var newValue = this.value * this.maxWidth - halfWidth;
+            var newPos = this.thumb.anchoredPosition;
+
+            if (this.horizontalThumb)
+                newPos.x = newValue;
+            else
+                newPos.y = newValue;
+
+            this.thumb.anchoredPosition = newPos;
         }
 
 #if UNITY_EDITOR
 
-        private void Update()
+        private void OnValidate()
         {
-            if (!Application.isPlaying)
-            {
-                UpdateValue(this.value);
-            }
+            if (this.autoMaxWidth)
+                this.maxWidth = GetComponent<RectTransform>().rect.width;
+
+            UpdateVisual();
         }
 
 #endif
