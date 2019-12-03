@@ -7,20 +7,20 @@ namespace UnuGames
     public class UIProgressBar : MonoBehaviour, IProgressBar
     {
         [SerializeField]
-        private RectTransform foreground;
+        private RectTransform foreground = null;
 
         [SerializeField]
-        private RectTransform thumb;
+        private RectTransform thumb = null;
 
         [SerializeField]
-        private Image.Type type;
+        private Image.Type type = Image.Type.Simple;
 
         [SerializeField]
         private float maxWidth = 0;
 
         [SerializeField]
         [Range(0, 1)]
-        private float value;
+        private float value = 0;
 
         private Image forgroundImage;
 
