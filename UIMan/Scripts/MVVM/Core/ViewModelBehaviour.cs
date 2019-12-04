@@ -82,7 +82,7 @@ namespace UnuGames.MVVM
         public void OnPropertyChanged(string propertyName, object value)
         {
             this.PropertyChanged?.Invoke(this);
-            NotifyPropertyChanged(propertyName, value);
+            NotifyPropertyChanged($"set_{propertyName}", value);
         }
 
         /// <summary>
