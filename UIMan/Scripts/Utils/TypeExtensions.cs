@@ -37,20 +37,20 @@ namespace UnuGames
 
         public static string GetNiceName(this Type type, Dictionary<Type, string> translations, bool fullName = false)
         {
-            var name = GetNiceName(type, translations);
+            var name = GetNiceNameOf(type, translations);
 
             if (type.IsNested)
             {
-                var nestedType = type.DeclaringType;
+                var outerType = type.DeclaringType;
 
                 do
                 {
-                    var outerName = GetNiceName(type.DeclaringType, fullName);
+                    var outerName = GetNiceNameOf(outerType, translations);
                     name = string.Format("{0}.{1}", outerName, name);
 
-                    nestedType = nestedType.DeclaringType;
+                    outerType = outerType.DeclaringType;
                 }
-                while (nestedType != null && nestedType.IsNested);
+                while (outerType != null && outerType.IsNested);
             }
 
             if (!fullName)
@@ -65,7 +65,7 @@ namespace UnuGames
             return string.Format("{0}.{1}", type.Namespace, name);
         }
 
-        private static string GetNiceName(Type type, Dictionary<Type, string> translations)
+        private static string GetNiceNameOf(Type type, Dictionary<Type, string> translations)
         {
             string name;
 
@@ -75,15 +75,17 @@ namespace UnuGames
             }
             else if (type.IsArray)
             {
-                name = GetNiceName(type.GetElementType(), translations) + "[]";
+                name = GetNiceNameOf(type.GetElementType(), translations) + "[]";
             }
             else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
-                name = type.GetGenericArguments()[0].GetNiceName() + "?";
+                name = GetNiceNameOf(type.GetGenericArguments()[0], translations) + "?";
             }
             else if (type.IsGenericType)
             {
-                name = type.Name.Split('`')[0] + "<" + string.Join(", ", type.GetGenericArguments().Select(x => GetNiceName(x)).ToArray()) + ">";
+                var tName = type.Name.Split('`')[0];
+                var args = string.Join(", ", type.GetGenericArguments().Select(x => GetNiceNameOf(x, translations)).ToArray());
+                name = $"{tName}<{args}>";
             }
             else
             {
