@@ -5,15 +5,34 @@ namespace UnuGames
 {
     public class UIProgressBar : MonoBehaviour, IProgressBar
     {
+        public enum HorizontalOrigins
+        {
+            Left, Right
+        }
+
+        public enum VerticalOrigins
+        {
+            Top, Bottom
+        }
+
         [SerializeField]
         private RectTransform foreground = null;
 
+        [Space]
         [SerializeField]
-        private RectTransform thumb = null;
+        private RectTransform horizontalThumb = null;
 
         [SerializeField]
-        private bool horizontalThumb = true;
+        private HorizontalOrigins horizontalThumbOrigin = HorizontalOrigins.Left;
 
+        [Space]
+        [SerializeField]
+        private RectTransform verticalThumb = null;
+
+        [SerializeField]
+        private VerticalOrigins verticalThumbOrigin = VerticalOrigins.Top;
+
+        [Space]
         [SerializeField]
         private Image.Type type = Image.Type.Simple;
 
@@ -27,10 +46,16 @@ namespace UnuGames
         [Range(0, 1)]
         private float value = 0;
 
-        public bool HorizontalThumb
+        public HorizontalOrigins HorizontalThumbOrigin
         {
-            get { return this.horizontalThumb; }
-            set { this.horizontalThumb = value; }
+            get { return this.horizontalThumbOrigin; }
+            set { this.horizontalThumbOrigin = value; }
+        }
+
+        public VerticalOrigins VerticalThumbOrigin
+        {
+            get { return this.verticalThumbOrigin; }
+            set { this.verticalThumbOrigin = value; }
         }
 
         public bool AutoMaxWidth
@@ -70,7 +95,8 @@ namespace UnuGames
         private void UpdateVisual()
         {
             UpdateForeground();
-            UpdateThumb();
+            UpdateHorizontalThumb();
+            UpdateVerticalThumb();
         }
 
         private void UpdateForeground()
@@ -92,21 +118,56 @@ namespace UnuGames
             }
         }
 
-        private void UpdateThumb()
+        private void UpdateHorizontalThumb()
         {
-            if (!this.thumb)
+            if (!this.horizontalThumb)
                 return;
 
-            var halfWidth = this.thumb.rect.width / 2f;
-            var newValue = this.value * this.maxWidth - halfWidth;
-            var newPos = this.thumb.anchoredPosition;
-
-            if (this.horizontalThumb)
-                newPos.x = newValue;
+            if (this.horizontalThumbOrigin == HorizontalOrigins.Left)
+            {
+                this.horizontalThumb.anchorMin = new Vector2(0, 0);
+                this.horizontalThumb.anchorMax = new Vector2(0, 1);
+                this.horizontalThumb.pivot = new Vector2(0, 0.5f);
+            }
             else
-                newPos.y = newValue;
+            {
+                this.horizontalThumb.anchorMin = new Vector2(1, 0);
+                this.horizontalThumb.anchorMax = new Vector2(1, 1);
+                this.horizontalThumb.pivot = new Vector2(1, 0.5f);
+            }
 
-            this.thumb.anchoredPosition = newPos;
+            var newPos = this.horizontalThumb.anchoredPosition;
+            var halfWidth = this.horizontalThumb.rect.width / 2f;
+            var newValue = this.value * this.maxWidth - halfWidth;
+            newPos.x = this.horizontalThumbOrigin == HorizontalOrigins.Left ? newValue : -newValue;
+
+            this.horizontalThumb.anchoredPosition = newPos;
+        }
+
+        private void UpdateVerticalThumb()
+        {
+            if (!this.verticalThumb)
+                return;
+
+            if (this.verticalThumbOrigin == VerticalOrigins.Top)
+            {
+                this.verticalThumb.anchorMin = new Vector2(0, 1);
+                this.verticalThumb.anchorMax = new Vector2(1, 1);
+                this.verticalThumb.pivot = new Vector2(0.5f, 1);
+            }
+            else
+            {
+                this.verticalThumb.anchorMin = new Vector2(0, 0);
+                this.verticalThumb.anchorMax = new Vector2(1, 0);
+                this.verticalThumb.pivot = new Vector2(0.5f, 0);
+            }
+
+            var newPos = this.verticalThumb.anchoredPosition;
+            var halfWidth = this.verticalThumb.rect.height / 2f;
+            var newValue = this.value * this.maxWidth - halfWidth;
+            newPos.y = this.verticalThumbOrigin == VerticalOrigins.Bottom ? newValue : -newValue;
+
+            this.verticalThumb.anchoredPosition = newPos;
         }
 
 #if UNITY_EDITOR
