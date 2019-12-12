@@ -18,6 +18,9 @@ namespace UnuGames
         [SerializeField]
         private RectTransform foreground = null;
 
+        [SerializeField]
+        private Image.Type type = Image.Type.Simple;
+
         [Space]
         [SerializeField]
         private RectTransform horizontalThumb = null;
@@ -33,9 +36,6 @@ namespace UnuGames
         private VerticalOrigins verticalThumbOrigin = VerticalOrigins.Top;
 
         [Space]
-        [SerializeField]
-        private Image.Type type = Image.Type.Simple;
-
         [SerializeField]
         private bool autoMaxWidth = true;
 
