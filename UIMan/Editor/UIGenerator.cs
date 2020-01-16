@@ -357,10 +357,6 @@ namespace UnuGames
             {
                 DrawHeaderButtons();
             }
-            else
-            {
-                DrawHeaderButtonsObservableModel();
-            }
 
             // Base type
             GUILayout.Space(10);
@@ -370,7 +366,7 @@ namespace UnuGames
 
             if (this.baseTypePopup.SelectedItem != nameof(ObservableModel))
             {
-                if (!System.IO.File.Exists(_handlerScriptPath))
+                if (!File.Exists(_handlerScriptPath))
                 {
                     if (GUILayout.Button("Generate Handler"))
                     {
@@ -407,17 +403,6 @@ namespace UnuGames
                 }
             }
             EditorGUILayout.EndScrollView();
-        }
-
-        private void DrawHeaderButtonsObservableModel()
-        {
-            if (ColorButton.Draw("Migrate To New Version", CommonColor.LightOrange, GUILayout.Height(30)))
-            {
-                SaveCurrentType(true, this.baseTypePopup.SelectedItem);
-                CachePropertiesDrawer(true);
-            }
-
-            LineHelper.Draw(Color.gray);
         }
 
         private void DrawHeaderButtons()
