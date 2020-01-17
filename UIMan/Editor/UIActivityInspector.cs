@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnuGames;
 
-[CustomEditor(typeof(UIActivity))]
+[CustomEditor(typeof(UIActivityIndicator))]
 public class UIActivityInspector : Editor
 {
     public override void OnInspectorGUI()

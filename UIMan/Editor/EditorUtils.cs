@@ -12,11 +12,13 @@ namespace UnuGames
             var root = Application.dataPath;
             var folders = Regex.Split(path, "/");
             var curFolder = root + "/";
+
             for (var i = 0; i < folders.Length; i++)
             {
                 if (i == 0 && folders[i] == "Assets")
                     continue;
                 curFolder += "/" + folders[i];
+
                 if (!Directory.Exists(curFolder))
                 {
                     Directory.CreateDirectory(curFolder);
@@ -30,6 +32,7 @@ namespace UnuGames
             {
                 if (AssetDatabase.LoadAssetAtPath<T>(newPath) != null)
                     AssetDatabase.DeleteAsset(newPath);
+
                 AssetDatabase.CopyAsset(path, newPath);
             }
         }

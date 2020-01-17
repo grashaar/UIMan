@@ -3,10 +3,10 @@
 /// @Author: Dang Minh Du
 /// @Email: cp.dev.minhdu@gmail.com
 /// </summary>
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -17,7 +17,7 @@ namespace UnuGames
     public class UIMan : SingletonBehaviour<UIMan>
     {
         // Constants
-        private const string ACTIVITY_INDICATOR_NAME = "UIActivityIndicator";
+        private const string ACTIVITY_INDICATOR_NAME = nameof(UIActivityIndicator);
 
         // Configuration
         private UIManConfig config;
@@ -58,6 +58,7 @@ namespace UnuGames
             {
                 Transform lastTrans = null;
                 var lastSibIndex = -1;
+
                 for (var i = 0; i < this.dialogRoot.transform.childCount; i++)
                 {
                     Transform child = this.dialogRoot.GetChild(i);
@@ -78,9 +79,9 @@ namespace UnuGames
 
         public string CurrentUnityScene { get; set; }
 
-        private UIActivity uiLoading;
+        private UIActivityIndicator uiLoading;
 
-        public void Loading(Action<UIActivity> callback)
+        public void Loading(Action<UIActivityIndicator> callback)
         {
             if (this.uiLoading)
             {
@@ -91,7 +92,7 @@ namespace UnuGames
             UIManAssetLoader.Load<GameObject>(ACTIVITY_INDICATOR_NAME, (key, asset) => OnLoading(key, asset, callback));
         }
 
-        private void OnLoading(string key, UnityEngine.Object asset, Action<UIActivity> callback)
+        private void OnLoading(string key, UnityEngine.Object asset, Action<UIActivityIndicator> callback)
         {
             if (!(asset is GameObject prefab))
             {
@@ -101,7 +102,7 @@ namespace UnuGames
 
             var obj = Instantiate(prefab) as GameObject;
             obj.name = ACTIVITY_INDICATOR_NAME;
-            this.uiLoading = obj.GetComponent<UIActivity>();
+            this.uiLoading = obj.GetComponent<UIActivityIndicator>();
             this.uiLoading.Setup(UIMan.Instance.transform);
 
             callback?.Invoke(this.uiLoading);
@@ -109,12 +110,13 @@ namespace UnuGames
 
         public override void Initialize()
         {
-            this.uiLoading = GetComponentInChildren<UIActivity>();
+            this.uiLoading = GetComponentInChildren<UIActivityIndicator>();
 
             this.config = Resources.Load<UIManConfig>("UIManConfig");
             this.bgRectTrans = this.background.GetComponent<RectTransform>();
 
-            UIManScreen[] screens = GetComponentsInChildren<UIManScreen>();
+            var screens = GetComponentsInChildren<UIManScreen>();
+
             if (screens.Length > 0)
             {
                 for (var i = 0; i < screens.Length; i++)
@@ -198,6 +200,7 @@ namespace UnuGames
             DoAnimShow(screen);
 
             this.CurrentScreen = screen;
+
             if (!seal)
                 this.screenQueue.Add(screen);
         }
@@ -269,7 +272,6 @@ namespace UnuGames
             else
             {
                 UnuLogger.LogWarningFormat(this, $"There are no UI of {uiType.Name} has been show!");
-                return;
             }
         }
 
@@ -313,10 +315,12 @@ namespace UnuGames
             }
 
             BringToFront(this.dialogRoot, dialog.transform, 2);
+
             this.activeDialog.Push(uiType);
             this.IsInDialogTransition = true;
             dialog.SetCallbacks(callbacks);
             dialog.OnShow(args);
+
             OnShowUI(dialog, args);
             DoAnimShow(dialog);
         }
@@ -388,6 +392,7 @@ namespace UnuGames
                 EnqueueDialog(uiType, UITransitionType.Hide, null, null);
                 return;
             }
+
             if (this.dialogDict.TryGetValue(uiType, out UIManDialog dialog))
             {
                 if (dialog.State == UIState.Hide)
@@ -419,7 +424,6 @@ namespace UnuGames
             else
             {
                 UnuLogger.LogWarningFormat(this, $"There are no UI of {uiType.Name} has been show!");
-                return;
             }
         }
 
@@ -458,8 +462,10 @@ namespace UnuGames
             this.IsLoadingUnityScene = true;
             yield return SceneManager.LoadSceneAsync(name);
             this.IsLoadingUnityScene = false;
+
             if (this.CurrentScreen != null)
                 HideScreen(this.CurrentScreen.UIType);
+
             OnLoadUnitySceneComplete(screen, args);
         }
 
@@ -478,10 +484,13 @@ namespace UnuGames
             {
                 yield return null;
             }
+
             var screen = (Type)args[0];
             object[] screenArgs = null;
+
             if (args.Length > 1)
                 screenArgs = (object[])args[1];
+
             Instance.ShowScreen(screen, screenArgs);
         }
 
@@ -697,17 +706,20 @@ namespace UnuGames
             ui.LockInput();
 
             if (ui.motionShow == UIMotion.CustomMecanimAnimation)
-            { //Custom animation use animator
+            {
+                // Custom animation use animator
                 ui.CanvasGroup.alpha = 1;
                 ui.animRoot.EnableAndPlay(UIManDefine.ANIM_SHOW);
             }
             else if (ui.motionShow == UIMotion.CustomScriptAnimation)
-            { //Custom animation use overrided function
+            {
+                // Custom animation use overrided function
                 ui.animRoot.Disable();
                 StartCoroutine(DelayDequeueDialog(ui.AnimationShow(), ui, true));
             }
             else
-            { // Simple tween
+            {
+                // Simple tween
                 ui.animRoot.Disable();
                 Vector3 initPos = GetTargetPosition(ui.motionShow, UIManDefine.ARR_SHOW_TARGET_POS);
 
@@ -718,13 +730,16 @@ namespace UnuGames
                 {
                     UITweener.Move(ui.gameObject, ui.animTime, ui.showPosition);
                 }
+
                 UITweener.Alpha(ui.gameObject, ui.animTime, 0f, 1f).SetOnComplete(() => {
                     ui.OnShowComplete();
                     OnShowUIComplete(ui);
+
                     if (ui.GetUIBaseType() == UIBaseType.Dialog)
                     {
                         this.IsInDialogTransition = false;
                     }
+
                     ui.UnlockInput();
                     DoAnimIdle(ui);
                 });
@@ -739,27 +754,33 @@ namespace UnuGames
         {
             ui.LockInput();
             if (ui.motionHide == UIMotion.CustomMecanimAnimation)
-            { //Custom animation use animator
+            {
+                // Custom animation use animator
                 ui.animRoot.EnableAndPlay(UIManDefine.ANIM_HIDE);
             }
             else if (ui.motionHide == UIMotion.CustomScriptAnimation)
-            { //Custom animation use overrided function
+            {
+                // Custom animation use overrided function
                 ui.animRoot.Disable();
                 StartCoroutine(DelayDequeueDialog(ui.AnimationHide(), ui, false));
             }
             else
-            { // Simple tween
+            {
+                // Simple tween
                 ui.animRoot.Disable();
                 Vector3 hidePos = GetTargetPosition(ui.motionHide, UIManDefine.ARR_HIDE_TARGET_POS);
+
                 // Tween position
                 if (ui.motionHide != UIMotion.None)
                 {
                     UITweener.Move(ui.gameObject, ui.animTime, hidePos);
                 }
+
                 UITweener.Alpha(ui.gameObject, ui.animTime, 1f, 0f).SetOnComplete(() => {
                     ui.RectTransform.anchoredPosition3D = hidePos;
                     ui.OnHideComplete();
                     OnHideUIComplete(ui);
+
                     if (ui.GetUIBaseType() == UIBaseType.Dialog)
                     {
                         this.IsInDialogTransition = false;
@@ -776,17 +797,21 @@ namespace UnuGames
         public void DoAnimIdle(UIManBase ui)
         {
             if (ui.motionIdle == UIMotion.CustomMecanimAnimation)
-            { //Custom animation use animator
+            {
+                // Custom animation use animator
                 ui.animRoot.EnableAndPlay(UIManDefine.ANIM_IDLE);
             }
             else if (ui.motionHide == UIMotion.CustomScriptAnimation)
-            { //Custom animation use overrided function
+            {
+                // Custom animation use overrided function
                 ui.animRoot.Disable();
                 StartCoroutine(DelayDequeueDialog(ui.AnimationIdle(), ui, false));
             }
             else
-            { // Simple tween
+            {
+                // Simple tween
                 ui.animRoot.Disable();
+
                 if (ui.motionIdle != UIMotion.None && ui.motionIdle != UIMotion.Hidden)
                 {
                     UnuLogger.LogWarning("UIMan does not support simple tween animation for idle yet!", this);
@@ -828,9 +853,11 @@ namespace UnuGames
         private IEnumerator DelayDequeueDialog(IEnumerator coroutine, UIManBase ui, bool resetDialogTransitionStatus)
         {
             yield return StartCoroutine(coroutine);
+
             this.IsInDialogTransition = false;
             ui.UnlockInput();
             ui.OnHideComplete();
+
             if (ui.GetUIBaseType() == UIBaseType.Dialog && !resetDialogTransitionStatus)
                 DequeueDialog();
         }
@@ -843,6 +870,7 @@ namespace UnuGames
             if (this.dialogQueue.Count > 0)
             {
                 UIDialogQueueData transition = this.dialogQueue.Dequeue();
+
                 if (transition.TransitionType == UITransitionType.Show)
                 {
                     ShowDialog(transition.UIType, transition.Callbacks, transition.Args);
@@ -857,11 +885,13 @@ namespace UnuGames
         public bool IsShowingDialog<T>()
         {
             Type uiType = typeof(T);
+
             foreach (KeyValuePair<Type, UIManDialog> dlg in this.dialogDict)
             {
                 if (dlg.Key == uiType && dlg.Value.IsActive)
                     return true;
             }
+
             return false;
         }
 
@@ -871,6 +901,7 @@ namespace UnuGames
             var dialog = uiType.BaseType == typeof(UIManDialog) ? true : false;
 
             UIManBase ui = null;
+
             if (dialog)
             {
                 if (this.dialogDict.ContainsKey(uiType))
@@ -898,6 +929,7 @@ namespace UnuGames
         {
             Type uiType = typeof(T);
             var dialog = uiType.BaseType == typeof(UIManDialog) ? true : false;
+
             if (dialog)
             {
                 if (this.dialogDict.ContainsKey(uiType))
@@ -946,7 +978,7 @@ namespace UnuGames
             UIManAssetLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessPreload(key, asset, uiType));
         }
 
-        private void PreprocessPreload(string key, UnityEngine.Object asset, Type uiType, params object[] args)
+        private void PreprocessPreload(string key, UnityEngine.Object asset, Type uiType)
         {
             if (!(asset is GameObject prefab))
             {

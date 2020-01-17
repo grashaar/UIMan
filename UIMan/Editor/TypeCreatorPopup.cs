@@ -28,8 +28,9 @@ namespace UnuGames
             {
                 if (this.baseTypePopup == null)
                 {
-                    this.namespaceField = new TextFieldHelper(Resources.Load<UIManConfig>("UIManConfig").classNamespace);
-                    this.baseTypePopup = new EditablePopup(this.arrSupportType, "UIManDialog", null);
+                    var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>();
+                    this.namespaceField = new TextFieldHelper(config.classNamespace);
+                    this.baseTypePopup = new EditablePopup(this.arrSupportType, config.name, null);
                 }
                 this.minSize = new Vector2(300, 160);
                 this.maxSize = this.minSize;
@@ -56,15 +57,16 @@ namespace UnuGames
             if (ColorButton.Draw("Create", CommonColor.LightGreen, GUILayout.Height(30)))
             {
                 var lastPath = "";
-                UIManConfig uiManConfig = Resources.Load<UIManConfig>("UIManConfig");
-                if (uiManConfig != null)
+                var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>();
+
+                if (config != null)
                 {
                     if (this.baseTypePopup.SelectedItem == this.arrSupportType[0])
-                        lastPath = uiManConfig.modelScriptFolder;
+                        lastPath = config.modelScriptFolder;
                     else if (this.baseTypePopup.SelectedItem == this.arrSupportType[1])
-                        lastPath = uiManConfig.screenScriptFolder;
+                        lastPath = config.screenScriptFolder;
                     else if (this.baseTypePopup.SelectedItem == this.arrSupportType[2])
-                        lastPath = uiManConfig.dialogScriptFolder;
+                        lastPath = config.dialogScriptFolder;
                 }
 
                 lastPath = EditorUtility.SaveFilePanel("Save script", Application.dataPath + lastPath, this.typeName, "cs");
@@ -77,21 +79,21 @@ namespace UnuGames
 
                     if (this.baseTypePopup.SelectedItem == this.arrSupportType[0])
                     {
-                        uiManConfig.modelScriptFolder = lastPath;
-                        uiManConfig.generatingTypeIsDialog = false;
+                        config.modelScriptFolder = lastPath;
+                        config.generatingTypeIsDialog = false;
                     }
                     else if (this.baseTypePopup.SelectedItem == this.arrSupportType[1])
                     {
-                        uiManConfig.screenScriptFolder = lastPath;
-                        uiManConfig.generatingTypeIsDialog = false;
+                        config.screenScriptFolder = lastPath;
+                        config.generatingTypeIsDialog = false;
                     }
                     else if (this.baseTypePopup.SelectedItem == this.arrSupportType[2])
                     {
-                        uiManConfig.dialogScriptFolder = lastPath;
-                        uiManConfig.generatingTypeIsDialog = true;
+                        config.dialogScriptFolder = lastPath;
+                        config.generatingTypeIsDialog = true;
                     }
-                    EditorUtility.SetDirty(uiManConfig);
 
+                    EditorUtility.SetDirty(config);
                     GenerateViewModel();
                 }
             }
@@ -117,9 +119,9 @@ namespace UnuGames
 
             this.baseType = this.baseTypePopup.SelectedItem;
 
-            UIManConfig config = Resources.Load<UIManConfig>("UIManConfig");
-
+            var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>();
             var savePath = "";
+
             if (this.baseType.Equals(UIGenerator.GetSupportTypeName(0)))
             {
                 savePath = config.modelScriptFolder;
@@ -137,6 +139,7 @@ namespace UnuGames
             }
 
             savePath = Application.dataPath + "/" + savePath + "/" + this.typeName + ".cs";
+
             if (File.Exists(savePath) || UIGenerator.IsViewModelExisted(this.typeName))
             {
                 EditorUtility.DisplayDialog("Error", "View model name is already exist, please input other name!", "OK");
@@ -144,7 +147,6 @@ namespace UnuGames
             }
 
             var paths = Regex.Split(savePath, "/");
-            var scriptName = paths[paths.Length - 1].Replace(".cs", "");
             var inheritance = string.Empty;
 
             if (this.baseType != this.arrSupportType[0])
@@ -171,7 +173,7 @@ namespace UnuGames
         public void GenerateViewModelHandler(string scriptPath)
         {
             var handlerScriptPath = UIManCodeGenerator.GeneratPathWithSubfix(scriptPath, ".Handler.cs");
-            var config = Resources.Load<UIManConfig>("UIManConfig");
+            var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>();
             var handlerCode = UIManCodeGenerator.GenerateViewModelHandler(this.typeName, this.baseType, config, this.namespaceField.Text);
 
             UIManCodeGenerator.SaveScript(handlerScriptPath, handlerCode, false, this.typeName, this.baseType);

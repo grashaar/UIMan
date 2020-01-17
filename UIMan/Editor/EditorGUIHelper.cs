@@ -761,6 +761,7 @@ namespace UnuGames
             GUILayout.EndVertical();
 
             Color textColor = Color.gray;
+
             if (this._property.HasChange)
                 textColor = Color.black;
 
@@ -802,6 +803,7 @@ namespace UnuGames
             this._currentItem = currentItem;
             this._arrItems = items;
             this._onSave = onSave;
+
             for (var i = 0; i < this._arrItems.Length; i++)
             {
                 if (this._arrItems[i] == currentItem)

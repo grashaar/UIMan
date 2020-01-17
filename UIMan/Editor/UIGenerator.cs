@@ -50,7 +50,7 @@ namespace UnuGames
         }
 
         [MenuItem("UIMan/UI Generator", false, -1)]
-        private static void Init()
+        private static void Initialize()
         {
             UIManEditorReflection.RefreshAssemblies(false);
             _types = UIManEditorReflection.GetAllUIManTypes();
@@ -72,25 +72,46 @@ namespace UnuGames
                 Selection.activeGameObject.AddComponent(typeof(DataContext));
         }
 
+        [MenuItem("UIMan/Component/Enable Binder", false, 2)]
+        private static void AttachEnableBinder()
+        {
+            if (Selection.activeGameObject != null)
+                Selection.activeGameObject.AddComponent(typeof(EnableBinder));
+        }
+
+        [MenuItem("UIMan/Component/SetActive Binder", false, 2)]
+        private static void AttachSetActiveBinder()
+        {
+            if (Selection.activeGameObject != null)
+                Selection.activeGameObject.AddComponent(typeof(SetActiveBinder));
+        }
+
+        [MenuItem("UIMan/Component/CanvasGroup Binder", false, 2)]
+        private static void AttachCanvasGroupBinder()
+        {
+            if (Selection.activeGameObject != null)
+                Selection.activeGameObject.AddComponent(typeof(CanvasGroupBinder));
+        }
+
+        [MenuItem("UIMan/Component/Interactable Binder", false, 2)]
+        private static void AttachInteractableBinder()
+        {
+            if (Selection.activeGameObject != null)
+                Selection.activeGameObject.AddComponent(typeof(InteractableBinder));
+        }
+
+        [MenuItem("UIMan/Component/Number Binder", false, 2)]
+        private static void AttachNumberBinder()
+        {
+            if (Selection.activeGameObject != null)
+                Selection.activeGameObject.AddComponent(typeof(NumberBinder));
+        }
+
         [MenuItem("UIMan/Component/Text Binder", false, 2)]
         private static void AttachTextBinder()
         {
             if (Selection.activeGameObject != null)
                 Selection.activeGameObject.AddComponent(typeof(TextBinder));
-        }
-
-        [MenuItem("UIMan/Component/Observale List Binder", false, 2)]
-        private static void AttachObservaleListBinder()
-        {
-            if (Selection.activeGameObject != null)
-                Selection.activeGameObject.AddComponent(typeof(ObservableListBinder));
-        }
-
-        [MenuItem("UIMan/Component/Visible Binder", false, 2)]
-        private static void AttachVisibleBinder()
-        {
-            if (Selection.activeGameObject != null)
-                Selection.activeGameObject.AddComponent(typeof(SetActiveBinder));
         }
 
         [MenuItem("UIMan/Component/Input Binder", false, 2)]
@@ -114,49 +135,51 @@ namespace UnuGames
                 Selection.activeGameObject.AddComponent(typeof(ExternalImageBinder));
         }
 
-        [MenuItem("UIMan/Component/Progress Binder", false, 2)]
-        private static void AttachProgressBinder()
+        [MenuItem("UIMan/Component/SpriteAtlas Image Binder", false, 2)]
+        private static void AttachSpriteAtlasImageBinder()
+        {
+            if (Selection.activeGameObject != null)
+                Selection.activeGameObject.AddComponent(typeof(SpriteAtlasImageBinder));
+        }
+
+        [MenuItem("UIMan/Component/Image FillAmount Binder", false, 2)]
+        private static void AttachImageFillAmountBinder()
+        {
+            if (Selection.activeGameObject != null)
+                Selection.activeGameObject.AddComponent(typeof(ImageFillAmountBinder));
+        }
+
+        [MenuItem("UIMan/Component/ProgressBar Binder", false, 2)]
+        private static void AttachProgressBarBinder()
         {
             if (Selection.activeGameObject != null)
                 Selection.activeGameObject.AddComponent(typeof(ProgressBarBinder));
         }
 
-        [MenuItem("UIMan/Component/Enable Binder", false, 2)]
-        private static void AttachEnableBinder()
+        [MenuItem("UIMan/Component/Observale List Binder", false, 2)]
+        private static void AttachObservaleListBinder()
         {
             if (Selection.activeGameObject != null)
-                Selection.activeGameObject.AddComponent(typeof(InteractableBinder));
+                Selection.activeGameObject.AddComponent(typeof(ObservableListBinder));
         }
 
-        [MenuItem("UIMan/Component/Number Binder", false, 2)]
-        private static void AttachNumberBinder()
+        [MenuItem("UIMan/Component/Simple Observale List Binder", false, 2)]
+        private static void AttachSimpleObservaleListBinder()
         {
             if (Selection.activeGameObject != null)
-                Selection.activeGameObject.AddComponent(typeof(NumberBinder));
+                Selection.activeGameObject.AddComponent(typeof(SimpleObservableListBinder));
         }
 
-        [MenuItem("UIMan/Prefab/Edit UIRoot", false, 3)]
-        private static void EditRoot()
+        [MenuItem("UIMan/Prefab/Find UIMan", false, 3)]
+        private static void FindUIMan()
         {
-            Selection.activeObject = UIMan.Instance;
+            EditorHelper.GetPrefab<UIMan>();
         }
 
-        [MenuItem("UIMan/Prefab/Edit Activity Indicator", false, 4)]
-        private static void EditLoading()
+        [MenuItem("UIMan/Prefab/Find UIActivityIndicator", false, 4)]
+        private static void FindUIActivityIndicator()
         {
-            var obj = Resources.Load("UIActivityIndicator") as GameObject;
-            if (obj != null)
-            {
-                var editorPath = AssetDatabase.GetAssetPath(obj);
-                var prefab = PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(editorPath)) as GameObject;
-                prefab.transform.SetParent(UIMan.Instance.transform, false);
-                prefab.transform.SetAsLastSibling();
-                Selection.activeObject = prefab;
-            }
-            else
-            {
-                UnuLogger.LogError("ActivityIndicator prefab could not be found! Please re-install UIMan!");
-            }
+            EditorHelper.GetPrefab<UIActivityIndicator>();
         }
 
         [MenuItem("UIMan/Configuration", false)]
@@ -174,9 +197,7 @@ namespace UnuGames
 
         private static void GetConfig()
         {
-            _config = Resources.Load<UIManConfig>("UIManConfig");
-            if (_config == null)
-                ConfigFile.Create<UIManConfig>();
+            _config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>();
         }
 
         private void OnGUI()
@@ -193,7 +214,7 @@ namespace UnuGames
 
             if (_container == null)
             {
-                Init();
+                Initialize();
             }
 
             GUILayout.BeginHorizontal();
