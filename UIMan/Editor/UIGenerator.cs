@@ -13,7 +13,9 @@ namespace UnuGames
 
         private static string _savedDirectory;
         private static UIGenerator _container;
-        private static string[] _types;
+        private static string[] _screenTypes;
+        private static string[] _dialogTypes;
+        private static string[] _modelTypes;
         private static float _typeAreaWidth = 250f;
         private static float _propertiesAreaWidth = 640f;
         private static Vector2 _propertiesScrollPos;
@@ -35,7 +37,7 @@ namespace UnuGames
         private static UIManConfig _config;
 
         private UISearchField searchField;
-        private ListView listTypes;
+        private UIManTypeListView listTypes;
         private TextFieldHelper namespaceField;
         private EditablePopup baseTypePopup;
 
@@ -46,14 +48,18 @@ namespace UnuGames
 
         public static bool IsViewModelExisted(string name)
         {
-            return ArrayUtility.Contains(_types, name);
+            return ArrayUtility.Contains(_screenTypes, name) ||
+                   ArrayUtility.Contains(_dialogTypes, name) ||
+                   ArrayUtility.Contains(_modelTypes, name);
         }
 
         [MenuItem("UIMan/UI Generator", false, -1)]
         private static void Initialize()
         {
             UIManEditorReflection.RefreshAssemblies(false);
-            _types = UIManEditorReflection.GetAllUIManTypes();
+            _screenTypes = UIManEditorReflection.GetAllTypes<UIManScreen>(true);
+            _dialogTypes = UIManEditorReflection.GetAllTypes<UIManDialog>(true);
+            _modelTypes = UIManEditorReflection.GetAllTypes<ObservableModel>(true);
             _container = EditorWindow.GetWindow<UIGenerator>(true, "UIMan - UI Generator");
             _container.minSize = new Vector2(900, 600);
             _container.maxSize = _container.minSize;
@@ -244,9 +250,9 @@ namespace UnuGames
             this.searchField.Draw();
 
             if (this.listTypes == null)
-                this.listTypes = new ListView();
+                this.listTypes = new UIManTypeListView();
 
-            this.listTypes.SetData(-1, _types, false, OnSelecType, this.searchField.KeyWord, this);
+            this.listTypes.SetData(-1, _screenTypes, _dialogTypes, _modelTypes, false, OnSelecType, this.searchField.KeyWord, this);
             this.listTypes.Draw();
 
             if (_reload && _config != null)
@@ -382,7 +388,7 @@ namespace UnuGames
             // Base type
             GUILayout.Space(10);
             LabelHelper.HeaderLabel("Type");
-            LineHelper.Draw(Color.gray);
+            GUILayout.Space(2);
             this.baseTypePopup.Draw();
 
             if (this.baseTypePopup.SelectedItem != nameof(ObservableModel))
@@ -400,7 +406,7 @@ namespace UnuGames
             // Namespace
             GUILayout.Space(10);
             LabelHelper.HeaderLabel("Namespace");
-            LineHelper.Draw(Color.gray);
+            GUILayout.Space(2);
             this.namespaceField.Draw(GUIContent.none, 0);
 
             if (this.baseTypePopup.SelectedItem != nameof(ObservableModel) &&
@@ -412,7 +418,7 @@ namespace UnuGames
             // Properties
             GUILayout.Space(10);
             LabelHelper.HeaderLabel("Properties");
-            LineHelper.Draw(Color.gray);
+            GUILayout.Space(2);
 
             _propertiesScrollPos = EditorGUILayout.BeginScrollView(_propertiesScrollPos, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             if (_propertiesDrawerCache.ContainsKey(_selectedType))
@@ -463,12 +469,6 @@ namespace UnuGames
                         prefabInstance.transform.SetParent(UIMan.Instance.screenRoot, false);
                 }
                 Selection.activeGameObject = prefabInstance;
-            }
-
-            if (ColorButton.Draw("Migrate To New Version", CommonColor.LightOrange, GUILayout.Height(30)))
-            {
-                SaveCurrentType(true, this.baseTypePopup.SelectedItem);
-                CachePropertiesDrawer(true);
             }
 
             if (ColorButton.Draw("Delete", CommonColor.LightRed, GUILayout.Height(30)))

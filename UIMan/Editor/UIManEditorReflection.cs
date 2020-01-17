@@ -15,7 +15,7 @@ namespace UnuGames
             return _types;
         }
 
-        public static string[] GetAllUIManTypes()
+        public static string[] GetAllUIManTypes(bool sort = false)
         {
             var uiManTypes = new List<string>();
             var types = GetAllTypes();
@@ -37,6 +37,36 @@ namespace UnuGames
                     }
                 }
             }
+
+            if (sort)
+                uiManTypes.Sort();
+
+            return uiManTypes.ToArray();
+        }
+
+        public static string[] GetAllTypes<T>(bool sort = false)
+        {
+            var uiManTypes = new List<string>();
+            var types = GetAllTypes();
+
+            for (var i = 0; i < types.Count; i++)
+            {
+                if (types[i] == null)
+                    continue;
+
+                var type = types[i];
+
+                if (type.BaseType == typeof(T))
+                {
+                    if (!uiManTypes.Contains(type.Name))
+                    {
+                        uiManTypes.Add(type.Name);
+                    }
+                }
+            }
+
+            if (sort)
+                uiManTypes.Sort();
 
             return uiManTypes.ToArray();
         }

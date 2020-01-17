@@ -318,7 +318,9 @@ namespace UnuGames
             var type = Type.GetType(typeName);
             if (type != null)
             {
-                if (type.BaseType == typeof(UIManScreen) || type.BaseType == typeof(UIManDialog) || type.BaseType == typeof(ObservableModel))
+                if (type.BaseType == typeof(UIManScreen) ||
+                    type.BaseType == typeof(UIManDialog) ||
+                    type.BaseType == typeof(ObservableModel))
                 {
                     if (type.Name == typeName)
                     {

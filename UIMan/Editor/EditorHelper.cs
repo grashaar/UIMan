@@ -6,7 +6,7 @@ namespace UnuGames
 {
     public static class EditorHelper
     {
-        public static T CreateScriptableObject<T>() where T : ScriptableObject
+        public static T CreateScriptableObject<T>(bool autoSelection = true) where T : ScriptableObject
         {
             T asset = ScriptableObject.CreateInstance<T>();
 
@@ -26,29 +26,33 @@ namespace UnuGames
             AssetDatabase.CreateAsset(asset, assetPathAndName);
             AssetDatabase.SaveAssets();
             EditorUtility.FocusProjectWindow();
-            Selection.activeObject = asset;
+
+            if (autoSelection)
+                Selection.activeObject = asset;
 
             return asset;
         }
 
-        public static T GetOrCreateScriptableObject<T>() where T : ScriptableObject
+        public static T GetOrCreateScriptableObject<T>(bool autoSelection = true) where T : ScriptableObject
         {
             var typeName = typeof(T).Name;
             var guids = AssetDatabase.FindAssets($"t:{typeName}");
 
             if (guids == null || guids.Length == 0)
             {
-                return CreateScriptableObject<T>();
+                return CreateScriptableObject<T>(autoSelection);
             }
 
             var file = AssetDatabase.GUIDToAssetPath(guids[0]);
             var asset = AssetDatabase.LoadAssetAtPath<T>(file);
-            Selection.activeObject = asset;
+
+            if (autoSelection)
+                Selection.activeObject = asset;
 
             return asset;
         }
 
-        public static T GetPrefab<T>() where T : Object
+        public static T GetPrefab<T>(bool autoSelection = true) where T : Object
         {
             var typeName = typeof(T).Name;
             var guids = AssetDatabase.FindAssets($"{typeName} t:{nameof(GameObject)}");
@@ -61,7 +65,9 @@ namespace UnuGames
 
             var file = AssetDatabase.GUIDToAssetPath(guids[0]);
             var prefab = AssetDatabase.LoadAssetAtPath<T>(file);
-            Selection.activeObject = prefab;
+
+            if (autoSelection)
+                Selection.activeObject = prefab;
 
             return prefab;
         }

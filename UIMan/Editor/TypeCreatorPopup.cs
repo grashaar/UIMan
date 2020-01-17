@@ -57,7 +57,7 @@ namespace UnuGames
             if (ColorButton.Draw("Create", CommonColor.LightGreen, GUILayout.Height(30)))
             {
                 var lastPath = "";
-                var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>();
+                var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>(false);
 
                 if (config != null)
                 {
@@ -119,7 +119,7 @@ namespace UnuGames
 
             this.baseType = this.baseTypePopup.SelectedItem;
 
-            var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>();
+            var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>(false);
             var savePath = "";
 
             if (this.baseType.Equals(UIGenerator.GetSupportTypeName(0)))
@@ -173,7 +173,7 @@ namespace UnuGames
         public void GenerateViewModelHandler(string scriptPath)
         {
             var handlerScriptPath = UIManCodeGenerator.GeneratPathWithSubfix(scriptPath, ".Handler.cs");
-            var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>();
+            var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>(false);
             var handlerCode = UIManCodeGenerator.GenerateViewModelHandler(this.typeName, this.baseType, config, this.namespaceField.Text);
 
             UIManCodeGenerator.SaveScript(handlerScriptPath, handlerCode, false, this.typeName, this.baseType);

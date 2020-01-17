@@ -488,6 +488,160 @@ namespace UnuGames
         }
     }
 
+    public class UIManTypeListView
+    {
+        private const string Model = "<Model>";
+        private const string Dialog = "<Dialog>";
+        private const string Screen = "<Screen>";
+
+        private GUIStyle menuItemStyle;
+        private GUIStyle buttonStyle;
+        private int _selected;
+        private bool _selectOnMouseHover;
+        private string _filter;
+        private Vector2 _scrollPosition;
+        private List<string> _viewItems;
+
+        private Action<string> _onSelected;
+        private Action<int> _onSelectedIndex;
+
+        private int selectedIndex = -1;
+
+        public EditorWindow Window { get; private set; }
+
+        public string SelectedViewItem { get; private set; }
+
+        public string SelectedDataItem { get; private set; }
+
+        public UIManTypeListView()
+        {
+            this.menuItemStyle = new GUIStyle(GUI.skin.FindStyle("MenuItem")) {
+                fixedHeight = 16,
+                richText = true
+            };
+
+            this.buttonStyle = new GUIStyle(GUI.skin.button) {
+                richText = true
+            };
+        }
+
+        public void SetData(int selectedIndex, string[] screenTypes, string[] dialogTypes, string[] modelTypes, bool selectOnMouseHover, Action<string> onSelected, string filterString, EditorWindow window, Action<int> onSelectedIndex = null)
+        {
+            this._selected = selectedIndex;
+            this._selectOnMouseHover = selectOnMouseHover;
+            this._filter = filterString;
+            this.Window = window;
+            this._onSelected = onSelected;
+            this._onSelectedIndex = onSelectedIndex;
+
+            this._viewItems = new List<string>();
+
+            this._viewItems.Add(Model);
+            this._viewItems.AddRange(modelTypes);
+
+            this._viewItems.Add(Dialog);
+            this._viewItems.AddRange(dialogTypes);
+
+            this._viewItems.Add(Screen);
+            this._viewItems.AddRange(screenTypes);
+        }
+
+        public void Draw()
+        {
+            //List of items
+            this._scrollPosition = GUILayout.BeginScrollView(this._scrollPosition, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            var defaultMenuColor = this.menuItemStyle.normal.textColor;
+            var defaultButtonColor = this.buttonStyle.normal.textColor;
+
+            for (var i = 0; i < this._viewItems.Count; i++)
+            {
+                if (string.Equals(this._viewItems[i], Model))
+                {
+                    GUILayout.Space(i == 0 ? 4 : 10);
+                    LabelHelper.SubTitleLabel(nameof(MVVM.ObservableModel));
+                    GUILayout.Space(2);
+                    continue;
+                }
+
+                if (string.Equals(this._viewItems[i], Dialog))
+                {
+                    GUILayout.Space(i == 0 ? 4 : 10);
+                    LabelHelper.SubTitleLabel(nameof(UIManDialog));
+                    GUILayout.Space(2);
+                    continue;
+                }
+
+                if (string.Equals(this._viewItems[i], Screen))
+                {
+                    GUILayout.Space(i == 0 ? 4 : 10);
+                    LabelHelper.SubTitleLabel(nameof(UIManScreen));
+                    GUILayout.Space(2);
+                    continue;
+                }
+
+                if (i == this._selected)
+                {
+                    this.menuItemStyle.normal.textColor = Color.blue;
+                    this.buttonStyle.normal.textColor = Color.blue;
+                }
+                else
+                {
+                    this.menuItemStyle.normal.textColor = defaultMenuColor;
+                    this.buttonStyle.normal.textColor = defaultButtonColor;
+                }
+
+                // Filter item by keyword
+                if (!string.IsNullOrEmpty(this._filter))
+                {
+                    if (this._viewItems[i].ToLower().IndexOf(this._filter.ToLower(), StringComparison.Ordinal) < 0)
+                        continue;
+                }
+
+                // Draw suitable items
+                if (this._selectOnMouseHover)
+                {
+                    if (GUILayout.Button(this._viewItems[i], this.menuItemStyle))
+                    {
+                        DoSelect(i);
+                    }
+                }
+                else
+                {
+                    var val = i == this.selectedIndex ? true : false;
+                    var newVal = GUILayout.Toggle(val, this._viewItems[i], this.buttonStyle);
+                    if (val != newVal && newVal == true)
+                    {
+                        DoSelect(i);
+                    }
+                }
+
+                // Update button's status (for hover event)
+                if (this._selectOnMouseHover)
+                    this.Window.Repaint();
+            }
+
+            GUILayout.EndScrollView();
+        }
+
+        private void DoSelect(int i)
+        {
+            if (i > -1)
+            {
+                this.selectedIndex = i;
+                this.SelectedViewItem = this._viewItems[i];
+
+                this._onSelected?.Invoke(this._viewItems[i]);
+                this._onSelectedIndex?.Invoke(i);
+            }
+        }
+
+        public void Select(string item)
+        {
+            var itemIndex = this._viewItems.IndexOf(item);
+            DoSelect(itemIndex);
+        }
+    }
+
     public class EditablePropertyDrawer
     {
         private Type _viewModelType;
@@ -851,6 +1005,7 @@ namespace UnuGames
     {
         private static GUIStyle headerLabel;
         private static GUIStyle titleLabel;
+        private static GUIStyle subTitleLabel;
 
         public static void HeaderLabel(string text, GUILayoutOption width = null)
         {
@@ -878,13 +1033,30 @@ namespace UnuGames
                 titleLabel = new GUIStyle();
                 titleLabel.normal.textColor = Color.black;
                 titleLabel.fontStyle = FontStyle.Bold;
-                titleLabel.fontSize = titleLabel.fontSize + 15;
+                titleLabel.fontSize += 15;
                 titleLabel.alignment = TextAnchor.MiddleCenter;
             }
 
             GUILayout.BeginHorizontal();
             GUILayout.Space(5);
             GUILayout.Label(text, titleLabel);
+            GUILayout.EndHorizontal();
+        }
+
+        public static void SubTitleLabel(string text)
+        {
+            if (subTitleLabel == null)
+            {
+                subTitleLabel = new GUIStyle();
+                subTitleLabel.normal.textColor = Color.black;
+                subTitleLabel.fontStyle = FontStyle.Bold;
+                subTitleLabel.fontSize += 12;
+                subTitleLabel.alignment = TextAnchor.MiddleCenter;
+            }
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(5);
+            GUILayout.Label(text, subTitleLabel);
             GUILayout.EndHorizontal();
         }
 

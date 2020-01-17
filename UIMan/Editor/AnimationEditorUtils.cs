@@ -8,7 +8,7 @@ namespace UnuGames
     {
         public static Animator GenerateAnimator(GameObject target, params string[] clipsName)
         {
-            var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>();
+            var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>(false);
 
             Animator anim = target.GetComponent<Animator>();
 
