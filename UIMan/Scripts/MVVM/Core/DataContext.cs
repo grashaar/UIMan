@@ -91,7 +91,7 @@ namespace UnuGames.MVVM
                 if (this.model != null)
                 {
                     this.viewModel.CacheNotifiableMembers(this.model);
-                    this.viewModel.SubscribeAction(this.propertyName, this.viewModel.NotifyModelPropertyChange);
+                    this.viewModel.SubscribeAction(this.propertyName, this.viewModel.NotifyModelChange);
                 }
             }
         }

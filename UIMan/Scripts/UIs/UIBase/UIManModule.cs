@@ -17,7 +17,7 @@ namespace UnuGames
             set
             {
                 this.dataInstance = value;
-                NotifyModelPropertyChange(nameof(this.DataInstance), this.DataInstance);
+                NotifyModelChange(this.DataInstance);
             }
         }
 
