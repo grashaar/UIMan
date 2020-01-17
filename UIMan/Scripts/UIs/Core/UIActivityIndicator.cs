@@ -5,15 +5,14 @@ using UnityEngine.UI;
 
 namespace UnuGames
 {
-    public class UIActivity : MonoBehaviour
+    public class UIActivityIndicator : MonoBehaviour
     {
         public GameObject loadingIcon;
         public Image backgroundImage;
         public Image loadingCover;
-        public Text progressValue;
-        public Text tipText;
 
         public bool isLoading = false;
+
         private Action<object[]> loadingCallback;
         private object[] loadingCallbackArgs;
 
@@ -27,6 +26,7 @@ namespace UnuGames
         private IEnumerator WaitTask(IEnumerator coroutine)
         {
             yield return StartCoroutine(coroutine);
+
             DoCallback();
             Hide();
         }
@@ -36,10 +36,11 @@ namespace UnuGames
             while (!asyncTask.isDone)
             {
                 this.Progress = asyncTask.progress;
-                if (this.progressValue.enabled)
-                    ShowValue(Mathf.FloorToInt(this.Progress).ToString() + "%");
+                ShowValue(Mathf.FloorToInt(this.Progress).ToString() + "%");
+
                 yield return null;
             }
+
             DoCallback();
             Hide();
         }
@@ -58,8 +59,9 @@ namespace UnuGames
             this.loadingIcon.SetActive(showIcon);
             this.loadingCover.enabled = showCover;
             this.backgroundImage.enabled = showBackground;
-            this.progressValue.enabled = showProgress;
-            this.tipText.text = tip;
+
+            SetShowProgress(showProgress);
+            ShowTip(tip);
         }
 
         public void Show(bool showIcon = true, bool showCover = true, bool showBackground = false, bool showProgress = false, string tip = "")
@@ -92,15 +94,11 @@ namespace UnuGames
             Setting(false, false, false, false, "");
         }
 
-        public void ShowTip(string tip)
-        {
-            this.tipText.text = tip;
-        }
+        protected virtual void SetShowProgress(bool value) { }
 
-        public void ShowValue(string value)
-        {
-            this.progressValue.text = value;
-        }
+        public virtual void ShowTip(string value) { }
+
+        public virtual void ShowValue(string value) { }
 
         public void ShowImage(Sprite sprite)
         {
