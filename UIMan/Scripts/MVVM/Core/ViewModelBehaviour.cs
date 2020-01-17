@@ -12,9 +12,14 @@ namespace UnuGames.MVVM
     /// </summary>
     public class ViewModelBehaviour : MonoBehaviour, IObservable
     {
-        private readonly Dictionary<string, Action<object>> actions = new Dictionary<string, Action<object>>();
         private readonly Dictionary<string, PropertyInfo> propertyCache = new Dictionary<string, PropertyInfo>();
         private readonly List<MemberInfo> notifiableMembers = new List<MemberInfo>();
+
+        private readonly Dictionary<string, Action<object>> objectActions
+            = new Dictionary<string, Action<object>>();
+
+        private readonly Dictionary<string, Action<string, object>> stringObjectActions
+            = new Dictionary<string, Action<string, object>>();
 
         /// <summary>
         /// Invoke when any property has been changed.
@@ -29,6 +34,7 @@ namespace UnuGames.MVVM
             {
                 if (this.rectTransform == null)
                     this.rectTransform = GetComponent<RectTransform>();
+
                 return this.rectTransform;
             }
         }
@@ -48,12 +54,32 @@ namespace UnuGames.MVVM
         /// <param name="value"></param>
         public virtual void NotifyPropertyChanged(string propertyName, object value)
         {
-            if (!this.actions.TryGetValue(propertyName, out Action<object> actions))
+            if (!this.objectActions.TryGetValue(propertyName, out Action<object> actions))
                 return;
 
             try
             {
                 actions?.Invoke(value);
+            }
+            catch (Exception e)
+            {
+                UnuLogger.LogException(e, this);
+            }
+        }
+
+        /// <summary>
+        /// Notify the property which has change to all binder that has been subcribed with property name and value.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="value"></param>
+        public virtual void NotifyModelPropertyChanged(string propertyName, object value)
+        {
+            if (!this.stringObjectActions.TryGetValue(propertyName, out Action<string, object> actions))
+                return;
+
+            try
+            {
+                actions?.Invoke(propertyName, value);
             }
             catch (Exception e)
             {
@@ -68,6 +94,7 @@ namespace UnuGames.MVVM
         public void OnPropertyChanged()
         {
             var propertyName = GetCaller();
+
             if (this.propertyCache.TryGetValue(propertyName, out PropertyInfo property))
             {
                 var newValue = property.GetValue(this, null);
@@ -96,6 +123,14 @@ namespace UnuGames.MVVM
             return sf.GetMethod().Name;
         }
 
+        private void CacheProperty(string propertyKey, string propertyName)
+        {
+            if (this.propertyCache.ContainsKey(propertyKey))
+                return;
+
+            this.propertyCache.Add(propertyKey, this.GetCachedType().GetProperty(propertyName));
+        }
+
         /// <summary>
         /// Subcribe action to notify on property changed
         /// </summary>
@@ -104,15 +139,17 @@ namespace UnuGames.MVVM
         public void SubscribeAction(string propertyName, Action<object> updateAction)
         {
             var propertyKey = "set_" + propertyName;
-            if (this.actions.ContainsKey(propertyKey))
+
+            if (this.objectActions.ContainsKey(propertyKey))
             {
-                this.actions[propertyKey] += updateAction;
+                this.objectActions[propertyKey] += updateAction;
             }
             else
             {
-                this.actions.Add(propertyKey, updateAction);
-                this.propertyCache.Add(propertyKey, this.GetCachedType().GetProperty(propertyName));
+                this.objectActions.Add(propertyKey, updateAction);
             }
+
+            CacheProperty(propertyKey, propertyName);
         }
 
         /// <summary>
@@ -123,9 +160,46 @@ namespace UnuGames.MVVM
         public void UnsubscribeAction(string propertyName, Action<object> updateAction)
         {
             var propertyKey = "set_" + propertyName;
-            if (this.actions.ContainsKey(propertyKey))
+
+            if (this.objectActions.ContainsKey(propertyKey))
             {
-                this.actions[propertyKey] -= updateAction;
+                this.objectActions[propertyKey] -= updateAction;
+            }
+        }
+
+        /// <summary>
+        /// Subcribe action to notify on property changed
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="updateAction"></param>
+        public void SubscribeAction(string propertyName, Action<string, object> updateAction)
+        {
+            var propertyKey = "set_" + propertyName;
+
+            if (this.stringObjectActions.ContainsKey(propertyKey))
+            {
+                this.stringObjectActions[propertyKey] += updateAction;
+            }
+            else
+            {
+                    this.stringObjectActions.Add(propertyKey, updateAction);
+            }
+
+            CacheProperty(propertyKey, propertyName);
+        }
+
+        /// <summary>
+        /// Unsubcribe action from notify on property changed
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="updateAction"></param>
+        public void UnsubscribeAction(string propertyName, Action<string, object> updateAction)
+        {
+            var propertyKey = "set_" + propertyName;
+
+            if (this.stringObjectActions.ContainsKey(propertyKey))
+            {
+                this.stringObjectActions[propertyKey] -= updateAction;
             }
         }
 
@@ -153,19 +227,50 @@ namespace UnuGames.MVVM
 
             for (var i = 0; i < this.notifiableMembers.Count; i++)
             {
-                object value;
-                if (this.notifiableMembers[i] is FieldInfo)
+                switch (this.notifiableMembers[i])
                 {
-                    FieldInfo field = this.notifiableMembers[i].ToField();
-                    value = field.GetValue(obj);
-                }
-                else
-                {
-                    PropertyInfo property = this.notifiableMembers[i].ToProperty();
-                    value = property.GetValue(obj, null);
-                }
+                    case FieldInfo field:
+                    {
+                        var value = field.GetValue(obj);
+                        NotifyPropertyChanged("set_" + this.notifiableMembers[i].Name, value);
+                        break;
+                    }
 
-                NotifyPropertyChanged("set_" + this.notifiableMembers[i].Name, value);
+                    case PropertyInfo property:
+                    {
+                        var value = property.GetValue(obj, null);
+                        NotifyPropertyChanged("set_" + this.notifiableMembers[i].Name, value);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Notifies the model change.
+        /// </summary>
+        /// <param name="obj">Object.</param>
+        public void NotifyModelPropertyChange(string propertyName, object obj)
+        {
+            if (this.notifiableMembers == null)
+                return;
+
+            var index = this.notifiableMembers.FindIndex(x => string.Equals(x.Name, propertyName));
+
+            if (index < 0)
+                return;
+
+            var member = this.notifiableMembers[index];
+
+            if (member is FieldInfo field)
+            {
+                var value = field.GetValue(obj);
+                NotifyModelPropertyChanged("set_" + member.Name, value);
+            }
+            else if (member is PropertyInfo property)
+            {
+                var value = property.GetValue(obj, null);
+                NotifyModelPropertyChanged("set_" + member.Name, value);
             }
         }
 
@@ -185,13 +290,32 @@ namespace UnuGames.MVVM
         }
 
         /// <summary>
+        /// Notifies the model change with the changed value.
+        /// </summary>
+        /// <param name="value">Changed value.</param>
+        public void NotifyModelPropertyChangedValue(string propertyName, object value)
+        {
+            if (this.notifiableMembers == null)
+                return;
+
+            var index = this.notifiableMembers.FindIndex(x => string.Equals(x.Name, propertyName));
+
+            if (index < 0)
+                return;
+
+            var member = this.notifiableMembers[index];
+            NotifyModelPropertyChanged("set_" + member.Name, value);
+        }
+
+        /// <summary>
         /// Subcripts the object action.
         /// </summary>
         /// <param name="obj">Object.</param>
         /// <param name="onChange">On change.</param>
-        public void SubcriptObjectAction(object obj)
+        public void CacheNotifiableMembers(object obj)
         {
             MemberInfo[] members = obj.GetCachedType().GetMembers();
+
             for (var i = 0; i < members.Length; i++)
             {
                 if (members[i] is FieldInfo || members[i] is PropertyInfo)
@@ -206,9 +330,10 @@ namespace UnuGames.MVVM
         /// </summary>
         /// <param name="obj">Object.</param>
         /// <param name="onChange">On change.</param>
-        public void SubcriptObjectAction(PropertyInfo property)
+        public void CacheNotifiableMembers(PropertyInfo property)
         {
             MemberInfo[] members = property.GetType().GetMembers();
+
             for (var i = 0; i < members.Length; i++)
             {
                 if (members[i] is FieldInfo || members[i] is PropertyInfo)
@@ -230,6 +355,7 @@ namespace UnuGames.MVVM
                 if (property.Value != null)
                 {
                     var propertyVal = property.Value.GetValue(this, null);
+
                     if (propertyVal != null && propertyVal.Equals(modelInstance))
                     {
                         return property.Value;

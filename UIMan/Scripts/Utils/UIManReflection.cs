@@ -289,21 +289,6 @@ namespace UnuGames
             return result;
         }
 
-        public static FieldInfo ToField(this MemberInfo member)
-        {
-            return (member as FieldInfo);
-        }
-
-        public static PropertyInfo ToProperty(this MemberInfo member)
-        {
-            return (member as PropertyInfo);
-        }
-
-        public static MethodInfo ToMethod(this MemberInfo member)
-        {
-            return (member as MethodInfo);
-        }
-
         public static Type GetCachedType(this object obj)
         {
             Type type = null;

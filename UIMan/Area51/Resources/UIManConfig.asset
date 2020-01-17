@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: UIManConfig
   m_EditorClassIdentifier: 
   classNamespace: 
-  dialogPrefabFolder: UIMan/Area51/Addressables/Dialogs/
-  screenPrefabFolder: UIMan/Area51/Addressables/Screens/
-  backgroundRootFolder: UIMan/Area51/Addressables/Backgrounds/
-  animRootFolder: UIMan/Area51/Animations/
-  modelScriptFolder: /UIMan/Examples/Scripts
-  dialogScriptFolder: /UIMan/Examples/Scripts
-  screenScriptFolder: /UIMan/Examples/Scripts
-  selectedType: UIRanking
+  dialogPrefabFolder: Dev/UIMan/Addressables/Dialogs/
+  screenPrefabFolder: Dev/UIMan/Addressables/Screens/
+  backgroundRootFolder: Dev/UIMan/Addressables/Backgrounds/
+  animRootFolder: Dev/UIMan/Animations/
+  modelScriptFolder: /Dev/Scripts
+  dialogScriptFolder: /Dev/Scripts
+  screenScriptFolder: /Dev/Scripts
+  selectedType: UIStartScreen
   generatingType: 
-  generatingTypeIsDialog: 0
+  generatingTypeIsDialog: 1

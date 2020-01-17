@@ -30,16 +30,17 @@ namespace UnuGames.MVVM
 
             this.sourceMember = this.dataContext.viewModel.GetMemberInfo(this.observableList.member);
 
-            if (this.sourceMember is FieldInfo)
+            switch (this.sourceMember)
             {
-                FieldInfo sourceField = this.sourceMember.ToField();
-                this.dataList = (IObservaleCollection)sourceField.GetValue(this.dataContext.viewModel);
+                case FieldInfo sourceField:
+                    this.dataList = (IObservaleCollection)sourceField.GetValue(this.dataContext.viewModel);
+                    break;
+
+                case PropertyInfo sourceProperty:
+                    this.dataList = (IObservaleCollection)sourceProperty.GetValue(this.dataContext.viewModel, null);
+                    break;
             }
-            else
-            {
-                PropertyInfo sourceProperty = this.sourceMember.ToProperty();
-                this.dataList = (IObservaleCollection)sourceProperty.GetValue(this.dataContext.viewModel, null);
-            }
+
             if (this.dataList != null)
             {
                 this.dataList.OnAddObject += HandleOnAdd;

@@ -13,10 +13,11 @@ namespace UnuGames
             {
                 return this.dataInstance;
             }
+
             set
             {
                 this.dataInstance = value;
-                NotifyModelChange(this.DataInstance);
+                NotifyModelPropertyChange(nameof(this.DataInstance), this.DataInstance);
             }
         }
 
@@ -24,8 +25,9 @@ namespace UnuGames
         {
             get
             {
-                return (object)this.DataInstance;
+                return this.DataInstance;
             }
+
             set
             {
                 this.DataInstance = (T)value;

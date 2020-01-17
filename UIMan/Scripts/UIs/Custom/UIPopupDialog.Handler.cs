@@ -14,6 +14,7 @@ namespace UnuGames
                 this.Title = (string)args[0];
                 this.Content = (string)args[1];
                 this.LabelButtonYes = (string)args[2];
+
                 if (args.Length == 4)
                 {
                     this.IsConfirmDialog = false;
@@ -30,12 +31,12 @@ namespace UnuGames
 
         public void OK()
         {
-            this.Callback(0, this.args);
+            Callback(0, this.args);
         }
 
         public void No()
         {
-            this.Callback(1, this.args);
+            Callback(1, this.args);
         }
     }
 }

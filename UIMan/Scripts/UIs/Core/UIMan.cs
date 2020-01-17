@@ -241,7 +241,7 @@ namespace UnuGames
         {
             if (this.screenQueue.Count <= 1)
             {
-                UnuLogger.LogWarning("UI Error: There are no scene has been loaded before this scene!");
+                UnuLogger.LogWarning("UI Error: There are no scene has been loaded before this scene!", this);
                 return;
             }
 
@@ -268,7 +268,7 @@ namespace UnuGames
             }
             else
             {
-                UnuLogger.LogFormatWarning("There are no UI of {0} has been show!", uiType.Name);
+                UnuLogger.LogWarningFormat(this, $"There are no UI of {uiType.Name} has been show!");
                 return;
             }
         }
@@ -418,7 +418,7 @@ namespace UnuGames
             }
             else
             {
-                UnuLogger.LogFormatWarning("There are no UI of {0} has been show!", uiType.Name);
+                UnuLogger.LogWarningFormat(this, $"There are no UI of {uiType.Name} has been show!");
                 return;
             }
         }
@@ -789,7 +789,7 @@ namespace UnuGames
                 ui.animRoot.Disable();
                 if (ui.motionIdle != UIMotion.None && ui.motionIdle != UIMotion.Hidden)
                 {
-                    UnuLogger.LogWarning("UIMan does not support simple tween animation for idle yet!");
+                    UnuLogger.LogWarning("UIMan does not support simple tween animation for idle yet!", this);
                 }
             }
         }

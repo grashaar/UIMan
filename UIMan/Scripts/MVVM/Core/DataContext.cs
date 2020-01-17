@@ -18,9 +18,11 @@ namespace UnuGames.MVVM
             for (var i = 0; i < contextsList.Count; i++)
             {
                 DataContext context = contextsList[i];
+
                 if (context.model != null && context.model is ObservableModel)
                 {
                     PropertyInfo propertyInfo = context.viewModel.IsBindingTo(modelInstance);
+
                     if (propertyInfo != null)
                     {
                         context.viewModel.NotifyModelChange(modelInstance);
@@ -34,9 +36,11 @@ namespace UnuGames.MVVM
             for (var i = 0; i < contextsList.Count; i++)
             {
                 DataContext context = contextsList[i];
+
                 if (context.model != null && context.model is ObservableModel)
                 {
                     PropertyInfo propertyInfo = context.viewModel.IsBindingTo(modelInstance);
+
                     if (propertyInfo != null && propertyInfo.Name.Equals(propertyName))
                     {
                         context.viewModel.NotifyModelChangedValue(value);
@@ -52,23 +56,15 @@ namespace UnuGames.MVVM
         public ContextType type;
         public ViewModelBehaviour viewModel;
         public object model;
-
         public string propertyName;
-        private PropertyInfo propertyInfo;
 
-        public PropertyInfo PropertyInfo
-        {
-            get
-            {
-                return this.propertyInfo;
-            }
-        }
+        public PropertyInfo PropertyInfo { get; private set; }
 
         public void Clear()
         {
             this.viewModel = null;
             this.propertyName = null;
-            this.propertyInfo = null;
+            this.PropertyInfo = null;
         }
 
         private void Awake()
@@ -84,15 +80,18 @@ namespace UnuGames.MVVM
         public void Initialize()
         {
             GetPropertyInfo();
-            if (this.propertyInfo != null)
+
+            if (this.PropertyInfo != null)
             {
-                this.model = this.propertyInfo.GetValue(this.viewModel, null);
+                this.model = this.PropertyInfo.GetValue(this.viewModel, null);
+
                 if (this.model == null && this.type == ContextType.Property)
-                    this.model = UIManReflection.GetCachedTypeInstance(this.propertyInfo.PropertyType);
+                    this.model = UIManReflection.GetCachedTypeInstance(this.PropertyInfo.PropertyType);
+
                 if (this.model != null)
                 {
-                    this.viewModel.SubcriptObjectAction(this.model);
-                    this.viewModel.SubscribeAction(this.propertyName, this.viewModel.NotifyModelChange);
+                    this.viewModel.CacheNotifiableMembers(this.model);
+                    this.viewModel.SubscribeAction(this.propertyName, this.viewModel.NotifyModelPropertyChange);
                 }
             }
         }
@@ -101,9 +100,11 @@ namespace UnuGames.MVVM
         private void RegisterBindingMessage(bool forceReinit = false)
         {
             BinderBase[] binders = GetComponentsInChildren<BinderBase>(true);
+
             for (var i = 0; i < binders.Length; i++)
             {
                 BinderBase binder = binders[i];
+
                 if (binder.dataContext == this)
                 {
                     binder.Initialize(forceReinit);
@@ -113,13 +114,13 @@ namespace UnuGames.MVVM
 
         public PropertyInfo GetPropertyInfo()
         {
-#if !UNITY_EDITOR
-			if(propertyInfo == null)
-				propertyInfo = viewModel.GetCachedType ().GetProperty (propertyName);
+#if UNITY_EDITOR
+            this.PropertyInfo = this.viewModel.GetCachedType().GetProperty(this.propertyName);
 #else
-            this.propertyInfo = this.viewModel.GetCachedType().GetProperty(this.propertyName);
+            if (this.PropertyInfo == null)
+				this.PropertyInfo = this.viewModel.GetCachedType().GetProperty(this.propertyName);
 #endif
-            return this.propertyInfo;
+            return this.PropertyInfo;
         }
     }
 

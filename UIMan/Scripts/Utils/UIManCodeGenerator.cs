@@ -463,7 +463,7 @@ namespace UnuGames
             }
             catch
             {
-                UnuLogger.Log("Type of property has been changed, the default value will set to default value of new type!");
+                UnuLogger.LogWarning("Type of property has been changed, the default value will set to default value of new type!");
                 return default;
             }
         }
@@ -508,7 +508,6 @@ namespace UnuGames
                 foreach (var c in constructors)
                 {
                     parameterless = c.GetParameters().Length <= 0;
-                    UnuLogger.Log(c.GetParameters().Length);
                     if (parameterless)
                         break;
                 }

@@ -97,32 +97,39 @@ namespace UnuGames.MVVM
                 return;
 
             this.scrollRect = GetComponent<ScrollRect>();
+
             if (this.grouping == Vector2.zero)
                 this.grouping = Vector2.one;
+
             RectTransform contentItemRect = this.contentPrefab.GetComponent<RectTransform>();
+
             if (this.contentWidth == 0)
                 this.contentWidth = contentItemRect.sizeDelta.x;
+
             if (this.contentHeight == 0)
                 this.contentHeight = contentItemRect.sizeDelta.y;
 
             if (this.contentRect == null)
                 this.contentRect = this.scrollRect.content;
+
             if (this.viewPort == null)
                 this.viewPort = this.scrollRect.viewport;
 
             InitPool();
 
             this.sourceMember = this.dataContext.viewModel.GetMemberInfo(this.observableList.member);
-            if (this.sourceMember is FieldInfo)
+
+            switch (this.sourceMember)
             {
-                FieldInfo sourceField = this.sourceMember.ToField();
-                this.dataList = (IObservaleCollection)sourceField.GetValue(this.dataContext.viewModel);
+                case FieldInfo fieldInfo:
+                    this.dataList = (IObservaleCollection)fieldInfo.GetValue(this.dataContext.viewModel);
+                    break;
+
+                case PropertyInfo sourceProperty:
+                    this.dataList = (IObservaleCollection)sourceProperty.GetValue(this.dataContext.viewModel, null);
+                    break;
             }
-            else
-            {
-                PropertyInfo sourceProperty = this.sourceMember.ToProperty();
-                this.dataList = (IObservaleCollection)sourceProperty.GetValue(this.dataContext.viewModel, null);
-            }
+
             if (this.dataList != null)
             {
                 this.dataList.OnAddObject += HandleOnAdd;
@@ -132,6 +139,7 @@ namespace UnuGames.MVVM
                 this.dataList.OnClearObjects += HandleOnClear;
                 this.dataList.OnChangeObject += HandleOnChange;
             }
+
             this.scrollRect.onValueChanged.AddListener(OnScroll);
 
             if (!string.IsNullOrEmpty(this.contentPrefab.scene.name))
@@ -199,6 +207,7 @@ namespace UnuGames.MVVM
 
             // Check for hidden cell and push to pool
             var releaseCells = new List<Cell>();
+
             foreach (var cell in this.activeCells)
             {
                 if (!IsVisible(cell.Key, rectBounds))
@@ -218,6 +227,7 @@ namespace UnuGames.MVVM
             // Check and get cell from pool to fill blank cell
             var colRange = new Vector2(rectBounds.x, rectBounds.y);
             var rowRange = new Vector2(0, this.grouping.y);
+
             if (this.scrollRect.vertical)
             {
                 colRange = new Vector2(0, this.grouping.x);
@@ -230,6 +240,7 @@ namespace UnuGames.MVVM
                 {
                     if (i < 0 || j < 0)
                         continue;
+
                     var cell = new Cell() {
                         column = i,
                         row = j
@@ -256,15 +267,20 @@ namespace UnuGames.MVVM
         private void RecalculateBounds()
         {
             var pageCount = Mathf.CeilToInt(this.orgDataList.Count / (this.grouping.x * this.grouping.y));
+
             if (this.scrollRect.horizontal)
             {
-                this.contentRect.sizeDelta = new Vector2(this.contentWidth * pageCount * this.grouping.x + this.contentSpacing.x * pageCount * this.grouping.x,
-                    this.contentHeight * this.grouping.y + this.contentSpacing.y * this.grouping.y);
+                this.contentRect.sizeDelta = new Vector2(
+                    this.contentWidth * pageCount * this.grouping.x + this.contentSpacing.x * pageCount * this.grouping.x,
+                    this.contentHeight * this.grouping.y + this.contentSpacing.y * this.grouping.y
+                );
             }
             else if (this.scrollRect.vertical)
             {
-                this.contentRect.sizeDelta = new Vector2(this.contentWidth * this.grouping.x + this.contentSpacing.x * this.grouping.x,
-                    this.contentHeight * pageCount * this.grouping.y + this.contentSpacing.y * pageCount * this.grouping.y);
+                this.contentRect.sizeDelta = new Vector2(
+                    this.contentWidth * this.grouping.x + this.contentSpacing.x * this.grouping.x,
+                    this.contentHeight * pageCount * this.grouping.y + this.contentSpacing.y * pageCount * this.grouping.y
+                );
             }
         }
 
@@ -276,6 +292,7 @@ namespace UnuGames.MVVM
                 var columnWidth = this.contentWidth + this.contentSpacing.x;
                 var minColumn = Mathf.FloorToInt(Mathf.Abs(rectPos) / columnWidth);
                 var maxColumn = minColumn + Mathf.RoundToInt(this.viewPortRect.width / columnWidth);
+
                 return new Vector2(minColumn - BOUND_BUFFERS, maxColumn + BOUND_BUFFERS);
             }
             else
@@ -284,6 +301,7 @@ namespace UnuGames.MVVM
                 var rowHeight = this.contentHeight + this.contentSpacing.y;
                 var minRow = Mathf.FloorToInt(Mathf.Abs(rectPos) / rowHeight);
                 var maxRow = minRow + Mathf.RoundToInt(this.viewPortRect.height / rowHeight);
+
                 return new Vector2(minRow - BOUND_BUFFERS, maxRow + BOUND_BUFFERS);
             }
         }
@@ -293,6 +311,7 @@ namespace UnuGames.MVVM
             var cell = new Cell();
             var index = 0;
             var pageCount = Mathf.CeilToInt(this.orgDataList.Count / (this.grouping.x * this.grouping.y));
+
             for (var page = 0; page < pageCount; page++)
             {
                 for (var i = 0; i < this.grouping.y; i++)
@@ -311,12 +330,15 @@ namespace UnuGames.MVVM
                                 cell.row = page * (int)this.grouping.y + i;
                                 cell.column = j;
                             }
+
                             return cell;
                         }
+
                         index++;
                     }
                 }
             }
+
             return cell;
         }
 
@@ -325,6 +347,7 @@ namespace UnuGames.MVVM
             Vector2 position = Vector2.zero;
             position.x = this.contentWidth * cell.column + cell.column * this.contentSpacing.x + this.padding.x;
             position.y = -this.contentHeight * cell.row - cell.row * this.contentSpacing.y - this.padding.y;
+
             return position;
         }
 
@@ -335,17 +358,11 @@ namespace UnuGames.MVVM
 
             if (this.scrollRect.horizontal)
             {
-                if (cell.column > rectBounds.Value.x && cell.column < rectBounds.Value.y)
-                    return true;
-                else
-                    return false;
+                return cell.column > rectBounds.Value.x && cell.column < rectBounds.Value.y;
             }
             else
             {
-                if (cell.row > rectBounds.Value.x && cell.row < rectBounds.Value.y)
-                    return true;
-                else
-                    return false;
+                return cell.row > rectBounds.Value.x && cell.row < rectBounds.Value.y;
             }
         }
 
@@ -354,10 +371,12 @@ namespace UnuGames.MVVM
             for (var i = index; i < this.orgDataList.Count; i++)
             {
                 Cell cell = GetCellByIndex(i);
+
                 if (this.dataDict.ContainsKey(cell))
                     this.dataDict[cell] = this.orgDataList[i];
                 else
                     this.dataDict.Add(cell, this.orgDataList[i]);
+
                 if (this.activeCells.ContainsKey(cell))
                     this.activeCells[cell].OriginalData = this.orgDataList[i];
             }
@@ -377,6 +396,7 @@ namespace UnuGames.MVVM
             {
                 PoolModule(cell.Value);
             }
+
             this.listModules.Clear();
             this.dataDict.Clear();
             this.activeCells.Clear();
@@ -386,6 +406,7 @@ namespace UnuGames.MVVM
         private void HandleOnRemove(object obj)
         {
             var indexToRemove = 0;
+
             for (var i = 0; i < this.listModules.Count; i++)
             {
                 if (this.listModules[i].OriginalData == obj)
@@ -404,6 +425,7 @@ namespace UnuGames.MVVM
         private void HandleOnRemoveAt(int index)
         {
             Cell cell = GetCellByIndex(this.orgDataList.Count - 1);
+
             if (this.activeCells.ContainsKey(cell))
             {
                 PoolModule((IModule)this.activeCells[cell].ViewModel);
@@ -411,9 +433,11 @@ namespace UnuGames.MVVM
                 if (!this.usePoolRectToHide)
                     this.activeCells[cell].ViewModel.RectTransform.anchoredPosition = _hidePosition;
             }
+
             this.listModules.RemoveAt(index);
             this.dataDict.Remove(cell);
             this.orgDataList.RemoveAt(index);
+
             RecalculateBounds();
             RefreshDataDict(index);
             OnScroll(Vector2.zero);
@@ -424,20 +448,24 @@ namespace UnuGames.MVVM
             this.orgDataList.Add(obj);
             RecalculateBounds();
             Cell cell = GetCellByIndex(this.orgDataList.Count - 1);
+
             if (IsVisible(cell))
             {
                 IModule module = GetModuleFromPool();
+
                 if (module != null)
                 {
                     this.listModules.Add(module);
                     module.OriginalData = obj;
                     module.ViewModel.RectTransform.anchoredPosition = GetPositionByCell(cell);
+
                     if (this.activeCells.ContainsKey(cell))
                         this.activeCells[cell] = module;
                     else
                         this.activeCells.Add(cell, module);
                 }
             }
+
             this.dataDict.Add(cell, obj);
         }
 
@@ -452,6 +480,7 @@ namespace UnuGames.MVVM
         public bool IsActive(GameObject item)
         {
             IModule module = item.GetComponent<IModule>();
+
             if (module != null)
             {
                 foreach (var cell in this.activeCells)
@@ -460,6 +489,7 @@ namespace UnuGames.MVVM
                         return true;
                 }
             }
+
             return false;
         }
 
@@ -473,6 +503,7 @@ namespace UnuGames.MVVM
         {
             if (this.activeCells.ContainsKey(cell))
                 return this.activeCells[cell].ViewModel;
+
             return null;
         }
     }
