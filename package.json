@@ -12,7 +12,7 @@
   "category": "Unity",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/grashaar/UIMan.git"
+    "url": "git+https://github.com/grashaar/uiman.git"
   },
   "author": "Đặng Minh Dự <cp.dev.minhdu@gmail.com> (https://github.com/minhdu)"
 }
