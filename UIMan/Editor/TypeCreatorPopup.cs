@@ -103,12 +103,12 @@ namespace UnuGames
                     }
 
                     EditorUtility.SetDirty(config);
-                    GenerateViewModel();
+                    GenerateType();
                 }
             }
         }
 
-        public void GenerateViewModel()
+        public void GenerateType()
         {
             if (this.typeName.Contains(" "))
             {
@@ -163,11 +163,11 @@ namespace UnuGames
             else
                 inheritance = $" : {this.baseType}";
 
-            var code = UIManCodeGenerator.GenerateScript(this.typeName, inheritance, config, this.namespaceField.Text);
+            var code = UIManCodeGenerator.GenerateType(this.typeName, inheritance, false, config, this.namespaceField.Text);
             UIManCodeGenerator.SaveScript(savePath, code, true);
 
             if (this.baseType != this.arrSupportType[0])
-                GenerateViewModelHandler(savePath);
+                GenerateHandler(savePath);
 
             AssetDatabase.Refresh(ImportAssetOptions.Default);
 
@@ -179,11 +179,11 @@ namespace UnuGames
             Close();
         }
 
-        public void GenerateViewModelHandler(string scriptPath)
+        public void GenerateHandler(string scriptPath)
         {
             var handlerScriptPath = UIManCodeGenerator.GeneratPathWithSubfix(scriptPath, ".Handler.cs");
             var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>(false);
-            var handlerCode = UIManCodeGenerator.GenerateViewModelHandler(this.typeName, this.baseType, config, this.namespaceField.Text);
+            var handlerCode = UIManCodeGenerator.GenerateHandler(this.typeName, this.baseType, config, this.namespaceField.Text);
 
             UIManCodeGenerator.SaveScript(handlerScriptPath, handlerCode, false, this.typeName, this.baseType);
         }

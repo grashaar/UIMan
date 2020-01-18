@@ -17,6 +17,7 @@ namespace UnuGames
 
         private const string NAME_SPACES_TAG = "<#NAME_SPACES#>";
         private const string NAME_SPACE_TAG = "<#NAME_SPACE#>";
+        private const string SEALED_TAG = "<#CSEALED#>";
         private const string NAME_TAG = "<#CNAME#>";
         private const string TYPE_TAG = "<#CTYPE#>";
         private const string PROPERTIES_TAG = "<#PROPERTIES#>";
@@ -26,8 +27,8 @@ namespace UnuGames
 
         #endregion TAGS and REGIONS
 
-        private const string TYPE_PATH = "TypeTemplate";
-        private const string VIEW_MODEL_HANDLER_PATH = "ViewModelHandlerTemplate";
+        private const string TYPE_TEMPLATE_PATH = "TypeTemplate";
+        private const string HANDLER_TEMPLATE_PATH = "HandlerTemplate";
 
         private const string DEFAULT_NAMESPACE = "UnuGames";
 
@@ -39,10 +40,10 @@ namespace UnuGames
             return "";
         }
 
-        public static string GenerateScript(string modelName, string baseType, UIManConfig config, string customNamespace, params CustomPropertyInfo[] properties)
+        public static string GenerateType(string modelName, string baseType, bool isSealed, UIManConfig config, string customNamespace, params CustomPropertyInfo[] properties)
         {
             var code = "";
-            var text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(TYPE_PATH));
+            var text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(TYPE_TEMPLATE_PATH));
 
             if (text != null)
             {
@@ -50,6 +51,7 @@ namespace UnuGames
                 code = Regex.Replace(code, NAME_SPACE_TAG, string.IsNullOrEmpty(customNamespace) ? GetNamespace(config) : customNamespace);
                 code = Regex.Replace(code, NAME_TAG, modelName);
                 code = Regex.Replace(code, TYPE_TAG, baseType);
+                code = Regex.Replace(code, SEALED_TAG, isSealed ? "sealed " : string.Empty);
                 code = Regex.Replace(code, PROPERTIES_TAG, GeneratePropertiesBlock(properties));
                 code = Regex.Replace(code, NAME_SPACES_TAG, GenerateNamespaceBlock(properties));
             }
@@ -61,17 +63,17 @@ namespace UnuGames
             return code;
         }
 
-        public static string GenerateViewModelHandler(string modelName, string viewModelType, UIManConfig config, string customNamespace = null)
+        public static string GenerateHandler(string modelName, string baseType, UIManConfig config, string customNamespace = null)
         {
             var code = "";
-            var text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(VIEW_MODEL_HANDLER_PATH));
+            var text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(HANDLER_TEMPLATE_PATH));
 
             if (text != null)
             {
                 code = text.text;
                 code = Regex.Replace(code, NAME_SPACE_TAG, string.IsNullOrEmpty(customNamespace) ? GetNamespace(config) : customNamespace);
                 code = Regex.Replace(code, NAME_TAG, modelName);
-                code = Regex.Replace(code, TYPE_TAG, viewModelType);
+                code = Regex.Replace(code, TYPE_TAG, baseType);
             }
             else
             {

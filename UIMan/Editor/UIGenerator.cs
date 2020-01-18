@@ -22,6 +22,7 @@ namespace UnuGames
 
         private readonly static Dictionary<Type, EditablePropertyDrawer[]> _propertiesDrawerCache = new Dictionary<Type, EditablePropertyDrawer[]>();
         private static Type _selectedType = null;
+        private static bool _selectedTypeIsSealed = false;
         private static CustomPropertyInfo[] _selectedProperties = null;
 
         private static string _currentScriptPath = null;
@@ -268,7 +269,7 @@ namespace UnuGames
 
         private void LayoutWindow(int id = 1)
         {
-            GUILayout.Label("NO LAYOUT HAS BEEN SELECTED!");
+            GUILayout.Label("NO TYPE HAS BEEN SELECTED");
         }
 
         private void PropertiesWindow(int id = 2)
@@ -281,7 +282,7 @@ namespace UnuGames
             }
             else
             {
-                GUILayout.Label("NO DATA FOR PREVIEW!");
+                GUILayout.Label("NO DATA FOR PREVIEW");
             }
 
             GUILayout.EndVertical();
@@ -331,7 +332,8 @@ namespace UnuGames
             LineHelper.Draw(Color.gray);
             GUILayout.Space(5);
 
-            if (changeList.Length > 0 || !string.Equals(_selectedType.Namespace, this.namespaceField.Text))
+            if (changeList.Length > 0 || !string.Equals(_selectedType.Namespace, this.namespaceField.Text) ||
+                _selectedType.IsSealed != _selectedTypeIsSealed)
             {
                 if (ColorButton.Draw("Save All Changes", CommonColor.LightGreen, GUILayout.Height(30)))
                 {
@@ -391,17 +393,8 @@ namespace UnuGames
             GUILayout.Space(2);
             this.baseTypePopup.Draw();
 
-            if (this.baseTypePopup.SelectedItem != nameof(ObservableModel))
-            {
-                if (!File.Exists(_handlerScriptPath))
-                {
-                    if (GUILayout.Button("Generate Handler"))
-                    {
-                        var backupCode = UIManCodeGenerator.DeleteScript(_handlerScriptPath);
-                        GenerateViewModelHandler(backupCode, _selectedType.BaseType.Name);
-                    }
-                }
-            }
+            GUILayout.Space(4);
+            _selectedTypeIsSealed = EditorGUILayout.Toggle("Sealed", _selectedTypeIsSealed);
 
             // Namespace
             GUILayout.Space(10);
@@ -435,14 +428,26 @@ namespace UnuGames
         private void DrawHeaderButtons()
         {
             GUILayout.BeginHorizontal();
-            if (ColorButton.Draw("Edit View Logic (Handler)", CommonColor.LightBlue, GUILayout.Height(30)))
+
+            if (!File.Exists(_handlerScriptPath))
             {
-                var handler = UIManCodeGenerator.GetScriptPathByType(_selectedType);
-                handler = handler.Replace(".cs", ".Handler.cs");
-                UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(handler, 1);
+                if (ColorButton.Draw("Generate Type Handler", CommonColor.LightGreen, GUILayout.Height(30)))
+                {
+                    var backupCode = UIManCodeGenerator.DeleteScript(_handlerScriptPath);
+                    GenerateHandler(backupCode, _selectedType.BaseType.Name);
+                }
+            }
+            else
+            {
+                if (ColorButton.Draw("Edit Type Handler", CommonColor.LightBlue, GUILayout.Height(30)))
+                {
+                    var handler = UIManCodeGenerator.GetScriptPathByType(_selectedType);
+                    handler = handler.Replace(".cs", ".Handler.cs");
+                    UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(handler, 1);
+                }
             }
 
-            if (ColorButton.Draw("Edit View (UI)", CommonColor.LightBlue, GUILayout.Height(30)))
+            if (ColorButton.Draw("Edit Type View", CommonColor.LightBlue, GUILayout.Height(30)))
             {
                 GameObject prefabInstance;
                 UnityEngine.Object obj = FindObjectOfType(_selectedType);
@@ -527,6 +532,7 @@ namespace UnuGames
         {
             _config.selectedType = typeName;
             _selectedType = UIManEditorReflection.GetTypeByName(typeName);
+            _selectedTypeIsSealed = _selectedType.IsSealed;
             _selectedProperties = _selectedType.GetUIManProperties(true);
             this.namespaceField = new TextFieldHelper(_selectedType.Namespace);
             this.baseTypePopup = new EditablePopup(_arrSupportType, _selectedType.BaseType.Name, OnChangeBaseType);
@@ -581,13 +587,13 @@ namespace UnuGames
             if (!string.IsNullOrEmpty(_currentScriptPath))
             {
                 var backupCode = UIManCodeGenerator.DeleteScript(_handlerScriptPath);
-                var code = UIManCodeGenerator.GenerateScript(_selectedType.Name, inheritance, _config, this.namespaceField.Text, _selectedProperties);
+                var code = UIManCodeGenerator.GenerateType(_selectedType.Name, inheritance, _selectedTypeIsSealed, _config, this.namespaceField.Text, _selectedProperties);
 
                 var saved = UIManCodeGenerator.SaveScript(_currentScriptPath, code, true);
 
                 if (baseType != nameof(ObservableModel))
                 {
-                    GenerateViewModelHandler(backupCode, baseType);
+                    GenerateHandler(backupCode, baseType);
                     saved = false;
                 }
 
@@ -598,7 +604,7 @@ namespace UnuGames
             }
         }
 
-        public void GenerateViewModelHandler(string backupCode, string baseType = null)
+        public void GenerateHandler(string backupCode, string baseType = null)
         {
             if (string.IsNullOrEmpty(baseType))
                 baseType = _selectedType.BaseType.Name;
@@ -606,7 +612,7 @@ namespace UnuGames
             var handlerCode = backupCode;
 
             if (string.IsNullOrEmpty(handlerCode))
-                handlerCode = UIManCodeGenerator.GenerateViewModelHandler(_selectedType.Name, baseType, _config, this.namespaceField.Text);
+                handlerCode = UIManCodeGenerator.GenerateHandler(_selectedType.Name, baseType, _config, this.namespaceField.Text);
             else
                 handlerCode = handlerCode.Replace($": {_selectedType.BaseType.Name}", $": {baseType}");
 
