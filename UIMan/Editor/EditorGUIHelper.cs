@@ -539,11 +539,11 @@ namespace UnuGames
             this._viewItems.Add(Model);
             this._viewItems.AddRange(modelTypes);
 
-            this._viewItems.Add(Dialog);
-            this._viewItems.AddRange(dialogTypes);
-
             this._viewItems.Add(Screen);
             this._viewItems.AddRange(screenTypes);
+
+            this._viewItems.Add(Dialog);
+            this._viewItems.AddRange(dialogTypes);
         }
 
         public void Draw()

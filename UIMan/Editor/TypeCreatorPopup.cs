@@ -8,7 +8,7 @@ namespace UnuGames
 {
     public class TypeCreatorPopup : EditorWindow
     {
-        private string baseType = "UIManDialog";
+        private string baseType = nameof(UIManDialog);
 
         private TextFieldHelper namespaceField;
         private EditablePopup baseTypePopup;
@@ -62,11 +62,20 @@ namespace UnuGames
                 if (config != null)
                 {
                     if (this.baseTypePopup.SelectedItem == this.arrSupportType[0])
+                    {
                         lastPath = config.modelScriptFolder;
+                        this.typeName = "NewViewModel";
+                    }
                     else if (this.baseTypePopup.SelectedItem == this.arrSupportType[1])
+                    {
                         lastPath = config.screenScriptFolder;
+                        this.typeName = "UINewScreen";
+                    }
                     else if (this.baseTypePopup.SelectedItem == this.arrSupportType[2])
+                    {
                         lastPath = config.dialogScriptFolder;
+                        this.typeName = "UINewDialog";
+                    }
                 }
 
                 lastPath = EditorUtility.SaveFilePanel("Save script", Application.dataPath + lastPath, this.typeName, "cs");
@@ -103,7 +112,7 @@ namespace UnuGames
         {
             if (this.typeName.Contains(" "))
             {
-                EditorUtility.DisplayDialog("Error", "View model name cannot constain special character", "OK");
+                EditorUtility.DisplayDialog("Error", "Class name cannot constain special characters", "OK");
                 return;
             }
 
@@ -142,7 +151,7 @@ namespace UnuGames
 
             if (File.Exists(savePath) || UIGenerator.IsViewModelExisted(this.typeName))
             {
-                EditorUtility.DisplayDialog("Error", "View model name is already exist, please input other name!", "OK");
+                EditorUtility.DisplayDialog("Error", "A class of the same name has already existed", "OK");
                 return;
             }
 
@@ -152,7 +161,7 @@ namespace UnuGames
             if (this.baseType != this.arrSupportType[0])
                 config.generatingType = this.typeName;
             else
-                inheritance = $": {this.baseType}";
+                inheritance = $" : {this.baseType}";
 
             var code = UIManCodeGenerator.GenerateScript(this.typeName, inheritance, config, this.namespaceField.Text);
             UIManCodeGenerator.SaveScript(savePath, code, true);
@@ -164,7 +173,7 @@ namespace UnuGames
 
             if (warn)
             {
-                Debug.LogWarning("Code generation warning: Invalid name detected, auto generate is activated!");
+                UnuLogger.LogWarning("Code generation warning: Class name is invalid. New name is generated.");
             }
 
             Close();
