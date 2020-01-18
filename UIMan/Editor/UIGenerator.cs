@@ -582,7 +582,7 @@ namespace UnuGames
             if (baseType == null)
                 baseType = _selectedType.BaseType.Name;
 
-            var inheritance = baseType == nameof(ObservableModel) ? $": {baseType}" : string.Empty;
+            var inheritance = baseType == nameof(ObservableModel) ? $" : {baseType}" : string.Empty;
 
             if (!string.IsNullOrEmpty(_currentScriptPath))
             {
