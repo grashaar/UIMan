@@ -21,7 +21,7 @@ namespace UnuGames.MVVM
 
         public SpriteAtlas atlas;
         public bool autoCorrectSize;
-        public bool zeroAlphaOnImageNull;
+        public float noSpriteAlpha;
 
         private SpriteAtlas loadedAtlas;
         private string imageKey = string.Empty;
@@ -48,6 +48,7 @@ namespace UnuGames.MVVM
                 return;
 
             this.image.color = valChange;
+            SetAlpha();
         }
 
         public void OnUpdateAtlas(object val)
@@ -107,9 +108,9 @@ namespace UnuGames.MVVM
         {
             var color = this.image.color;
 
-            if (!this.image.sprite && this.zeroAlphaOnImageNull)
+            if (!this.image.sprite)
             {
-                color.a = 0;
+                color.a = this.noSpriteAlpha;
             }
             else
             {

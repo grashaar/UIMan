@@ -16,7 +16,7 @@ namespace UnuGames.MVVM
         public BindingField colorField = new BindingField("Color");
 
         public bool autoCorrectSize;
-        public bool zeroAlphaOnImageNull;
+        public float noSpriteAlpha = 1f;
 
         public override void Initialize(bool forceInit)
         {
@@ -38,6 +38,7 @@ namespace UnuGames.MVVM
                 return;
 
             this.image.color = valChange;
+            SetAlpha();
         }
 
         public void OnUpdateImage(object newImage)
@@ -77,9 +78,9 @@ namespace UnuGames.MVVM
         {
             var color = this.image.color;
 
-            if (!this.image.sprite && this.zeroAlphaOnImageNull)
+            if (!this.image.sprite)
             {
-                color.a = 0;
+                color.a = this.noSpriteAlpha;
             }
             else
             {
