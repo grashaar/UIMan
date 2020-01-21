@@ -17,6 +17,8 @@ namespace UnuGames.MVVM
 
         public string resourcePath = "/Images/";
         public bool autoCorrectSize;
+
+        [Range(0, 1f)]
         public float noSpriteAlpha = 1f;
 
         public override void Initialize(bool forceInit)

@@ -16,6 +16,8 @@ namespace UnuGames.MVVM
         public BindingField colorField = new BindingField("Color");
 
         public bool autoCorrectSize;
+
+        [Range(0, 1f)]
         public float noSpriteAlpha = 1f;
 
         public override void Initialize(bool forceInit)

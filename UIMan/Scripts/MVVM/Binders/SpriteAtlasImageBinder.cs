@@ -21,6 +21,8 @@ namespace UnuGames.MVVM
 
         public SpriteAtlas atlas;
         public bool autoCorrectSize;
+
+        [Range(0, 1f)]
         public float noSpriteAlpha = 1f;
 
         private SpriteAtlas loadedAtlas;
