@@ -21,6 +21,9 @@ namespace UnuGames
         [SerializeField]
         private Image.Type type = Image.Type.Simple;
 
+        [SerializeField, HideInInspector]
+        private Image foregroundImage = null;
+
         [Space]
         [SerializeField]
         private RectTransform horizontalThumb = null;
@@ -81,12 +84,10 @@ namespace UnuGames
             }
         }
 
-        private Image forgroundImage;
-
         private void Awake()
         {
             if (this.foreground)
-                this.forgroundImage = this.foreground.GetComponent<Image>();
+                this.foregroundImage = this.foreground.GetComponent<Image>();
 
             if (this.autoMaxWidth)
                 this.maxWidth = GetComponent<RectTransform>().rect.width;
@@ -104,10 +105,10 @@ namespace UnuGames
             if (!this.foreground)
                 return;
 
-            if (this.type == Image.Type.Filled)
+            if (this.type == Image.Type.Filled &&
+                this.foregroundImage)
             {
-                if (this.forgroundImage)
-                    this.forgroundImage.fillAmount = this.value;
+                this.foregroundImage.fillAmount = this.value;
             }
             else
             {
@@ -174,6 +175,9 @@ namespace UnuGames
 
         private void OnValidate()
         {
+            if (this.foreground)
+                this.foregroundImage = this.foreground.GetComponent<Image>();
+
             if (this.autoMaxWidth)
                 this.maxWidth = GetComponent<RectTransform>().rect.width;
 
