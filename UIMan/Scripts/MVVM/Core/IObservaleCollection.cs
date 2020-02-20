@@ -9,7 +9,7 @@ namespace UnuGames.MVVM
             get;
         }
 
-        int IndexOf(object o);
+        int IndexOf(object item);
 
         event Action<object> OnAddObject;
 

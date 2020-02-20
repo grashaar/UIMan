@@ -6,7 +6,7 @@ using UnityEngine;
 namespace UnuGames.MVVM
 {
     [Serializable]
-    public class ObservableList<T> : IEnumerable<T>, IEnumerable, IObservaleCollection
+    public class ObservableList<T> : IList<T>, IEnumerable<T>, IEnumerable, IObservaleCollection
     {
         [SerializeField]
         private List<T> list = new List<T>();
@@ -97,10 +97,12 @@ namespace UnuGames.MVVM
 
         public int Count
         {
-            get
-            {
-                return this.list.Count;
-            }
+            get { return this.list.Count; }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return false; }
         }
 
         public T this[int i]
@@ -109,6 +111,7 @@ namespace UnuGames.MVVM
             {
                 return this.list[i];
             }
+
             set
             {
                 this.list[i] = value;
@@ -125,15 +128,16 @@ namespace UnuGames.MVVM
             AddRange(set);
         }
 
-        public void Add(T o)
+        public void Add(T item)
         {
-            this.list.Add(o);
-            this.onAddObject?.Invoke(o);
+            this.list.Add(item);
+            this.onAddObject?.Invoke(item);
         }
 
         public void AddRange(IEnumerable<T> list)
         {
-            IEnumerator ienumerator = list.GetEnumerator();
+            var ienumerator = list.GetEnumerator();
+
             while (ienumerator.MoveNext())
             {
                 Add((T)ienumerator.Current);
@@ -166,39 +170,133 @@ namespace UnuGames.MVVM
             return this.list.GetEnumerator();
         }
 
-        public void Insert(int index, T o)
+        public void Insert(int index, T item)
         {
-            this.list.Insert(index, o);
-            this.onInsertObject?.Invoke(index, o);
+            this.list.Insert(index, item);
+            this.onInsertObject?.Invoke(index, item);
         }
 
-        public void Remove(T o)
+        public bool Remove(T item)
         {
-            if (this.list.Remove(o))
+            if (this.list.Remove(item))
             {
-                this.onRemoveObject?.Invoke(o);
+                this.onRemoveObject?.Invoke(item);
+                return true;
             }
+
+            return false;
         }
 
         public void RemoveAt(int index)
         {
-            T o = this.list[index];
-            this.list.RemoveAt(index);
-            this.onRemoveAt?.Invoke(index);
+            if (index >= 0 && index < this.list.Count)
+            {
+                this.list.RemoveAt(index);
+                this.onRemoveAt?.Invoke(index);
+            }
         }
 
         public void RemoveRange(IEnumerable<T> list)
         {
-            IEnumerator ienumerator = list.GetEnumerator();
+            var ienumerator = list.GetEnumerator();
+
             while (ienumerator.MoveNext())
             {
                 Remove((T)ienumerator.Current);
             }
         }
 
-        public int IndexOf(object obj)
+        public void CopyTo(T[] array, int arrayIndex)
         {
-            return this.list.IndexOf((T)obj);
+            this.list.CopyTo(array, arrayIndex);
+        }
+
+        public T[] ToArray()
+        {
+            return this.list.ToArray();
+        }
+
+        public int IndexOf(object item)
+        {
+            return this.list.IndexOf((T)item);
+        }
+
+        public int IndexOf(T item)
+        {
+            return this.list.IndexOf(item);
+        }
+        public int IndexOf(T item, int index, int count)
+        {
+            return this.list.IndexOf(item, index, count);
+        }
+
+        public int IndexOf(T item, int index)
+        {
+            return this.list.IndexOf(item, index);
+        }
+
+        public bool Exists(Predicate<T> match)
+        {
+            return this.list.Exists(match);
+        }
+
+        public T Find(Predicate<T> match)
+        {
+            return this.list.Find(match);
+        }
+
+        public List<T> FindAll(Predicate<T> match)
+        {
+            return this.list.FindAll(match);
+        }
+
+        public int FindIndex(int startIndex, int count, Predicate<T> match)
+        {
+            return this.list.FindIndex(startIndex, count, match);
+        }
+
+        public int FindIndex(int startIndex, Predicate<T> match)
+        {
+            return this.list.FindIndex(startIndex, match);
+        }
+
+        public int FindIndex(Predicate<T> match)
+        {
+            return this.list.FindIndex(match);
+        }
+
+        public T FindLast(Predicate<T> match)
+        {
+            return this.list.FindLast(match);
+        }
+
+        public int FindLastIndex(int startIndex, int count, Predicate<T> match)
+        {
+            return this.list.FindLastIndex(startIndex, count, match);
+        }
+
+        public int FindLastIndex(int startIndex, Predicate<T> match)
+        {
+            return this.list.FindLastIndex(startIndex, match);
+        }
+
+        public int FindLastIndex(Predicate<T> match)
+        {
+            return this.list.FindLastIndex(match);
+        }
+        public int LastIndexOf(T item)
+        {
+            return this.list.LastIndexOf(item);
+        }
+
+        public int LastIndexOf(T item, int index)
+        {
+            return this.list.LastIndexOf(item, index);
+        }
+
+        public int LastIndexOf(T item, int index, int count)
+        {
+            return this.list.LastIndexOf(item, index, count);
         }
     }
 }
