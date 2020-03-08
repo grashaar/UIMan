@@ -71,6 +71,14 @@ namespace UnuGames
             _supportedNamespaces.Sort((x, y) => y.Length.CompareTo(x.Length));
         }
 
+        public static void SupportNamespaces(params string[] namespaces)
+        {
+            foreach (var ns in namespaces)
+            {
+                SupportNamespace(ns);
+            }
+        }
+
         public static void SupportType(Type type)
         {
             if (_supportedTypes.Contains(type))
@@ -79,6 +87,14 @@ namespace UnuGames
             }
 
             _supportedTypes.Add(type);
+        }
+
+        public static void SupportTypes(params Type[] types)
+        {
+            foreach (var type in types)
+            {
+                SupportType(type);
+            }
         }
 
         public static void SupportType<T>()
