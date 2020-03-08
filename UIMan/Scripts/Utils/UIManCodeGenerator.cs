@@ -243,12 +243,14 @@ namespace UnuGames
                 return string.Empty;
 
             var namespaces = new List<string>();
+
             foreach (CustomPropertyInfo cpi in properties)
             {
                 var ns = cpi.GetNamespace();
+
                 if (!string.IsNullOrEmpty(ns) && !namespaces.Contains(ns))
                 {
-                    if (ns != "System" && !cpi.PropertyType.IsPrimitive())
+                    if (!cpi.PropertyType.IsPrimitive())
                         namespaces.Add(ns);
                 }
             }
