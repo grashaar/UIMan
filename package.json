@@ -1,18 +1,10 @@
 {
-  "name": "com.minhdu.uiman",
+  "author": "Đặng Minh Dự <cp.dev.minhdu@gmail.com> (https://github.com/minhdu)",
+  "description": "Fast and flexible solution for development and UI management with MVVM pattern",
   "displayName": "UIMan",
-  "version": "0.0.2",
-  "unity": "2019.1",
   "license": "MIT",
-  "description": "A fork of UIMan 1.0.2",
-  "keywords": [
-    "uiman",
-    "unity"
-  ],
-  "category": "Unity",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/grashaar/uiman.git"
-  },
-  "author": "Đặng Minh Dự <cp.dev.minhdu@gmail.com> (https://github.com/minhdu)"
+  "name": "com.minhdu.uiman",
+  "version": "1.0.2",
+  "type": "library",
+  "unity": "2019.1"
 }

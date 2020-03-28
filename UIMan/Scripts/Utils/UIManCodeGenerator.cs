@@ -182,9 +182,46 @@ namespace UnuGames
 
         public static string GetScriptByType(Type type)
         {
-            var scriptPath = GetScriptPathByType(type);
+            var typeName = type.Name;
+            var assets = AssetDatabase.FindAssets(typeName);
+            var scriptPath = "";
+            var isViewModel = false;
+
+            if (type == typeof(UIManBase))
+            {
+                isViewModel = true;
+            }
+
+            foreach (var asset in assets)
+            {
+                scriptPath = AssetDatabase.GUIDToAssetPath(asset);
+
+                if (scriptPath.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (isViewModel)
+                    {
+                        UIManBase viewModelAsset = AssetDatabase.LoadAssetAtPath<UIManBase>(scriptPath);
+
+                        if (viewModelAsset)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        TextAsset script = AssetDatabase.LoadAssetAtPath<TextAsset>(scriptPath);
+
+                        if (script && script.name.Equals(typeName))
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
             TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(scriptPath);
-            if (textAsset != null)
+
+            if (textAsset)
             {
                 return textAsset.text;
             }
@@ -197,8 +234,8 @@ namespace UnuGames
             var typeName = type.Name;
             var assets = AssetDatabase.FindAssets(typeName);
             var scriptPath = "";
-
             var isViewModel = false;
+
             if (type == typeof(UIManBase))
             {
                 isViewModel = true;
@@ -207,12 +244,14 @@ namespace UnuGames
             foreach (var asset in assets)
             {
                 scriptPath = AssetDatabase.GUIDToAssetPath(asset);
+
                 if (scriptPath.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
                 {
                     if (isViewModel)
                     {
                         UIManBase viewModelAsset = AssetDatabase.LoadAssetAtPath<UIManBase>(scriptPath);
-                        if (viewModelAsset != null)
+
+                        if (viewModelAsset)
                         {
                             break;
                         }
@@ -220,7 +259,8 @@ namespace UnuGames
                     else
                     {
                         TextAsset script = AssetDatabase.LoadAssetAtPath<TextAsset>(scriptPath);
-                        if (script != null)
+
+                        if (script && script.name.Equals(typeName))
                         {
                             break;
                         }
@@ -229,7 +269,8 @@ namespace UnuGames
             }
 
             TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(scriptPath);
-            if (textAsset != null)
+
+            if (textAsset)
             {
                 return scriptPath;
             }
