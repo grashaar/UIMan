@@ -1,10 +1,19 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector.Editor;
+#endif
+
 namespace UnuGames
 {
     [CustomEditor(typeof(UIManBase), true)]
-    public class UIManBaseInspector : Editor
+    public class UIManBaseInspector :
+#if ODIN_INSPECTOR
+        OdinEditor
+#else
+        Editor
+#endif
     {
         private readonly GUIContent animator = new GUIContent("Animator", "Animator component to do custom animation");
         private readonly GUIContent show = new GUIContent("Show", "Animation to do when UI is show");
@@ -105,9 +114,15 @@ namespace UnuGames
 
             EditorGUILayout.Space();
             LabelHelper.HeaderLabel("Custom fields");
+
+#if ODIN_INSPECTOR
+            EditorGUILayout.Space();
+            base.OnInspectorGUI();
+#else
             GUILayout.BeginVertical("Box");
             DrawDefaultInspector();
             GUILayout.EndVertical();
+#endif
 
             EditorGUILayout.Space();
             if (ColorButton.Draw("Edit View (UI)", CommonColor.LightGreen, GUILayout.Height(25)))
