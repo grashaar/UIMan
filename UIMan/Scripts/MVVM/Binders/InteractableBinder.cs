@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 namespace UnuGames.MVVM
 {
-    [DisallowMultipleComponent]
     public class InteractableBinder : BinderBase
     {
         public List<Selectable> enableOnTrue = new List<Selectable>();

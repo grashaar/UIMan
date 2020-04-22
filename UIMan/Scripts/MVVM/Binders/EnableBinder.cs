@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace UnuGames.MVVM
 {
-    [DisallowMultipleComponent]
     public class EnableBinder : BinderBase
     {
         public List<Behaviour> enableOnTrue = new List<Behaviour>();
