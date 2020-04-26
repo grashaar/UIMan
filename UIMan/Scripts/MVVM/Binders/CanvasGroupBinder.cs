@@ -40,7 +40,15 @@ namespace UnuGames.MVVM
                 return;
             }
 
-            if (val is bool valBool)
+            if (val is double valDouble ||
+                double.TryParse(val.ToString(), out valDouble))
+            {
+                this.canvasGroup.alpha = (float)valDouble;
+                return;
+            }
+
+            if (val is bool valBool ||
+                bool.TryParse(val.ToString(), out valBool))
             {
                 this.canvasGroup.alpha = valBool ? 1f : 0f;
             }
@@ -51,7 +59,11 @@ namespace UnuGames.MVVM
             if (val == null)
                 return;
 
-                this.canvasGroup.interactable = (bool)val;
+            if (val is bool valBool ||
+                bool.TryParse(val.ToString(), out valBool))
+            {
+                this.canvasGroup.interactable = valBool;
+            }
         }
 
         public void OnUpdateBlockRaycasts(object val)
@@ -59,7 +71,11 @@ namespace UnuGames.MVVM
             if (val == null)
                 return;
 
-            this.canvasGroup.blocksRaycasts = (bool)val;
+            if (val is bool valBool ||
+                bool.TryParse(val.ToString(), out valBool))
+            {
+                this.canvasGroup.blocksRaycasts = valBool;
+            }
         }
     }
 }

@@ -30,9 +30,20 @@ namespace UnuGames.MVVM
             if (this.bar == null)
                 return;
 
-            var tempValue = val.ToString();
+            if (!(val is float valChange))
+            {
+                if (!(val is double valChangeD))
+                {
+                    if (!double.TryParse(val.ToString(), out valChangeD))
+                    {
+                        UnuLogger.LogError($"Cannot convert {val} to number.", this);
+                        valChangeD = this.bar.Value;
+                    }
+                }
 
-            float.TryParse(tempValue, out var valChange);
+                valChange = (float)valChangeD;
+            }
+
             var time = 0f;
 
             if (this.tweenValueChange)

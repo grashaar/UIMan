@@ -1,6 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
+
 namespace UnuGames.MVVM
 {
     [RequireComponent(typeof(Image))]
@@ -18,8 +22,25 @@ namespace UnuGames.MVVM
         public string resourcePath = "/Images/";
         public bool autoCorrectSize;
 
+        [Header("No Sprite")]
         [Range(0, 1f)]
+#if ODIN_INSPECTOR
+        [LabelText("Alpha")]
+#endif
         public float noSpriteAlpha = 1f;
+
+#if ODIN_INSPECTOR
+        [HorizontalGroup("CustomColor")]
+        [LabelText("Custom Color")]
+#endif
+        public bool useNoSpriteColor = false;
+
+#if ODIN_INSPECTOR
+        [HorizontalGroup("CustomColor")]
+        [HideLabel]
+        [ShowIf("useNoSpriteColor")]
+#endif
+        public Color noSpriteColor = Color.white;
 
         public override void Initialize(bool forceInit)
         {
@@ -75,6 +96,9 @@ namespace UnuGames.MVVM
 
             if (!this.image.sprite)
             {
+                if (this.useNoSpriteColor)
+                    color = this.noSpriteColor;
+
                 color.a = this.noSpriteAlpha;
             }
             else

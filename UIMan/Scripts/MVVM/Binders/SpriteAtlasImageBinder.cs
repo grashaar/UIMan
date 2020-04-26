@@ -1,6 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.U2D;
+
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
 
 namespace UnuGames.MVVM
 {
@@ -22,8 +26,25 @@ namespace UnuGames.MVVM
         public SpriteAtlas atlas;
         public bool autoCorrectSize;
 
+        [Header("No Sprite")]
         [Range(0, 1f)]
+#if ODIN_INSPECTOR
+        [LabelText("Alpha")]
+#endif
         public float noSpriteAlpha = 1f;
+
+#if ODIN_INSPECTOR
+        [HorizontalGroup("CustomColor")]
+        [LabelText("Custom Color")]
+#endif
+        public bool useNoSpriteColor = false;
+
+#if ODIN_INSPECTOR
+        [HorizontalGroup("CustomColor")]
+        [HideLabel]
+        [ShowIf("useNoSpriteColor")]
+#endif
+        public Color noSpriteColor = Color.white;
 
         private SpriteAtlas loadedAtlas;
         private string imageKey = string.Empty;
@@ -112,6 +133,9 @@ namespace UnuGames.MVVM
 
             if (!this.image.sprite)
             {
+                if (this.useNoSpriteColor)
+                    color = this.noSpriteColor;
+
                 color.a = this.noSpriteAlpha;
             }
             else

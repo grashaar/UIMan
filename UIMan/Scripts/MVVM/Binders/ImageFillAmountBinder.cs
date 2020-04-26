@@ -29,10 +29,27 @@ namespace UnuGames.MVVM
             if (val == null)
                 return;
 
-            if (!(val is float valChange))
+            if (val is float valChange)
+            {
+                TweenValue(valChange);
                 return;
+            }
 
-            UITweener.Value(this.gameObject, this.timeChangeValue, this.image.fillAmount, valChange).SetOnUpdate(UpdateValue);
+            if (val is double valChangeD)
+            {
+                TweenValue((float)valChangeD);
+                return;
+            }
+
+            if (double.TryParse(val.ToString(), out valChangeD))
+            {
+                TweenValue((float)valChangeD);
+            }
+        }
+
+        private void TweenValue(float value)
+        {
+            UITweener.Value(this.gameObject, this.timeChangeValue, this.image.fillAmount, value).SetOnUpdate(UpdateValue);
         }
 
         private void UpdateValue(float val)

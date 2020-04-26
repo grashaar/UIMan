@@ -33,13 +33,11 @@ namespace UnuGames.MVVM
 
         private void Update()
         {
-            if (this.input.text != this.oldText)
+            if (string.Equals(this.input.text, this.oldText))
             {
                 this.oldText = this.input.text;
-                if (this.oldText.Contains("\t"))
-                {
-                    this.oldText.Replace("\t", string.Empty);
-                }
+                this.oldText.Replace("\t", string.Empty);
+
                 this.input.text = this.oldText;
                 SetValue(this.valueField.member, this.oldText);
             }

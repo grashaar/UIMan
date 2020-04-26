@@ -24,17 +24,34 @@ namespace UnuGames.MVVM
             SubscribeOnChangedEvent(this.valueField, OnUpdateNumber);
         }
 
-        public void OnUpdateNumber(object newNumber)
+        public void OnUpdateNumber(object newVal)
         {
-            if (newNumber == null)
+            if (newVal == null)
                 return;
 
-            double.TryParse(this.text.text, out var val);
-            double.TryParse(newNumber.ToString(), out var change);
+            if (!double.TryParse(this.text.text, out var val))
+            {
+                UnuLogger.LogError($"Cannot convert {this.text.text} to number.", this);
+                val = 0.0;
+            }
 
-            UITweener.Value(this.gameObject, this.timeChange, (float)val, (float)change)
+            if (!(newVal is float change))
+            {
+                if (!(newVal is double changeD))
+                {
+                    if (!double.TryParse(newVal.ToString(), out changeD))
+                    {
+                        UnuLogger.LogError($"Cannot convert {newVal} to number.", this);
+                        changeD = 0.0;
+                    }
+                }
+
+                change = (float)changeD;
+            }
+
+            UITweener.Value(this.gameObject, this.timeChange, (float)val, change)
                      .SetOnUpdate(OnUpdate)
-                     .SetOnComplete(() => OnComplete(newNumber));
+                     .SetOnComplete(() => OnComplete(newVal));
         }
 
         private void OnUpdate(float val)

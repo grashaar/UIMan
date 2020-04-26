@@ -26,7 +26,13 @@ namespace UnuGames.MVVM
                 return;
 
             if (!(val is bool valChange))
-                return;
+            {
+                if (!bool.TryParse(val.ToString(), out valChange))
+                {
+                    UnuLogger.LogError($"Cannot convert {val} to boolean.", this);
+                    valChange = false;
+                }
+            }
 
             if (this.enableOnTrue != null && this.enableOnTrue.Count > 0)
             {
