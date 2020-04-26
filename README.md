@@ -5,6 +5,12 @@
 
 The original example has been upgraded and moved to another repo: [grashaar/uiman-examples](https://github.com/grashaar/uiman-examples)
 
+## Changes in 1.1.0
+* `UIManAssetLoader` has been changed to `UIManLoader`.
+* All `UIManLoader.Set` methods have been removed. Now, `UIManLoader` must be initialized by the `UIManLoader.Initialize(IUIManLoader)` method.
+* `SpriteAtlasImageBinder` will now get sprites from `SpriteAtlasManager` to reduce memory usage.
+* To replace the default atlas manager, create a class that implements `ISpriteAtlasManager` interface, then pass it to `SpriteAtlasManager.Initialize(ISpriteAtlasManager)` method.
+
 ---
 
 <p align="center">
