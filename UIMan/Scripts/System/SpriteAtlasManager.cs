@@ -153,7 +153,7 @@ namespace UnuGames
                 if (!atlas)
                 {
                     if (!Silent)
-                        UnuLogger.LogException(new ArgumentNullException(atlas));
+                        UnuLogger.LogException(new ArgumentNullException(nameof(atlas)));
 
                     return false;
                 }
