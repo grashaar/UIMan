@@ -55,7 +55,7 @@ namespace UnuGames.MVVM
                 return;
 
             this.image = GetComponent<Image>();
-            this.loadedAtlas = this.atlas;
+            SetLoadedAtlas(this.atlas);
 
             SubscribeOnChangedEvent(this.atlasField, OnUpdateAtlas);
             SubscribeOnChangedEvent(this.valueField, OnUpdateImage);
@@ -80,7 +80,7 @@ namespace UnuGames.MVVM
 
             if (string.IsNullOrEmpty(key))
             {
-                this.loadedAtlas = this.atlas;
+                SetLoadedAtlas(this.atlas);
                 TryResolveImage();
             }
             else
@@ -99,29 +99,31 @@ namespace UnuGames.MVVM
         {
             if (asset is SpriteAtlas atlas)
             {
-                this.loadedAtlas = atlas;
+                SetLoadedAtlas(atlas);
             }
             else
             {
                 Debug.LogError($"Asset of key={key} is not a SpriteAtlas.");
-                this.loadedAtlas = this.atlas;
+                SetLoadedAtlas(this.atlas);
             }
 
             TryResolveImage();
         }
 
+        private void SetLoadedAtlas(SpriteAtlas value)
+        {
+            this.loadedAtlas = value;
+            SpriteAtlasManager.Register(value);
+        }
+
         private void TryResolveImage()
         {
-            if (string.IsNullOrEmpty(this.imageKey) || !this.loadedAtlas)
-            {
-                this.image.sprite = null;
-            }
-            else
-            {
-                this.image.sprite = this.loadedAtlas.GetSprite(this.imageKey);
+            var result = SpriteAtlasManager.TryGetSprite(this.loadedAtlas, this.imageKey, out var sprite);
+            this.image.sprite = sprite;
 
-                if (this.autoCorrectSize)
-                    this.image.SetNativeSize();
+            if (result && this.autoCorrectSize)
+            {
+                this.image.SetNativeSize();
             }
 
             SetAlpha();
