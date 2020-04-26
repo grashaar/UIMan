@@ -18,7 +18,6 @@ namespace UnuGames
         bool TryGetSprite(SpriteAtlas atlas, string spriteKey, out Sprite sprite);
 
         bool TryGetSprite(string atlasKey, string spriteKey, out Sprite sprite);
-
     }
 
     public static class SpriteAtlasManager
@@ -26,6 +25,8 @@ namespace UnuGames
         public static ISpriteAtlasManager DefaultManager { get; }
 
         private static ISpriteAtlasManager _manager;
+
+        public static bool Silent { get; set; } = false;
 
         static SpriteAtlasManager()
         {
@@ -105,7 +106,9 @@ namespace UnuGames
             {
                 if (!atlas)
                 {
-                    UnuLogger.LogException(new ArgumentNullException(nameof(atlas)));
+                    if (!Silent)
+                        UnuLogger.LogException(new ArgumentNullException(nameof(atlas)));
+
                     return;
                 }
 
@@ -122,13 +125,17 @@ namespace UnuGames
             {
                 if (string.IsNullOrEmpty(key))
                 {
-                    UnuLogger.LogError("Key is null or empty.");
+                    if (!Silent)
+                        UnuLogger.LogError("Key is null or empty.");
+
                     return;
                 }
 
                 if (!atlas)
                 {
-                    UnuLogger.LogException(new ArgumentNullException(nameof(atlas)));
+                    if (!Silent)
+                        UnuLogger.LogException(new ArgumentNullException(nameof(atlas)));
+
                     return;
                 }
 
@@ -144,7 +151,12 @@ namespace UnuGames
                 map = default;
 
                 if (!atlas)
+                {
+                    if (!Silent)
+                        UnuLogger.LogException(new ArgumentNullException(atlas));
+
                     return false;
+                }
 
                 var key = atlas.name;
 
@@ -162,8 +174,13 @@ namespace UnuGames
             {
                 sprite = default;
 
-                if (!atlas || string.IsNullOrEmpty(spriteKey))
+                if (string.IsNullOrEmpty(spriteKey))
+                {
+                    if (!Silent)
+                        UnuLogger.LogError("Sprite key is null or empty.");
+
                     return false;
+                }
 
                 if (!TryRegister(atlas, out var map))
                     return false;
@@ -182,7 +199,8 @@ namespace UnuGames
                 }
                 catch (Exception ex)
                 {
-                    UnuLogger.LogException(ex);
+                    if (!Silent)
+                        UnuLogger.LogException(ex);
 
                     sprite = default;
                     return false;
@@ -193,22 +211,36 @@ namespace UnuGames
             {
                 sprite = default;
 
-                if (string.IsNullOrEmpty(spriteKey))
-                    return false;
+                if (string.IsNullOrEmpty(atlasKey))
+                {
+                    if (!Silent)
+                        UnuLogger.LogError("Atlas key is null or empty.");
 
-                if (this.spriteMap.TryGetValue(atlasKey, out var map))
                     return false;
+                }
+
+                if (string.IsNullOrEmpty(spriteKey))
+                {
+                    if (!Silent)
+                        UnuLogger.LogError("Sprite key is null or empty.");
+
+                    return false;
+                }
+
+                if (this.atlasMap.TryGetValue(atlasKey, out var atlas))
+                {
+                    if (!Silent)
+                        UnuLogger.LogError($"Cannot find any atlas by the key {atlasKey}.");
+
+                    return false;
+                }
+
+                var map = this.spriteMap[atlasKey];
 
                 if (map.ContainsKey(spriteKey))
                 {
                     sprite = map[spriteKey];
                     return true;
-                }
-
-                if (this.atlasMap.TryGetValue(atlasKey, out var atlas))
-                {
-                    UnuLogger.LogError($"Cannot find any registered atlas by they key {atlasKey}.");
-                    return false;
                 }
 
                 try
@@ -219,7 +251,8 @@ namespace UnuGames
                 }
                 catch (Exception ex)
                 {
-                    UnuLogger.LogException(ex);
+                    if (!Silent)
+                        UnuLogger.LogException(ex);
 
                     sprite = default;
                     return false;
