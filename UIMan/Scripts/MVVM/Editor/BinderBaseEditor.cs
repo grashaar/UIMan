@@ -2,16 +2,29 @@
 using UnityEditor;
 using UnityEngine;
 
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector.Editor;
+#endif
+
 namespace UnuGames.MVVM
 {
     [CustomEditor(typeof(BinderBase), true)]
-    public class BinderBaseEditor : Editor
+    public class BinderBaseEditor :
+#if ODIN_INSPECTOR
+        OdinEditor
+#else
+        Editor
+#endif
     {
         public BinderBase binder;
 
         public override void OnInspectorGUI()
         {
+#if ODIN_INSPECTOR
+            base.OnInspectorGUI();
+#else
             DrawDefaultInspector();
+#endif
 
             this.binder = this.target as BinderBase;
 

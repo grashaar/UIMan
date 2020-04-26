@@ -1,18 +1,34 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using UnuGames;
 
-[CustomEditor(typeof(UIActivityIndicator))]
-public class UIActivityInspector : Editor
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector.Editor;
+#endif
+
+namespace UnuGames
 {
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(UIActivityIndicator))]
+    public class UIActivityInspector :
+#if ODIN_INSPECTOR
+        OdinEditor
+#else
+        Editor
+#endif
     {
-        GUILayout.BeginHorizontal("Box");
-        LabelHelper.HeaderLabel("UIMan Activity Indicator");
-        GUILayout.EndHorizontal();
+        public override void OnInspectorGUI()
+        {
+            GUILayout.BeginHorizontal("Box");
+            LabelHelper.HeaderLabel("UIMan Activity Indicator");
+            GUILayout.EndHorizontal();
 
-        GUILayout.BeginVertical("Box");
-        DrawDefaultInspector();
-        GUILayout.EndVertical();
+#if ODIN_INSPECTOR
+            EditorGUILayout.Space();
+            base.OnInspectorGUI();
+#else
+            GUILayout.BeginVertical("Box");
+            DrawDefaultInspector();
+            GUILayout.EndVertical();
+#endif
+        }
     }
 }
