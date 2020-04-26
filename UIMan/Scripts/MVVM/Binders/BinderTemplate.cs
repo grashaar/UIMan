@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿/** BINDER TEMPLATE
+
+using UnityEngine;
 
 namespace UnuGames.MVVM
 {
@@ -32,3 +34,5 @@ namespace UnuGames.MVVM
         }
     }
 }
+
+**/
