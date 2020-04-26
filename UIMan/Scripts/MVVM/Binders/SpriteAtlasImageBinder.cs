@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.U2D;
 
@@ -85,7 +85,7 @@ namespace UnuGames.MVVM
             }
             else
             {
-                UIManAssetLoader.Load<SpriteAtlas>(key, OnLoadedAtlas);
+                UIManLoader.Load<SpriteAtlas>(key, OnLoadedAtlas);
             }
         }
 

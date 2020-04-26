@@ -75,7 +75,7 @@ namespace UnuGames.MVVM
             }
             else
             {
-                UIManAssetLoader.Load<Sprite>(key, OnLoadedImage);
+                UIManLoader.Load<Sprite>(key, OnLoadedImage);
             }
         }
 

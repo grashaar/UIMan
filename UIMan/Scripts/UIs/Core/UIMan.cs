@@ -89,7 +89,7 @@ namespace UnuGames
                 return;
             }
 
-            UIManAssetLoader.Load<GameObject>(ACTIVITY_INDICATOR_NAME, (key, asset) => OnLoading(key, asset, callback));
+            UIManLoader.Load<GameObject>(ACTIVITY_INDICATOR_NAME, (key, asset) => OnLoading(key, asset, callback));
         }
 
         private void OnLoading(string key, UnityEngine.Object asset, Action<UIActivityIndicator> callback)
@@ -179,7 +179,7 @@ namespace UnuGames
 
             if (!this.screenDict.TryGetValue(uiType, out UIManScreen screen))
             {
-                UIManAssetLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessScreen(key, asset, uiType, seal, args));
+                UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessScreen(key, asset, uiType, seal, args));
                 return;
             }
 
@@ -190,7 +190,7 @@ namespace UnuGames
             {
                 this.background.gameObject.SetActive(true);
 
-                UIManAssetLoader.Load<Texture2D>(screen.background, SetScreenBackground);
+                UIManLoader.Load<Texture2D>(screen.background, SetScreenBackground);
             }
 
             BringToFront(this.screenRoot, screen.transform, 2);
@@ -301,7 +301,7 @@ namespace UnuGames
             if (!this.dialogDict.TryGetValue(uiType, out UIManDialog dialog))
             {
                 this.IsLoadingDialog = true;
-                UIManAssetLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessDialogue(key, asset, uiType, callbacks, args));
+                UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessDialogue(key, asset, uiType, callbacks, args));
                 return;
             }
 
@@ -975,7 +975,7 @@ namespace UnuGames
             }
 
             // Preload
-            UIManAssetLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessPreload(key, asset, uiType));
+            UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessPreload(key, asset, uiType));
         }
 
         private void PreprocessPreload(string key, UnityEngine.Object asset, Type uiType)

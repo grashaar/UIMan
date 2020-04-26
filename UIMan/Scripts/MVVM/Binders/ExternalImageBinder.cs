@@ -64,7 +64,9 @@ namespace UnuGames.MVVM
             }
             else
             {
-                ExternalImageLoader.Instance.Load("file:///" + Application.persistentDataPath + this.resourcePath + newImage.ToString(), OnLoadComplete);
+                ExternalImageLoader.Instance.Load("file:///" + Application.persistentDataPath +
+                                                  this.resourcePath + newImage.ToString(),
+                                                  OnLoadComplete);
             }
         }
 
