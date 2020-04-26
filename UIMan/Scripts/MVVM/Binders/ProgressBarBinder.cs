@@ -10,6 +10,9 @@ namespace UnuGames.MVVM
         [HideInInspector]
         public BindingField valueField = new BindingField("float");
 
+        [HideInInspector]
+        public FloatConverter valueConverter = new FloatConverter("float");
+
         public bool tweenValueChange;
         public float changeTime = 0.1f;
 
@@ -24,26 +27,7 @@ namespace UnuGames.MVVM
 
         public void OnUpdateValue(object val)
         {
-            if (val == null)
-                return;
-
-            if (this.bar == null)
-                return;
-
-            if (!(val is float valChange))
-            {
-                if (!(val is double valChangeD))
-                {
-                    if (!double.TryParse(val.ToString(), out valChangeD))
-                    {
-                        UnuLogger.LogError($"Cannot convert {val} to number.", this);
-                        valChangeD = this.bar.Value;
-                    }
-                }
-
-                valChange = (float)valChangeD;
-            }
-
+            var valChange = this.valueConverter.Convert(val, this);
             var time = 0f;
 
             if (this.tweenValueChange)
@@ -52,10 +36,10 @@ namespace UnuGames.MVVM
             }
 
             UITweener.Value(this.gameObject, time, this.bar.Value, valChange)
-                     .SetOnUpdate(UpdateValue);
+                     .SetOnUpdate(SetValue);
         }
 
-        private void UpdateValue(float val)
+        private void SetValue(float val)
         {
             this.bar.Value = val;
         }

@@ -32,7 +32,8 @@ namespace UnuGames.MVVM
             GUILayout.BeginVertical(GUI.skin.box);
             GUILayout.Space(4);
 
-            var context = EditorGUILayout.ObjectField(new GUIContent("Data Context"), this.binder.dataContext, typeof(DataContext), true) as DataContext;
+            var context = EditorGUILayout.ObjectField(new GUIContent("Data Context"), this.binder.dataContext,
+                                                      typeof(DataContext), true) as DataContext;
 
             if (context == null)
             {
@@ -57,23 +58,69 @@ namespace UnuGames.MVVM
                 return;
             }
 
+            GUILayout.Space(4);
+
             BindingField[] arrFields = this.binder.GetBindingFields();
+            Converter[] arrConverters = this.binder.GetConverters();
 
-            GUILayout.BeginVertical();
-
-            for (var i = 0; i < arrFields.Length; i++)
+            if (arrFields.Length > 0)
             {
-                DrawBindingField(arrFields[i]);
+                EditorGUILayout.LabelField("Binders", EditorStyles.boldLabel);
+                GUILayout.BeginVertical();
+
+                for (var i = 0; i < arrFields.Length; i++)
+                {
+                    DrawBindingField(arrFields[i]);
+                }
+
+                GUILayout.EndVertical();
+                GUILayout.Space(4);
             }
 
-            GUILayout.EndVertical();
-            GUILayout.Space(4);
+            if (arrConverters.Length > 0)
+            {
+                EditorGUILayout.LabelField("Converters", EditorStyles.boldLabel);
+                GUILayout.BeginVertical();
+
+                for (var i = 0; i < arrConverters.Length; i++)
+                {
+                    DrawConverter(arrConverters[i]);
+                }
+
+                GUILayout.EndVertical();
+                GUILayout.Space(4);
+            }
+
             GUILayout.EndVertical();
 
             if (Event.current.type == EventType.Repaint)
             {
                 FilterPopup.SetPopupRect(GUILayoutUtility.GetLastRect());
             }
+        }
+
+        public void DrawConverter(Converter converter)
+        {
+            GUILayout.BeginVertical();
+            GUILayout.BeginHorizontal();
+
+            EditorGUILayout.PrefixLabel(new GUIContent(converter.label));
+
+            var adapter = converter.GetAdapter();
+            var adapterType = converter.GetAdapterType();
+
+            EditorGUI.BeginChangeCheck();
+            adapter = EditorGUILayout.ObjectField(adapter, adapterType, false) as Adapter;
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(this.target, "Set Adapter");
+                converter.SetAdapter(adapter);
+                Apply();
+            }
+
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
         }
 
         public void DrawBindingField(BindingField field)

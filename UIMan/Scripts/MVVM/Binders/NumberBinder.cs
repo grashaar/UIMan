@@ -12,6 +12,9 @@ namespace UnuGames.MVVM
         [HideInInspector]
         public BindingField valueField = new BindingField("Number");
 
+        [HideInInspector]
+        public FloatConverter valueConverter = new FloatConverter("Number");
+
         public string format;
         public float timeChange = 0.25f;
 
@@ -26,57 +29,23 @@ namespace UnuGames.MVVM
 
         public void OnUpdateNumber(object newVal)
         {
-            if (newVal == null)
-                return;
+            var oldValue = this.valueConverter.Convert(this.text.text, this);
+            var newValue = this.valueConverter.Convert(newVal, this);
 
-            if (!double.TryParse(this.text.text, out var val))
-            {
-                UnuLogger.LogError($"Cannot convert {this.text.text} to number.", this);
-                val = 0.0;
-            }
-
-            if (!(newVal is float change))
-            {
-                if (!(newVal is double changeD))
-                {
-                    if (!double.TryParse(newVal.ToString(), out changeD))
-                    {
-                        UnuLogger.LogError($"Cannot convert {newVal} to number.", this);
-                        changeD = 0.0;
-                    }
-                }
-
-                change = (float)changeD;
-            }
-
-            UITweener.Value(this.gameObject, this.timeChange, (float)val, change)
-                     .SetOnUpdate(OnUpdate)
-                     .SetOnComplete(() => OnComplete(newVal));
+            UITweener.Value(this.gameObject, this.timeChange, oldValue, newValue)
+                     .SetOnUpdate(SetValue)
+                     .SetOnComplete(() => SetValue(newValue));
         }
 
-        private void OnUpdate(float val)
+        private void SetValue(float value)
         {
             if (string.IsNullOrEmpty(this.format))
             {
-                this.text.text = val.ToString();
+                this.text.text = value.ToString();
             }
             else
             {
-                this.text.text = string.Format(this.format, val);
-            }
-        }
-
-        private void OnComplete(object newNumber)
-        {
-            var text = newNumber.ToString();
-
-            if (string.IsNullOrEmpty(this.format))
-            {
-                this.text.text = text;
-            }
-            else
-            {
-                this.text.text = string.Format(this.format, text);
+                this.text.text = string.Format(this.format, value);
             }
         }
     }

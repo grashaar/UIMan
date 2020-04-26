@@ -12,6 +12,9 @@ namespace UnuGames.MVVM
         [HideInInspector]
         public BindingField valueField = new BindingField("bool");
 
+        [HideInInspector]
+        public BoolConverter valueConverter = new BoolConverter("bool");
+
         public override void Initialize(bool forceInit)
         {
             if (!CheckInitialize(forceInit))
@@ -22,17 +25,7 @@ namespace UnuGames.MVVM
 
         public void OnUpdateValue(object val)
         {
-            if (val == null)
-                return;
-
-            if (!(val is bool valChange))
-            {
-                if (!bool.TryParse(val.ToString(), out valChange))
-                {
-                    UnuLogger.LogError($"Cannot convert {val} to boolean.", this);
-                    valChange = false;
-                }
-            }
+            var valChange = this.valueConverter.Convert(val, this);
 
             if (this.enableOnTrue != null && this.enableOnTrue.Count > 0)
             {

@@ -162,7 +162,7 @@ namespace UnuGames.MVVM
             }
         }
 
-        protected BindingField[] fields;
+        private BindingField[] fields;
 
         /// <summary>
         /// Get and cache all binding fields of this binder
@@ -171,19 +171,21 @@ namespace UnuGames.MVVM
         public BindingField[] GetBindingFields()
         {
 #if !UNITY_EDITOR
-            if(fields != null)
-                return  fields;
+            if (this.fields != null)
+                return  this.fields;
 #endif
 
             var listField = new List<BindingField>();
             MemberInfo[] members = this.Type.GetMembers();
+            var bindingFieldType = typeof(BindingField);
+
             for (var i = 0; i < members.Length; i++)
             {
                 MemberInfo memberInfo = members[i];
                 if (memberInfo.MemberType == MemberTypes.Field)
                 {
                     var fieldInfo = memberInfo as FieldInfo;
-                    if (fieldInfo.FieldType == typeof(BindingField))
+                    if (fieldInfo.FieldType == bindingFieldType)
                     {
                         listField.Add(fieldInfo.GetValue(this) as BindingField);
                     }
@@ -194,12 +196,46 @@ namespace UnuGames.MVVM
             return this.fields;
         }
 
+        private Converter[] converters;
+
+        public Converter[] GetConverters()
+        {
+#if !UNITY_EDITOR
+            if (this.converters != null)
+                return  this.converters;
+#endif
+
+            var listConverter = new List<Converter>();
+            MemberInfo[] members = this.Type.GetMembers();
+            var converterType = typeof(Converter);
+
+            for (var i = 0; i < members.Length; i++)
+            {
+                MemberInfo memberInfo = members[i];
+
+                if (memberInfo.MemberType == MemberTypes.Field)
+                {
+                    var fieldInfo = memberInfo as FieldInfo;
+
+                    if (converterType.IsAssignableFrom(fieldInfo.FieldType))
+                    {
+                        listConverter.Add(fieldInfo.GetValue(this) as Converter);
+                    }
+                }
+            }
+
+            this.converters = listConverter.ToArray();
+            return this.converters;
+        }
+
         protected bool CheckInitialize(bool forceInitialize)
         {
             if (!Application.isPlaying)
                 return false;
+
             if (this.isInitialize)
                 return forceInitialize;
+
             this.isInitialize = true;
             return true;
         }

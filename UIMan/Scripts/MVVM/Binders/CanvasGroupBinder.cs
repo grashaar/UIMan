@@ -17,6 +17,15 @@ namespace UnuGames.MVVM
         [HideInInspector]
         public BindingField blockRaycastsField = new BindingField("Block Raycasts");
 
+        [HideInInspector]
+        public FloatConverter alphaConverter = new FloatConverter("Alpha");
+
+        [HideInInspector]
+        public BoolConverter interactableConverter = new BoolConverter("Interactable");
+
+        [HideInInspector]
+        public BoolConverter blockRaycastsConverter = new BoolConverter("Block Raycasts");
+
         public override void Initialize(bool forceInit)
         {
             if (!CheckInitialize(forceInit))
@@ -31,51 +40,17 @@ namespace UnuGames.MVVM
 
         public void OnUpdateAlpha(object val)
         {
-            if (val == null)
-                return;
-
-            if (val is float valFloat)
-            {
-                this.canvasGroup.alpha = valFloat;
-                return;
-            }
-
-            if (val is double valDouble ||
-                double.TryParse(val.ToString(), out valDouble))
-            {
-                this.canvasGroup.alpha = (float)valDouble;
-                return;
-            }
-
-            if (val is bool valBool ||
-                bool.TryParse(val.ToString(), out valBool))
-            {
-                this.canvasGroup.alpha = valBool ? 1f : 0f;
-            }
+            this.canvasGroup.alpha = this.alphaConverter.Convert(val, this);
         }
 
         public void OnUpdateInteractable(object val)
         {
-            if (val == null)
-                return;
-
-            if (val is bool valBool ||
-                bool.TryParse(val.ToString(), out valBool))
-            {
-                this.canvasGroup.interactable = valBool;
-            }
+            this.canvasGroup.interactable = this.interactableConverter.Convert(val, this);
         }
 
         public void OnUpdateBlockRaycasts(object val)
         {
-            if (val == null)
-                return;
-
-            if (val is bool valBool ||
-                bool.TryParse(val.ToString(), out valBool))
-            {
-                this.canvasGroup.blocksRaycasts = valBool;
-            }
+            this.canvasGroup.blocksRaycasts = this.interactableConverter.Convert(val, this);
         }
     }
 }

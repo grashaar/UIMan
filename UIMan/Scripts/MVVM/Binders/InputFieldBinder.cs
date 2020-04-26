@@ -12,6 +12,11 @@ namespace UnuGames.MVVM
         [HideInInspector]
         public BindingField valueField = new BindingField("Text");
 
+        [HideInInspector]
+        public StringConverter valueConverter = new StringConverter("Text");
+
+        private string oldText = "";
+
         public override void Initialize(bool forceInit)
         {
             if (!CheckInitialize(forceInit))
@@ -24,28 +29,20 @@ namespace UnuGames.MVVM
 
         public void OnUpdateText(object newText)
         {
-            //if(newText == null)
-            //	return;
-            //input.text = newText.ToString();
+            var text = this.valueConverter.Convert(newText, this);
+            this.input.text = text;
         }
-
-        private string oldText = "";
 
         private void Update()
         {
-            if (string.Equals(this.input.text, this.oldText))
+            if (!string.Equals(this.input.text, this.oldText))
             {
                 this.oldText = this.input.text;
                 this.oldText.Replace("\t", string.Empty);
-
                 this.input.text = this.oldText;
+
                 SetValue(this.valueField.member, this.oldText);
             }
-        }
-
-        public void EndEdit()
-        {
-            this.input.text = this.oldText;
         }
     }
 }

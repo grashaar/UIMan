@@ -12,6 +12,9 @@ namespace UnuGames.MVVM
         [HideInInspector]
         public BindingField valueField = new BindingField("float");
 
+        [HideInInspector]
+        public FloatConverter valueConverter = new FloatConverter("float");
+
         private readonly float timeChangeValue = 0.75f;
 
         public override void Initialize(bool forceInit)
@@ -26,30 +29,10 @@ namespace UnuGames.MVVM
 
         public void OnUpdateValue(object val)
         {
-            if (val == null)
-                return;
+            var valChange = this.valueConverter.Convert(val, this);
 
-            if (val is float valChange)
-            {
-                TweenValue(valChange);
-                return;
-            }
-
-            if (val is double valChangeD)
-            {
-                TweenValue((float)valChangeD);
-                return;
-            }
-
-            if (double.TryParse(val.ToString(), out valChangeD))
-            {
-                TweenValue((float)valChangeD);
-            }
-        }
-
-        private void TweenValue(float value)
-        {
-            UITweener.Value(this.gameObject, this.timeChangeValue, this.image.fillAmount, value).SetOnUpdate(UpdateValue);
+            UITweener.Value(this.gameObject, this.timeChangeValue, this.image.fillAmount, valChange)
+                     .SetOnUpdate(UpdateValue);
         }
 
         private void UpdateValue(float val)

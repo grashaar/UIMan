@@ -15,6 +15,12 @@ namespace UnuGames.MVVM
         [HideInInspector]
         public BindingField colorField = new BindingField("Color", true);
 
+        [HideInInspector]
+        public StringConverter textConverter = new StringConverter("Text");
+
+        [HideInInspector]
+        public ColorConverter colorConverter = new ColorConverter("Color");
+
         public string format;
 
         public override void Initialize(bool forceInit)
@@ -30,7 +36,7 @@ namespace UnuGames.MVVM
 
         public void OnUpdateText(object val)
         {
-            var newText = val == null ? string.Empty : val.ToString();
+            var newText = this.textConverter.Convert(val, this);
 
             if (string.IsNullOrEmpty(this.format))
             {
@@ -44,13 +50,7 @@ namespace UnuGames.MVVM
 
         public void OnUpdateColor(object val)
         {
-            if (val == null)
-                return;
-
-            if (!(val is Color valChange))
-                return;
-
-            this.text.color = valChange;
+            this.text.color = this.colorConverter.Convert(val, this);
         }
     }
 }

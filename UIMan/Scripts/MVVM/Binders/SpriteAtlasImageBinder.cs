@@ -23,6 +23,9 @@ namespace UnuGames.MVVM
         [HideInInspector]
         public BindingField colorField = new BindingField("Color");
 
+        [HideInInspector]
+        public ColorConverter colorConverter = new ColorConverter("Color");
+
         public SpriteAtlas atlas;
         public bool autoCorrectSize;
 
@@ -64,13 +67,7 @@ namespace UnuGames.MVVM
 
         public void OnUpdateColor(object val)
         {
-            if (val == null)
-                return;
-
-            if (!(val is Color valChange))
-                return;
-
-            this.image.color = valChange;
+            this.image.color = this.colorConverter.Convert(val, this);
             SetAlpha();
         }
 
