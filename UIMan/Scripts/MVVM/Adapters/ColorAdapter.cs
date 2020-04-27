@@ -27,7 +27,7 @@ namespace UnuGames.MVVM
                 }
                 else
                 {
-                    UnuLogger.LogError($"Cannot convert {value} to Color.", context);
+                    UnuLogger.LogError($"Cannot convert '{value}' to Color.", context);
                     val = defaultValue;
                 }
             }

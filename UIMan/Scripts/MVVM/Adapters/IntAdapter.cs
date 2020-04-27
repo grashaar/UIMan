@@ -20,7 +20,7 @@ namespace UnuGames.MVVM
             {
                 if (!int.TryParse(value.ToString(), out val))
                 {
-                    UnuLogger.LogError($"Cannot convert {value} to int.", context);
+                    UnuLogger.LogError($"Cannot convert '{value}' to int.", context);
                     val = defaultValue;
                 }
             }

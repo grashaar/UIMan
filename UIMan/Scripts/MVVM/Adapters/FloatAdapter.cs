@@ -25,7 +25,7 @@ namespace UnuGames.MVVM
                 }
                 else
                 {
-                    UnuLogger.LogError($"Cannot convert {value} to float.", context);
+                    UnuLogger.LogError($"Cannot convert '{value}' to float.", context);
                     valFloat = defaultValue;
                 }
             }

@@ -27,7 +27,7 @@ namespace UnuGames.MVVM
                 }
                 else
                 {
-                    UnuLogger.LogError($"Cannot convert {value} to string.", context);
+                    UnuLogger.LogError($"Cannot convert '{value}' to string.", context);
                     val = defaultValue;
                 }
             }

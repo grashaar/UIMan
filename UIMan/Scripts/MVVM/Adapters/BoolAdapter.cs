@@ -20,7 +20,7 @@ namespace UnuGames.MVVM
             {
                 if (!bool.TryParse(value.ToString(), out val))
                 {
-                    UnuLogger.LogError($"Cannot convert {value} to boolean.", context);
+                    UnuLogger.LogError($"Cannot convert '{value}' to boolean.", context);
                     val = defaultValue;
                 }
             }
