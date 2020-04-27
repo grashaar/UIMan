@@ -18,6 +18,8 @@ namespace UnuGames.MVVM
         public string format;
         public float timeChange = 0.25f;
 
+        private float value = 0f;
+
         public override void Initialize(bool forceInit)
         {
             if (!CheckInitialize(forceInit))
@@ -29,7 +31,7 @@ namespace UnuGames.MVVM
 
         public void OnUpdateNumber(object newVal)
         {
-            var oldValue = this.valueConverter.Convert(this.text.text, this);
+            var oldValue = this.value;
             var newValue = this.valueConverter.Convert(newVal, this);
 
             UITweener.Value(this.gameObject, this.timeChange, oldValue, newValue)
@@ -39,6 +41,8 @@ namespace UnuGames.MVVM
 
         private void SetValue(float value)
         {
+            this.value = value;
+
             if (string.IsNullOrEmpty(this.format))
             {
                 this.text.text = value.ToString();
