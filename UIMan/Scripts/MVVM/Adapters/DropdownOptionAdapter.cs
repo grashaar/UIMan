@@ -3,31 +3,33 @@ using UnityEngine.UI;
 
 namespace UnuGames.MVVM
 {
+    using OptionData = Dropdown.OptionData;
+
     [CreateAssetMenu(menuName = "UIMan/Adapters/Dropdown Option Adapter")]
-    public class DropdownOptionAdapter : Adapter<Dropdown.OptionData>
+    public class DropdownOptionAdapter : Adapter<OptionData>
     {
         [SerializeField]
         private bool forceToString = true;
 
-        private static readonly Dropdown.OptionData _defaultValue = new Dropdown.OptionData(string.Empty);
+        private static readonly OptionData _defaultValue = new OptionData(string.Empty);
 
-        public override Dropdown.OptionData Convert(object value, Object context)
+        public override OptionData Convert(object value, Object context)
             => Convert(value, this.forceToString, context);
 
-        public static Dropdown.OptionData Convert(object value, bool forceToString, Object context)
+        public static OptionData Convert(object value, bool forceToString, Object context)
         {
             if (value == null)
                 return _defaultValue;
 
-            if (!(value is Dropdown.OptionData val))
+            if (!(value is OptionData val))
             {
                 if (forceToString)
                 {
-                    val = new Dropdown.OptionData(value.ToString());
+                    val = new OptionData(value.ToString());
                 }
                 else
                 {
-                    UnuLogger.LogError($"Cannot convert '{value}' to string.", context);
+                    UnuLogger.LogError($"Cannot convert '{value}' to {nameof(Dropdown)}.{nameof(OptionData)}", context);
                     val = _defaultValue;
                 }
             }
