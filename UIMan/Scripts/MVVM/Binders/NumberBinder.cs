@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace UnuGames.MVVM
@@ -29,7 +29,7 @@ namespace UnuGames.MVVM
             SubscribeOnChangedEvent(this.valueField, OnUpdateNumber);
         }
 
-        public void OnUpdateNumber(object newVal)
+        private void OnUpdateNumber(object newVal)
         {
             var oldValue = this.value;
             var newValue = this.valueConverter.Convert(newVal, this);

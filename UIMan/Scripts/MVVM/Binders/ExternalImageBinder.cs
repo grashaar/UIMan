@@ -56,7 +56,7 @@ namespace UnuGames.MVVM
             SubscribeOnChangedEvent(this.colorField, OnUpdateColor);
         }
 
-        public void OnUpdateImage(object newImage)
+        private void OnUpdateImage(object newImage)
         {
             var key = newImage == null ? string.Empty : newImage.ToString();
 

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace UnuGames.MVVM
 {
@@ -38,17 +38,17 @@ namespace UnuGames.MVVM
             SubscribeOnChangedEvent(this.blockRaycastsField, OnUpdateInteractable);
         }
 
-        public void OnUpdateAlpha(object val)
+        private void OnUpdateAlpha(object val)
         {
             this.canvasGroup.alpha = this.alphaConverter.Convert(val, this);
         }
 
-        public void OnUpdateInteractable(object val)
+        private void OnUpdateInteractable(object val)
         {
             this.canvasGroup.interactable = this.interactableConverter.Convert(val, this);
         }
 
-        public void OnUpdateBlockRaycasts(object val)
+        private void OnUpdateBlockRaycasts(object val)
         {
             this.canvasGroup.blocksRaycasts = this.interactableConverter.Convert(val, this);
         }

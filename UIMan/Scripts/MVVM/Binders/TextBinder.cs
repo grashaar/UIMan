@@ -34,7 +34,7 @@ namespace UnuGames.MVVM
             SubscribeOnChangedEvent(this.colorField, OnUpdateColor);
         }
 
-        public void OnUpdateText(object val)
+        private void OnUpdateText(object val)
         {
             var newText = this.textConverter.Convert(val, this);
 
@@ -48,7 +48,7 @@ namespace UnuGames.MVVM
             }
         }
 
-        public void OnUpdateColor(object val)
+        private void OnUpdateColor(object val)
         {
             this.text.color = this.colorConverter.Convert(val, this);
         }

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.U2D;
 
@@ -65,13 +65,13 @@ namespace UnuGames.MVVM
             SubscribeOnChangedEvent(this.colorField, OnUpdateColor);
         }
 
-        public void OnUpdateColor(object val)
+        private void OnUpdateColor(object val)
         {
             this.image.color = this.colorConverter.Convert(val, this);
             SetAlpha();
         }
 
-        public void OnUpdateAtlas(object val)
+        private void OnUpdateAtlas(object val)
         {
             var key = val == null ? string.Empty : val.ToString();
 
@@ -86,7 +86,7 @@ namespace UnuGames.MVVM
             }
         }
 
-        public void OnUpdateImage(object val)
+        private void OnUpdateImage(object val)
         {
             this.imageKey = val == null ? string.Empty : val.ToString();
             TryResolveImage();

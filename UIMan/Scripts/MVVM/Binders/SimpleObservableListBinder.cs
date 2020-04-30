@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
@@ -17,8 +17,8 @@ namespace UnuGames.MVVM
         public bool usePoolRectToHide;
         public RectTransform poolRect;
 
-        private IObservaleCollection dataList;
         private MemberInfo sourceMember;
+        private IObservaleCollection dataList;
 
         private readonly Queue<IModule> modulesPool = new Queue<IModule>();
         private readonly List<IModule> modules = new List<IModule>();

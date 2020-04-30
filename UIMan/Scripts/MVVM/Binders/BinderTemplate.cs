@@ -1,4 +1,4 @@
-﻿/** BINDER TEMPLATE
+/** BINDER TEMPLATE
 
 using UnityEngine;
 
@@ -22,7 +22,7 @@ namespace UnuGames.MVVM
             SubscribeOnChangedEvent(this.value, OnUpdateValue);
         }
 
-        public void OnUpdateValue(object newValue)
+        private void OnUpdateValue(object newValue)
         {
             if (newValue == null)
             {

@@ -55,13 +55,13 @@ namespace UnuGames.MVVM
             SubscribeOnChangedEvent(this.colorField, OnUpdateColor);
         }
 
-        public void OnUpdateColor(object val)
+        private void OnUpdateColor(object val)
         {
             this.image.color = this.colorConverter.Convert(val, this);
             SetAlpha();
         }
 
-        public void OnUpdateImage(object newImage)
+        private void OnUpdateImage(object newImage)
         {
             var key = newImage == null ? string.Empty : newImage.ToString();
 

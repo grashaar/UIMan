@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,7 +23,7 @@ namespace UnuGames.MVVM
             SubscribeOnChangedEvent(this.valueField, OnUpdateValue);
         }
 
-        public void OnUpdateValue(object val)
+        private void OnUpdateValue(object val)
         {
             var valChange = this.valueConverter.Convert(val, this);
 

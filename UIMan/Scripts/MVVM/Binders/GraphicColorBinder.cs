@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace UnuGames.MVVM
@@ -24,7 +24,7 @@ namespace UnuGames.MVVM
             SubscribeOnChangedEvent(this.valueField, OnUpdateColor);
         }
 
-        public void OnUpdateColor(object val)
+        private void OnUpdateColor(object val)
         {
             this.graphic.color = this.valueConverter.Convert(val, this);
         }
