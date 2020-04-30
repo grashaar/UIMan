@@ -45,7 +45,7 @@ This is an [example](https://github.com/grashaar/uiman-examples/blob/master/Asse
 * Update `InputFieldBinder` with two-way binding
 
 ### 1.2.0
-* Support data coversation via `Adapter<T>` and `Converter<TValue, TAdapter>`
+* Support data coversion via `Adapter<T>` and `Converter<TValue, TAdapter>`
 * Implement `BoolAdapter`, `IntAdapter`, `FloatAdapter`, `StringAdapter`, `ColorAdapter`
 * Implement `BoolConverter`, `IntConverter`, `FloatConverter`, `StringConverter`, `ColorConverter`
 * All binders are now using converters for their binding values
