@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace UnuGames.MVVM
@@ -13,9 +13,10 @@ namespace UnuGames.MVVM
         public BindingField valueField = new BindingField("Text");
 
         [HideInInspector]
-        public StringConverter valueConverter = new StringConverter("Text");
+        public TwoWayBinding onValueChanged = new TwoWayBinding("On Value Changed");
 
-        private string oldText = "";
+        [HideInInspector]
+        public StringConverter valueConverter = new StringConverter("Text");
 
         public override void Initialize(bool forceInit)
         {
@@ -24,25 +25,29 @@ namespace UnuGames.MVVM
 
             this.input = GetComponent<InputField>();
 
-            SubscribeOnChangedEvent(this.valueField, OnUpdateText);
+            SubscribeOnChangedEvent(this.valueField, OnUpdateValue);
+
+            OnValueChanged_OnChanged(this.onValueChanged);
+            this.onValueChanged.onChanged += OnValueChanged_OnChanged;
         }
 
-        public void OnUpdateText(object newText)
+        private void OnUpdateValue(object val)
         {
-            var text = this.valueConverter.Convert(newText, this);
-            this.input.text = text;
+            var value = this.valueConverter.Convert(val, this);
+            this.input.SetTextWithoutNotify(value);
         }
 
-        private void Update()
+        private void OnValueChanged(string value)
         {
-            if (!string.Equals(this.input.text, this.oldText))
-            {
-                this.oldText = this.input.text;
-                this.oldText.Replace("\t", string.Empty);
-                this.input.text = this.oldText;
+            SetValue(this.valueField.member, value);
+        }
 
-                SetValue(this.valueField.member, this.oldText);
-            }
+        private void OnValueChanged_OnChanged(bool value)
+        {
+            this.input.onValueChanged.RemoveListener(OnValueChanged);
+
+            if (value)
+                this.input.onValueChanged.AddListener(OnValueChanged);
         }
     }
 }
