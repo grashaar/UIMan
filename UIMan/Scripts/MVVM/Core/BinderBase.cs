@@ -228,6 +228,38 @@ namespace UnuGames.MVVM
             return this.converters;
         }
 
+        private TwoWayBinding[] twoWayBindings;
+
+        public TwoWayBinding[] GetTwoWayBindings()
+        {
+#if !UNITY_EDITOR
+            if (this.twoWayBindings != null)
+                return  this.twoWayBindings;
+#endif
+
+            var listTwoWayBinding = new List<TwoWayBinding>();
+            MemberInfo[] members = this.Type.GetMembers();
+            var twoWayBindingType = typeof(TwoWayBinding);
+
+            for (var i = 0; i < members.Length; i++)
+            {
+                MemberInfo memberInfo = members[i];
+
+                if (memberInfo.MemberType == MemberTypes.Field)
+                {
+                    var fieldInfo = memberInfo as FieldInfo;
+
+                    if (fieldInfo.FieldType == twoWayBindingType)
+                    {
+                        listTwoWayBinding.Add(fieldInfo.GetValue(this) as TwoWayBinding);
+                    }
+                }
+            }
+
+            this.twoWayBindings = listTwoWayBinding.ToArray();
+            return this.twoWayBindings;
+        }
+
         protected bool CheckInitialize(bool forceInitialize)
         {
             if (!Application.isPlaying)

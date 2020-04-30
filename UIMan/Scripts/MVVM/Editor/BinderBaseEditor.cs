@@ -60,17 +60,32 @@ namespace UnuGames.MVVM
 
             GUILayout.Space(4);
 
-            BindingField[] arrFields = this.binder.GetBindingFields();
+            BindingField[] arrBindingFields = this.binder.GetBindingFields();
             Converter[] arrConverters = this.binder.GetConverters();
+            TwoWayBinding[] arrTwoWayBindings = this.binder.GetTwoWayBindings();
 
-            if (arrFields.Length > 0)
+            if (arrBindingFields.Length > 0)
             {
                 EditorGUILayout.LabelField("Binders", EditorStyles.boldLabel);
                 GUILayout.BeginVertical();
 
-                for (var i = 0; i < arrFields.Length; i++)
+                for (var i = 0; i < arrBindingFields.Length; i++)
                 {
-                    DrawBindingField(arrFields[i]);
+                    DrawBindingField(arrBindingFields[i]);
+                }
+
+                GUILayout.EndVertical();
+                GUILayout.Space(4);
+            }
+
+            if (arrTwoWayBindings.Length > 0)
+            {
+                EditorGUILayout.LabelField("Two-way Bindings", EditorStyles.boldLabel);
+                GUILayout.BeginVertical();
+
+                for (var i = 0; i < arrTwoWayBindings.Length; i++)
+                {
+                    DrawTwoWayBinding(arrTwoWayBindings[i]);
                 }
 
                 GUILayout.EndVertical();
@@ -116,6 +131,28 @@ namespace UnuGames.MVVM
             {
                 Undo.RecordObject(this.target, "Set Adapter");
                 converter.SetAdapter(adapter);
+                Apply();
+            }
+
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+        }
+
+        public void DrawTwoWayBinding(TwoWayBinding twoWayBinding)
+        {
+            GUILayout.BeginVertical();
+            GUILayout.BeginHorizontal();
+
+            EditorGUILayout.PrefixLabel(new GUIContent(twoWayBinding.label));
+
+            EditorGUI.BeginChangeCheck();
+            var value = EditorGUILayout.Toggle(twoWayBinding.value);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(this.target, "Set Two-way Binding");
+                twoWayBinding.value = value;
+
                 Apply();
             }
 
