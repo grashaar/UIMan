@@ -1,13 +1,11 @@
 ﻿using System;
+using System.Collections;
 
 namespace UnuGames.MVVM
 {
-    public interface IObservaleCollection
+    public interface IObservaleCollection : IEnumerable
     {
-        int Count
-        {
-            get;
-        }
+        int Count { get; }
 
         int IndexOf(object item);
 

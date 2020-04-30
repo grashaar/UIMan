@@ -6,7 +6,7 @@ using UnityEngine;
 namespace UnuGames.MVVM
 {
     [Serializable]
-    public class ObservableList<T> : IList<T>, IEnumerable<T>, IEnumerable, IObservaleCollection
+    public class ObservableList<T> : IObservaleList<T>
     {
         [SerializeField]
         private List<T> list = new List<T>();
