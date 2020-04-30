@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,29 +9,38 @@ namespace UnuGames.MVVM
     [DisallowMultipleComponent]
     public class ObservableListBinder : BinderBase
     {
-        public struct Cell
+        private readonly struct Cell
         {
-            public int column;
-            public int row;
+            public readonly int row;
+            public readonly int column;
+
+            public Cell(int row, int column)
+            {
+                this.row = row;
+                this.column = column;
+            }
 
             public override string ToString()
             {
                 return string.Format("({0},{1})", this.column, this.row);
             }
 
-            public static bool operator !=(Cell c1, Cell c2)
+            public static bool operator !=(in Cell c1, in Cell c2)
             {
                 return (c1.column != c2.column || c1.row != c2.row);
             }
 
-            public static bool operator ==(Cell c1, Cell c2)
+            public static bool operator ==(in Cell c1, in Cell c2)
             {
                 return (c1.column == c2.column && c1.row == c2.row);
             }
 
             public override bool Equals(object obj)
             {
-                return base.Equals(obj);
+                if (obj is Cell other)
+                    return this == other;
+
+                return false;
             }
 
             public override int GetHashCode()
@@ -234,17 +243,14 @@ namespace UnuGames.MVVM
                 rowRange = new Vector2(rectBounds.x, rectBounds.y);
             }
 
-            for (var i = (int)colRange.x; i < colRange.y; i++)
+            for (var col = (int)colRange.x; col < colRange.y; col++)
             {
-                for (var j = (int)rowRange.x; j < rowRange.y; j++)
+                for (var row = (int)rowRange.x; row < rowRange.y; row++)
                 {
-                    if (i < 0 || j < 0)
+                    if (col < 0 || row < 0)
                         continue;
 
-                    var cell = new Cell() {
-                        column = i,
-                        row = j
-                    };
+                    var cell = new Cell(row, col);
 
                     if (!this.activeCells.ContainsKey(cell) && IsVisible(cell, rectBounds) && this.dataDict.ContainsKey(cell))
                     {
@@ -308,27 +314,26 @@ namespace UnuGames.MVVM
 
         private Cell GetCellByIndex(int targetIndex)
         {
-            var cell = new Cell();
+            Cell cell = default;
+
             var index = 0;
             var pageCount = Mathf.CeilToInt(this.orgDataList.Count / (this.grouping.x * this.grouping.y));
 
             for (var page = 0; page < pageCount; page++)
             {
-                for (var i = 0; i < this.grouping.y; i++)
+                for (var row = 0; row < this.grouping.y; row++)
                 {
-                    for (var j = 0; j < this.grouping.x; j++)
+                    for (var col = 0; col < this.grouping.x; col++)
                     {
                         if (index == targetIndex)
                         {
                             if (this.scrollRect.horizontal)
                             {
-                                cell.row = i;
-                                cell.column = page * (int)this.grouping.x + j;
+                                cell = new Cell(row, page * (int)this.grouping.x + col);
                             }
                             else if (this.scrollRect.vertical)
                             {
-                                cell.row = page * (int)this.grouping.y + i;
-                                cell.column = j;
+                                cell = new Cell(page * (int)this.grouping.y + row, col);
                             }
 
                             return cell;
@@ -342,7 +347,7 @@ namespace UnuGames.MVVM
             return cell;
         }
 
-        private Vector2 GetPositionByCell(Cell cell)
+        private Vector2 GetPositionByCell(in Cell cell)
         {
             Vector2 position = Vector2.zero;
             position.x = this.contentWidth * cell.column + cell.column * this.contentSpacing.x + this.padding.x;
@@ -351,7 +356,7 @@ namespace UnuGames.MVVM
             return position;
         }
 
-        private bool IsVisible(Cell cell, Vector2? rectBounds = null)
+        private bool IsVisible(in Cell cell, Vector2? rectBounds = null)
         {
             if (!rectBounds.HasValue)
                 rectBounds = GetScrollRectBounds();
@@ -370,7 +375,7 @@ namespace UnuGames.MVVM
         {
             for (var i = index; i < this.orgDataList.Count; i++)
             {
-                Cell cell = GetCellByIndex(i);
+                var cell = GetCellByIndex(i);
 
                 if (this.dataDict.ContainsKey(cell))
                     this.dataDict[cell] = this.orgDataList[i];
@@ -424,7 +429,7 @@ namespace UnuGames.MVVM
 
         private void HandleOnRemoveAt(int index)
         {
-            Cell cell = GetCellByIndex(this.orgDataList.Count - 1);
+            var cell = GetCellByIndex(this.orgDataList.Count - 1);
 
             if (this.activeCells.ContainsKey(cell))
             {
@@ -447,7 +452,8 @@ namespace UnuGames.MVVM
         {
             this.orgDataList.Add(obj);
             RecalculateBounds();
-            Cell cell = GetCellByIndex(this.orgDataList.Count - 1);
+
+            var cell = GetCellByIndex(this.orgDataList.Count - 1);
 
             if (IsVisible(cell))
             {
@@ -473,7 +479,8 @@ namespace UnuGames.MVVM
         {
             this.listModules[index].OriginalData = obj;
             this.orgDataList[index] = obj;
-            Cell cell = GetCellByIndex(index);
+
+            var cell = GetCellByIndex(index);
             this.dataDict[cell] = obj;
         }
 
@@ -496,11 +503,17 @@ namespace UnuGames.MVVM
         public ViewModelBehaviour GetItem(int index)
         {
             Cell cell = GetCellByIndex(index);
-            return GetItem(cell);
+
+            if (this.activeCells.ContainsKey(cell))
+                return this.activeCells[cell].ViewModel;
+
+            return null;
         }
 
-        public ViewModelBehaviour GetItem(Cell cell)
+        public ViewModelBehaviour GetItem(int row, int column)
         {
+            var cell = new Cell(row, column);
+
             if (this.activeCells.ContainsKey(cell))
                 return this.activeCells[cell].ViewModel;
 
