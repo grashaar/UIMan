@@ -1,5 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
+
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
 
 namespace UnuGames
 {
@@ -15,6 +20,9 @@ namespace UnuGames
             Top, Bottom
         }
 
+        [SerializeField, HideInInspector]
+        private RectTransform rectTransform = null;
+
         [SerializeField]
         private RectTransform foreground = null;
 
@@ -24,54 +32,64 @@ namespace UnuGames
         [SerializeField, HideInInspector]
         private Image foregroundImage = null;
 
-        [Space]
-        [SerializeField]
-        private RectTransform horizontalThumb = null;
-
-        [SerializeField]
-        private HorizontalOrigins horizontalThumbOrigin = HorizontalOrigins.Left;
-
-        [Space]
-        [SerializeField]
-        private RectTransform verticalThumb = null;
-
-        [SerializeField]
-        private VerticalOrigins verticalThumbOrigin = VerticalOrigins.Top;
-
-        [Space]
-        [SerializeField]
-        private bool autoMaxWidth = true;
-
-        [SerializeField]
-        private float maxWidth = 0;
-
+        [Header("Progress")]
         [SerializeField]
         [Range(0, 1)]
         private float value = 0;
 
-        public HorizontalOrigins HorizontalThumbOrigin
-        {
-            get { return this.horizontalThumbOrigin; }
-            set { this.horizontalThumbOrigin = value; }
-        }
+        [Space]
+        [Header("Horizonal")]
+#if ODIN_INSPECTOR
+        [LabelText("Enable")]
+#endif
+        [SerializeField]
+        private bool horizontal = true;
 
-        public VerticalOrigins VerticalThumbOrigin
-        {
-            get { return this.verticalThumbOrigin; }
-            set { this.verticalThumbOrigin = value; }
-        }
+#if ODIN_INSPECTOR
+        [LabelText("Thumb")]
+#endif
+        [SerializeField]
+        private RectTransform horizontalThumb = null;
 
-        public bool AutoMaxWidth
-        {
-            get { return this.autoMaxWidth; }
-            set { this.autoMaxWidth = value; }
-        }
+#if ODIN_INSPECTOR
+        [LabelText("Origin")]
+#endif
+        [SerializeField]
+        private HorizontalOrigins horizontalThumbOrigin = HorizontalOrigins.Left;
 
-        public float MaxWidth
-        {
-            get { return this.maxWidth; }
-            set { this.maxWidth = value; }
-        }
+        [FormerlySerializedAs("autoMaxWidth")]
+        [SerializeField]
+        private bool autoWidth = true;
+
+        [FormerlySerializedAs("maxWidth")]
+        [SerializeField]
+        private float width = 0;
+
+        [Space]
+        [Header("Vertical")]
+#if ODIN_INSPECTOR
+        [LabelText("Enable")]
+#endif
+        [SerializeField]
+        private bool vertical = true;
+
+#if ODIN_INSPECTOR
+        [LabelText("Thumb")]
+#endif
+        [SerializeField]
+        private RectTransform verticalThumb = null;
+
+#if ODIN_INSPECTOR
+        [LabelText("Origin")]
+#endif
+        [SerializeField]
+        private VerticalOrigins verticalThumbOrigin = VerticalOrigins.Top;
+
+        [SerializeField]
+        private bool autoHeight = true;
+
+        [SerializeField]
+        private float height = 0;
 
         public float Value
         {
@@ -84,13 +102,76 @@ namespace UnuGames
             }
         }
 
+        public bool Horizontal
+        {
+            get { return this.horizontal; }
+            set { this.horizontal = value; }
+        }
+
+        public HorizontalOrigins HorizontalThumbOrigin
+        {
+            get { return this.horizontalThumbOrigin; }
+            set { this.horizontalThumbOrigin = value; }
+        }
+
+        public bool AutoWidth
+        {
+            get { return this.autoWidth; }
+            set { this.autoWidth = value; UpdateAutoWidth(); }
+        }
+
+        public float Width
+        {
+            get { return this.width; }
+            set { this.width = value; UpdateAutoWidth(); }
+        }
+
+        public bool Vertical
+        {
+            get { return this.vertical; }
+            set { this.vertical = value; }
+        }
+
+        public VerticalOrigins VerticalThumbOrigin
+        {
+            get { return this.verticalThumbOrigin; }
+            set { this.verticalThumbOrigin = value; }
+        }
+
+        public bool AutoHeight
+        {
+            get { return this.autoHeight; }
+            set { this.autoHeight = value; UpdateAutoHeight(); }
+        }
+
+        public float Height
+        {
+            get { return this.Height; }
+            set { this.Height = value; UpdateAutoHeight(); }
+        }
+
         private void Awake()
         {
+            if (!this.rectTransform)
+                this.rectTransform = GetComponent<RectTransform>();
+
             if (this.foreground)
                 this.foregroundImage = this.foreground.GetComponent<Image>();
 
-            if (this.autoMaxWidth)
-                this.maxWidth = GetComponent<RectTransform>().rect.width;
+            UpdateAutoWidth();
+            UpdateAutoHeight();
+        }
+
+        private void UpdateAutoWidth()
+        {
+            if (this.autoWidth)
+                this.width = this.rectTransform.rect.width;
+        }
+
+        private void UpdateAutoHeight()
+        {
+            if (this.autoHeight)
+                this.height = this.rectTransform.rect.height;
         }
 
         private void UpdateVisual()
@@ -109,19 +190,29 @@ namespace UnuGames
                 this.foregroundImage)
             {
                 this.foregroundImage.fillAmount = this.value;
+                return;
             }
-            else
+
+            var newRect = this.foreground.sizeDelta;
+
+            if (this.horizontal)
             {
-                var newWidth = this.value * this.maxWidth;
-                var newRect = this.foreground.sizeDelta;
+                var newWidth = this.value * this.width;
                 newRect.x = newWidth;
-                this.foreground.sizeDelta = newRect;
             }
+
+            if (this.vertical)
+            {
+                var newHeight = this.value * this.height;
+                newRect.y = newHeight;
+            }
+
+            this.foreground.sizeDelta = newRect;
         }
 
         private void UpdateHorizontalThumb()
         {
-            if (!this.horizontalThumb)
+            if (!this.horizontal || !this.horizontalThumb)
                 return;
 
             if (this.horizontalThumbOrigin == HorizontalOrigins.Left)
@@ -139,7 +230,7 @@ namespace UnuGames
 
             var newPos = this.horizontalThumb.anchoredPosition;
             var halfWidth = this.horizontalThumb.rect.width / 2f;
-            var newValue = this.value * this.maxWidth - halfWidth;
+            var newValue = this.value * this.width - halfWidth;
             newPos.x = this.horizontalThumbOrigin == HorizontalOrigins.Left ? newValue : -newValue;
 
             this.horizontalThumb.anchoredPosition = newPos;
@@ -147,7 +238,7 @@ namespace UnuGames
 
         private void UpdateVerticalThumb()
         {
-            if (!this.verticalThumb)
+            if (!this.vertical || !this.verticalThumb)
                 return;
 
             if (this.verticalThumbOrigin == VerticalOrigins.Top)
@@ -164,8 +255,8 @@ namespace UnuGames
             }
 
             var newPos = this.verticalThumb.anchoredPosition;
-            var halfWidth = this.verticalThumb.rect.height / 2f;
-            var newValue = this.value * this.maxWidth - halfWidth;
+            var halfHeight = this.verticalThumb.rect.height / 2f;
+            var newValue = this.value * this.height - halfHeight;
             newPos.y = this.verticalThumbOrigin == VerticalOrigins.Bottom ? newValue : -newValue;
 
             this.verticalThumb.anchoredPosition = newPos;
@@ -175,11 +266,13 @@ namespace UnuGames
 
         private void OnValidate()
         {
+            this.rectTransform = GetComponent<RectTransform>();
+
             if (this.foreground)
                 this.foregroundImage = this.foreground.GetComponent<Image>();
 
-            if (this.autoMaxWidth)
-                this.maxWidth = GetComponent<RectTransform>().rect.width;
+            UpdateAutoWidth();
+            UpdateAutoHeight();
 
             UpdateVisual();
         }
