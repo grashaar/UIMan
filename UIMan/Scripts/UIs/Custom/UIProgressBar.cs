@@ -146,8 +146,8 @@ namespace UnuGames
 
         public float Height
         {
-            get { return this.Height; }
-            set { this.Height = value; UpdateAutoHeight(); }
+            get { return this.height; }
+            set { this.height = value; UpdateAutoHeight(); }
         }
 
         private void Awake()
