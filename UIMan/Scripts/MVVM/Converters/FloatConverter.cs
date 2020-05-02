@@ -7,7 +7,7 @@ namespace UnuGames.MVVM
     {
         public FloatConverter(string label) : base(label) { }
 
-        protected override float ConvertNoAdapter(object value, UnityEngine.Object context)
+        protected override float ConvertWithoutAdapter(object value, UnityEngine.Object context)
             => FloatAdapter.Convert(value, 0f, context);
     }
 }

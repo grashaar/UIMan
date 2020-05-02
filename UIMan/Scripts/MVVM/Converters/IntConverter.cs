@@ -7,7 +7,7 @@ namespace UnuGames.MVVM
     {
         public IntConverter(string label) : base(label) { }
 
-        protected override int ConvertNoAdapter(object value, UnityEngine.Object context)
+        protected override int ConvertWithoutAdapter(object value, UnityEngine.Object context)
             => IntAdapter.Convert(value, 0, context);
     }
 }

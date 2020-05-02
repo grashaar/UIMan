@@ -8,7 +8,7 @@ namespace UnuGames.MVVM
     {
         public DropdownOptionConverter(string label) : base(label) { }
 
-        protected override Dropdown.OptionData ConvertNoAdapter(object value, UnityEngine.Object context)
+        protected override Dropdown.OptionData ConvertWithoutAdapter(object value, UnityEngine.Object context)
             => DropdownOptionAdapter.Convert(value, true, context);
     }
 }

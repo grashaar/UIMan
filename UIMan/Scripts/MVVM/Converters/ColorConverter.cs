@@ -8,7 +8,7 @@ namespace UnuGames.MVVM
     {
         public ColorConverter(string label) : base(label) { }
 
-        protected override Color ConvertNoAdapter(object value, UnityEngine.Object context)
+        protected override Color ConvertWithoutAdapter(object value, UnityEngine.Object context)
             => ColorAdapter.Convert(value, Color.white, true, context);
     }
 }
