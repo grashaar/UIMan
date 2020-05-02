@@ -143,10 +143,6 @@ namespace UnuGames.MVVM
 
                 color.a = this.noSpriteAlpha;
             }
-            else
-            {
-                color.a = 1f;
-            }
 
             this.image.color = color;
         }
