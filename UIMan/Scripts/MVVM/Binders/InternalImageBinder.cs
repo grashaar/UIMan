@@ -46,6 +46,7 @@ namespace UnuGames.MVVM
         [ShowIf("useNoSpriteColor")]
 #endif
         public Color noSpriteColor = Color.white;
+        private float alpha = 1f;
 
         public override void Initialize(bool forceInit)
         {
@@ -60,7 +61,10 @@ namespace UnuGames.MVVM
 
         private void OnUpdateColor(object val)
         {
-            this.image.color = this.colorConverter.Convert(val, this);
+            var color = this.colorConverter.Convert(val, this);
+            this.image.color = color;
+            this.alpha = color.a;
+
             SetColor();
         }
 
@@ -107,6 +111,10 @@ namespace UnuGames.MVVM
                     color = this.noSpriteColor;
 
                 color.a = this.noSpriteAlpha;
+            }
+            else
+            {
+                color.a = this.alpha;
             }
 
             this.image.color = color;
