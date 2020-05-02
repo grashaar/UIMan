@@ -15,7 +15,15 @@ namespace UnuGames.MVVM
 
         public Converter(string label) : base(label) { }
 
-        public abstract TValue Convert(object value, UnityEngine.Object context);
+        public TValue Convert(object value, UnityEngine.Object context)
+        {
+            if (this.m_adapter)
+                return this.m_adapter.Convert(value, context);
+
+            return ConvertNoAdapter(value, context);
+        }
+
+        protected abstract TValue ConvertNoAdapter(object value, UnityEngine.Object context);
 
         public sealed override Adapter GetAdapter()
             => this.m_adapter;

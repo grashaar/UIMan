@@ -7,7 +7,7 @@ namespace UnuGames.MVVM
     {
         public BoolConverter(string label) : base(label) { }
 
-        public override bool Convert(object value, UnityEngine.Object context)
+        protected override bool ConvertNoAdapter(object value, UnityEngine.Object context)
             => BoolAdapter.Convert(value, false, context);
     }
 }
