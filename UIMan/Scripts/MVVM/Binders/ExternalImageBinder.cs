@@ -20,6 +20,9 @@ namespace UnuGames.MVVM
         public BindingField colorField = new BindingField("Color");
 
         [HideInInspector]
+        public StringConverter imageConverter = new StringConverter("Image");
+
+        [HideInInspector]
         public ColorConverter colorConverter = new ColorConverter("Color");
 
         public string resourcePath = "/Images/";
@@ -56,19 +59,19 @@ namespace UnuGames.MVVM
             SubscribeOnChangedEvent(this.colorField, OnUpdateColor);
         }
 
-        private void OnUpdateImage(object newImage)
+        private void OnUpdateImage(object val)
         {
-            var key = newImage == null ? string.Empty : newImage.ToString();
+            var key = this.imageConverter.Convert(val, this);
 
             if (string.IsNullOrEmpty(key))
             {
                 this.image.sprite = null;
-                SetAlpha();
+                SetColor();
             }
             else
             {
-                ExternalImageLoader.Instance.Load("file:///" + Application.persistentDataPath +
-                                                  this.resourcePath + newImage.ToString(),
+                ExternalImageLoader.Instance.Load(string.Format("file:///{0}{1}{2}" + Application.persistentDataPath,
+                                                  this.resourcePath, key),
                                                   OnLoadComplete);
             }
         }
@@ -80,16 +83,16 @@ namespace UnuGames.MVVM
             if (sprite && this.autoCorrectSize)
                 this.image.SetNativeSize();
 
-            SetAlpha();
+            SetColor();
         }
 
         public void OnUpdateColor(object val)
         {
             this.image.color = this.colorConverter.Convert(val, this);
-            SetAlpha();
+            SetColor();
         }
 
-        private void SetAlpha()
+        private void SetColor()
         {
             var color = this.image.color;
 

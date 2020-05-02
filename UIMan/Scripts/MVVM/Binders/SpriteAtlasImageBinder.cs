@@ -24,6 +24,12 @@ namespace UnuGames.MVVM
         public BindingField colorField = new BindingField("Color");
 
         [HideInInspector]
+        public StringConverter atlasConverter = new StringConverter("Atlas");
+
+        [HideInInspector]
+        public StringConverter imageConverter = new StringConverter("Image");
+
+        [HideInInspector]
         public ColorConverter colorConverter = new ColorConverter("Color");
 
         public SpriteAtlas atlas;
@@ -68,12 +74,12 @@ namespace UnuGames.MVVM
         private void OnUpdateColor(object val)
         {
             this.image.color = this.colorConverter.Convert(val, this);
-            SetAlpha();
+            SetColor();
         }
 
         private void OnUpdateAtlas(object val)
         {
-            var key = val == null ? string.Empty : val.ToString();
+            var key = this.atlasConverter.Convert(val, this);
 
             if (string.IsNullOrEmpty(key))
             {
@@ -88,7 +94,7 @@ namespace UnuGames.MVVM
 
         private void OnUpdateImage(object val)
         {
-            this.imageKey = val == null ? string.Empty : val.ToString();
+            this.imageKey = this.imageConverter.Convert(val, this);
             TryResolveImage();
         }
 
@@ -123,10 +129,10 @@ namespace UnuGames.MVVM
                 this.image.SetNativeSize();
             }
 
-            SetAlpha();
+            SetColor();
         }
 
-        private void SetAlpha()
+        private void SetColor()
         {
             var color = this.image.color;
 

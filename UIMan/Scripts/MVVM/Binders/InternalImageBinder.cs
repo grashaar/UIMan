@@ -20,6 +20,9 @@ namespace UnuGames.MVVM
         public BindingField colorField = new BindingField("Color");
 
         [HideInInspector]
+        public StringConverter imageConverter = new StringConverter("Image");
+
+        [HideInInspector]
         public ColorConverter colorConverter = new ColorConverter("Color");
 
         public bool autoCorrectSize;
@@ -58,17 +61,17 @@ namespace UnuGames.MVVM
         private void OnUpdateColor(object val)
         {
             this.image.color = this.colorConverter.Convert(val, this);
-            SetAlpha();
+            SetColor();
         }
 
-        private void OnUpdateImage(object newImage)
+        private void OnUpdateImage(object val)
         {
-            var key = newImage == null ? string.Empty : newImage.ToString();
+            var key = this.imageConverter.Convert(val, this);
 
             if (string.IsNullOrEmpty(key))
             {
                 this.image.sprite = null;
-                SetAlpha();
+                SetColor();
             }
             else
             {
@@ -91,10 +94,10 @@ namespace UnuGames.MVVM
                 this.image.sprite = null;
             }
 
-            SetAlpha();
+            SetColor();
         }
 
-        private void SetAlpha()
+        private void SetColor()
         {
             var color = this.image.color;
 
