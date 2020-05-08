@@ -30,7 +30,8 @@ namespace UnuGames.MVVM
             {
                 for (var i = 0; i < this.activeOnTrue.Count; i++)
                 {
-                    this.activeOnTrue[i].SetActive(valChange);
+                    if (this.activeOnTrue[i])
+                        this.activeOnTrue[i].SetActive(valChange);
                 }
             }
 
@@ -38,7 +39,8 @@ namespace UnuGames.MVVM
             {
                 for (var i = 0; i < this.inactiveOnTrue.Count; i++)
                 {
-                    this.inactiveOnTrue[i].SetActive(!valChange);
+                    if (this.inactiveOnTrue[i])
+                        this.inactiveOnTrue[i].SetActive(!valChange);
                 }
             }
         }

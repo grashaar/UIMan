@@ -31,7 +31,8 @@ namespace UnuGames.MVVM
             {
                 for (var i = 0; i < this.enableOnTrue.Count; i++)
                 {
-                    this.enableOnTrue[i].interactable = valChange;
+                    if (this.enableOnTrue[i])
+                        this.enableOnTrue[i].interactable = valChange;
                 }
             }
 
@@ -39,7 +40,8 @@ namespace UnuGames.MVVM
             {
                 for (var i = 0; i < this.disableOnTrue.Count; i++)
                 {
-                    this.disableOnTrue[i].interactable = !valChange;
+                    if (this.disableOnTrue[i])
+                        this.disableOnTrue[i].interactable = !valChange;
                 }
             }
         }
