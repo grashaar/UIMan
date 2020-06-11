@@ -17,10 +17,11 @@ namespace UnuGames
     {
         private readonly GUIContent animator = new GUIContent("Animator", "Animator component to do custom animation");
         private readonly GUIContent show = new GUIContent("Show", "Animation to do when UI is show");
+        private readonly GUIContent showTime = new GUIContent("Time", "Total time to do built-in or custom script animation");
         private readonly GUIContent hide = new GUIContent("Hide", "Animation to do when UI is hide");
+        private readonly GUIContent hideTime = new GUIContent("Time", "Total time to do built-in or custom script animation");
         private readonly GUIContent idle = new GUIContent("Idle", "Animation to do when UI is idle");
-        private readonly GUIContent time = new GUIContent("Time", "Total time to do built-in or custom script animation");
-        private readonly GUIContent position = new GUIContent("Position", "Target position to show UI");
+        private readonly GUIContent position = new GUIContent("Show Position", "Target position to show UI");
         private readonly GUIContent cover = new GUIContent("Use Cover", "Show gray cover after dialog to prevent click behind elements");
         private readonly GUIContent background = new GUIContent("Use Background", "Setting background image behine your screen elements");
 
@@ -78,13 +79,32 @@ namespace UnuGames
                 }
             }
 
-            uiManBase.motionShow = (UIMotion)EditorGUILayout.EnumPopup(this.show, uiManBase.motionShow);
-            uiManBase.motionHide = (UIMotion)EditorGUILayout.EnumPopup(this.hide, uiManBase.motionHide);
-            uiManBase.motionIdle = (UIMotion)EditorGUILayout.EnumPopup(this.idle, uiManBase.motionIdle);
+            EditorGUILayout.Space();
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(this.show, GUILayout.MaxWidth(50f));
+            uiManBase.motionShow = (UIMotion)EditorGUILayout.EnumPopup(uiManBase.motionShow);
+            GUILayout.Space(25f);
+            EditorGUILayout.LabelField(this.showTime, GUILayout.MaxWidth(50f));
+            uiManBase.animShowTime = EditorGUILayout.FloatField(uiManBase.animShowTime);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(this.hide, GUILayout.MaxWidth(50f));
+            uiManBase.motionHide = (UIMotion)EditorGUILayout.EnumPopup(uiManBase.motionHide);
+            GUILayout.Space(25f);
+            EditorGUILayout.LabelField(this.hideTime, GUILayout.MaxWidth(50f));
+            uiManBase.animHideTime = EditorGUILayout.FloatField(uiManBase.animHideTime);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(this.idle, GUILayout.MaxWidth(50f));
+            uiManBase.motionIdle = (UIMotion)EditorGUILayout.EnumPopup(uiManBase.motionIdle);
+            EditorGUILayout.EndHorizontal();
 
             var motions = new UIMotion[3] { uiManBase.motionShow, uiManBase.motionHide, uiManBase.motionIdle };
             var haveMecanimAnim = false;
             var haveTweenAnim = false;
+
             foreach (UIMotion m in motions)
             {
                 if ((int)m == 7)
@@ -92,6 +112,9 @@ namespace UnuGames
                 else
                     haveTweenAnim = true;
             }
+
+            EditorGUILayout.Space();
+
             if (haveTweenAnim && haveMecanimAnim)
             {
                 GUILayout.BeginHorizontal("Box");
@@ -106,9 +129,9 @@ namespace UnuGames
                 GUILayout.EndHorizontal();
             }
 
-            uiManBase.animTime = EditorGUILayout.FloatField(this.time, uiManBase.animTime);
             uiManBase.showPosition = EditorGUILayout.Vector3Field(this.position, uiManBase.showPosition);
 
+            GUILayout.Space(2f);
             GUILayout.EndVertical();
             LineHelper.Draw(Color.gray);
 

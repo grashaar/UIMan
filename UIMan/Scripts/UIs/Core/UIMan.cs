@@ -728,10 +728,10 @@ namespace UnuGames
                 // Tween position
                 if (ui.motionShow != UIMotion.None)
                 {
-                    UITweener.Move(ui.gameObject, ui.animTime, ui.showPosition);
+                    UITweener.Move(ui.gameObject, ui.animShowTime, ui.showPosition);
                 }
 
-                UITweener.Alpha(ui.gameObject, ui.animTime, 0f, 1f).SetOnComplete(() => {
+                UITweener.Alpha(ui.gameObject, ui.animShowTime, 0f, 1f).SetOnComplete(() => {
                     ui.OnShowComplete();
                     OnShowUIComplete(ui);
 
@@ -773,10 +773,10 @@ namespace UnuGames
                 // Tween position
                 if (ui.motionHide != UIMotion.None)
                 {
-                    UITweener.Move(ui.gameObject, ui.animTime, hidePos);
+                    UITweener.Move(ui.gameObject, ui.animHideTime, hidePos);
                 }
 
-                UITweener.Alpha(ui.gameObject, ui.animTime, 1f, 0f).SetOnComplete(() => {
+                UITweener.Alpha(ui.gameObject, ui.animHideTime, 1f, 0f).SetOnComplete(() => {
                     ui.RectTransform.anchoredPosition3D = hidePos;
                     ui.OnHideComplete();
                     OnHideUIComplete(ui);

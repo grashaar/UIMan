@@ -29,8 +29,15 @@ namespace UnuGames
         [HideInInspector]
         public Vector3 showPosition = Vector3.zero;
 
+        [Obsolete("Use animShowTime and animHideTime instead.")]
         [HideInInspector]
         public float animTime = 0.25f;
+
+        [HideInInspector]
+        public float animShowTime = 0.25f;
+
+        [HideInInspector]
+        public float animHideTime = 0.25f;
 
         private Type uiType;
 
