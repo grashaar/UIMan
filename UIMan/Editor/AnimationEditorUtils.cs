@@ -13,7 +13,7 @@ namespace UnuGames
             Animator anim = target.GetComponent<Animator>();
 
             if (anim == null)
-                anim = target.AddComponent<Animator>();
+                anim = Undo.AddComponent<Animator>(target);
 
             // Create folder
             var assetPath = Application.dataPath.Substring(Application.dataPath.IndexOf("/Assets") + 1) + "/" + config.animRootFolder;

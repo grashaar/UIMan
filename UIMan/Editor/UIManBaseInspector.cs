@@ -83,33 +83,6 @@ namespace UnuGames
                 }
             }
 
-            if (uiManBase.motionShow == UIMotion.CustomMecanimAnimation || uiManBase.motionHide == UIMotion.CustomMecanimAnimation)
-            {
-                if (uiManBase.gameObject != null)
-                {
-                    uiManBase.animRoot = uiManBase.gameObject.GetComponent<Animator>();
-                }
-
-                EditorGUI.BeginChangeCheck();
-
-                var animRoot = EditorGUILayout.ObjectField(this.animator, uiManBase.animRoot, typeof(Animator), true) as Animator;
-
-                if (EditorGUI.EndChangeCheck())
-                {
-                    Undo.RecordObject(uiManBase, nameof(animRoot));
-                    uiManBase.animRoot = animRoot;
-                }
-
-                if (uiManBase.animRoot == null || uiManBase.animRoot.runtimeAnimatorController == null)
-                {
-                    if (GUILayout.Button("Generate Animator"))
-                    {
-                        AnimationEditorUtils.GenerateAnimator(uiManBase.gameObject, UIManDefine.ANIM_SHOW, UIManDefine.ANIM_HIDE, UIManDefine.ANIM_IDLE);
-                    }
-                }
-            }
-
-            EditorGUILayout.Space();
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(this.show, GUILayout.MaxWidth(50f));
 
@@ -205,6 +178,34 @@ namespace UnuGames
                 EditorGUILayout.LabelField("<color=red><b>Warning: </b>Idle motion is now only support Mecanim animation!</color>", EditorGUIHelper.RichText(true));
                 GUILayout.EndHorizontal();
             }
+
+            if (uiManBase.motionShow == UIMotion.CustomMecanimAnimation || uiManBase.motionHide == UIMotion.CustomMecanimAnimation)
+            {
+                if (uiManBase.gameObject != null)
+                {
+                    uiManBase.animRoot = uiManBase.gameObject.GetComponent<Animator>();
+                }
+
+                EditorGUI.BeginChangeCheck();
+
+                var animRoot = EditorGUILayout.ObjectField(this.animator, uiManBase.animRoot, typeof(Animator), true) as Animator;
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(uiManBase, nameof(animRoot));
+                    uiManBase.animRoot = animRoot;
+                }
+
+                if (uiManBase.animRoot == null || uiManBase.animRoot.runtimeAnimatorController == null)
+                {
+                    if (GUILayout.Button("Generate Animator"))
+                    {
+                        AnimationEditorUtils.GenerateAnimator(uiManBase.gameObject, UIManDefine.ANIM_SHOW, UIManDefine.ANIM_HIDE, UIManDefine.ANIM_IDLE);
+                    }
+                }
+            }
+
+            EditorGUILayout.Space();
 
             EditorGUI.BeginChangeCheck();
 
