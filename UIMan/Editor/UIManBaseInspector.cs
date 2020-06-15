@@ -45,21 +45,43 @@ namespace UnuGames
             LabelHelper.HeaderLabel("General");
             GUILayout.BeginVertical("Box");
 
-            EditorGUI.BeginChangeCheck();
-
             if (uiManBase is UIManDialog dialog)
             {
-                dialog.useCover = EditorGUILayout.Toggle(this.cover, dialog.useCover);
+                EditorGUI.BeginChangeCheck();
+
+                var useCover = EditorGUILayout.Toggle(this.cover, dialog.useCover);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(dialog, nameof(useCover));
+                    dialog.useCover = useCover;
+                }
             }
             else if (uiManBase is UIManScreen screen)
             {
-                screen.useBackground = EditorGUILayout.Toggle(this.background, screen.useBackground);
-                if (screen.useBackground)
-                    screen.background = EditorGUILayout.TextField(screen.background);
-            }
+                EditorGUI.BeginChangeCheck();
 
-            if (EditorGUI.EndChangeCheck())
-                EditorUtility.SetDirty(this.target);
+                var useBackground = EditorGUILayout.Toggle(this.background, screen.useBackground);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(screen, nameof(useBackground));
+                    screen.useBackground = useBackground;
+                }
+
+                if (screen.useBackground)
+                {
+                    EditorGUI.BeginChangeCheck();
+
+                    var background = EditorGUILayout.TextField(screen.background);
+
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        Undo.RecordObject(screen, nameof(background));
+                        screen.background = background;
+                    }
+                }
+            }
 
             if (uiManBase.motionShow == UIMotion.CustomMecanimAnimation || uiManBase.motionHide == UIMotion.CustomMecanimAnimation)
             {
@@ -68,7 +90,15 @@ namespace UnuGames
                     uiManBase.animRoot = uiManBase.gameObject.GetComponent<Animator>();
                 }
 
-                uiManBase.animRoot = EditorGUILayout.ObjectField(this.animator, uiManBase.animRoot, typeof(Animator), true) as Animator;
+                EditorGUI.BeginChangeCheck();
+
+                var animRoot = EditorGUILayout.ObjectField(this.animator, uiManBase.animRoot, typeof(Animator), true) as Animator;
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(uiManBase, nameof(animRoot));
+                    uiManBase.animRoot = animRoot;
+                }
 
                 if (uiManBase.animRoot == null || uiManBase.animRoot.runtimeAnimatorController == null)
                 {
@@ -82,23 +112,70 @@ namespace UnuGames
             EditorGUILayout.Space();
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(this.show, GUILayout.MaxWidth(50f));
-            uiManBase.motionShow = (UIMotion)EditorGUILayout.EnumPopup(uiManBase.motionShow);
+
+            EditorGUI.BeginChangeCheck();
+
+            var motionShow = (UIMotion)EditorGUILayout.EnumPopup(uiManBase.motionShow);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(uiManBase,nameof(motionShow));
+                uiManBase.motionShow = motionShow;
+            }
+
             GUILayout.Space(25f);
             EditorGUILayout.LabelField(this.showTime, GUILayout.MaxWidth(50f));
-            uiManBase.animShowTime = EditorGUILayout.FloatField(uiManBase.animShowTime);
+
+            EditorGUI.BeginChangeCheck();
+
+            var animShowTime = EditorGUILayout.FloatField(uiManBase.animShowTime);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(uiManBase,nameof(animShowTime));
+                uiManBase.animShowTime = animShowTime;
+            }
+
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(this.hide, GUILayout.MaxWidth(50f));
-            uiManBase.motionHide = (UIMotion)EditorGUILayout.EnumPopup(uiManBase.motionHide);
+            EditorGUI.BeginChangeCheck();
+
+            var motionHide = (UIMotion)EditorGUILayout.EnumPopup(uiManBase.motionHide);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(uiManBase,nameof(motionHide));
+                uiManBase.motionHide = motionHide;
+            }
+
             GUILayout.Space(25f);
             EditorGUILayout.LabelField(this.hideTime, GUILayout.MaxWidth(50f));
-            uiManBase.animHideTime = EditorGUILayout.FloatField(uiManBase.animHideTime);
+            EditorGUI.BeginChangeCheck();
+
+            var animHideTime = EditorGUILayout.FloatField(uiManBase.animHideTime);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(uiManBase,nameof(animHideTime));
+                uiManBase.animHideTime = animHideTime;
+            }
+
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(this.idle, GUILayout.MaxWidth(50f));
-            uiManBase.motionIdle = (UIMotion)EditorGUILayout.EnumPopup(uiManBase.motionIdle);
+            EditorGUI.BeginChangeCheck();
+
+            var motionIdle = (UIMotion)EditorGUILayout.EnumPopup(uiManBase.motionIdle);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(uiManBase,nameof(motionIdle));
+                uiManBase.motionIdle = motionIdle;
+            }
+
             EditorGUILayout.EndHorizontal();
 
             var motions = new UIMotion[3] { uiManBase.motionShow, uiManBase.motionHide, uiManBase.motionIdle };
@@ -129,7 +206,15 @@ namespace UnuGames
                 GUILayout.EndHorizontal();
             }
 
-            uiManBase.showPosition = EditorGUILayout.Vector3Field(this.position, uiManBase.showPosition);
+            EditorGUI.BeginChangeCheck();
+
+            var showPosition = EditorGUILayout.Vector3Field(this.position, uiManBase.showPosition);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(uiManBase, nameof(showPosition));
+                uiManBase.showPosition = showPosition;
+            }
 
             GUILayout.Space(2f);
             GUILayout.EndVertical();
