@@ -83,6 +83,8 @@ namespace UnuGames
                 }
             }
 
+            EditorGUILayout.Space();
+
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(this.show, GUILayout.MaxWidth(50f));
 
@@ -157,13 +159,27 @@ namespace UnuGames
 
             foreach (UIMotion m in motions)
             {
-                if ((int)m == 7)
+                if (m == UIMotion.CustomMecanimAnimation)
                     haveMecanimAnim = true;
                 else
                     haveTweenAnim = true;
             }
 
-            EditorGUILayout.Space();
+            if (uiManBase.motionShow != UIMotion.None &&
+                uiManBase.motionShow != UIMotion.CustomScriptAnimation &&
+                uiManBase.motionShow != UIMotion.CustomMecanimAnimation)
+            {
+                EditorGUILayout.Space();
+                EditorGUI.BeginChangeCheck();
+
+                var showPosition = EditorGUILayout.Vector3Field(this.position, uiManBase.showPosition);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(uiManBase, nameof(showPosition));
+                    uiManBase.showPosition = showPosition;
+                }
+            }
 
             if (haveTweenAnim && haveMecanimAnim)
             {
@@ -179,8 +195,12 @@ namespace UnuGames
                 GUILayout.EndHorizontal();
             }
 
-            if (uiManBase.motionShow == UIMotion.CustomMecanimAnimation || uiManBase.motionHide == UIMotion.CustomMecanimAnimation)
+            if (uiManBase.motionShow == UIMotion.CustomMecanimAnimation ||
+                uiManBase.motionHide == UIMotion.CustomMecanimAnimation)
             {
+
+                EditorGUILayout.Space();
+
                 if (uiManBase.gameObject != null)
                 {
                     uiManBase.animRoot = uiManBase.gameObject.GetComponent<Animator>();
@@ -203,18 +223,6 @@ namespace UnuGames
                         AnimationEditorUtils.GenerateAnimator(uiManBase.gameObject, UIManDefine.ANIM_SHOW, UIManDefine.ANIM_HIDE, UIManDefine.ANIM_IDLE);
                     }
                 }
-            }
-
-            EditorGUILayout.Space();
-
-            EditorGUI.BeginChangeCheck();
-
-            var showPosition = EditorGUILayout.Vector3Field(this.position, uiManBase.showPosition);
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                Undo.RecordObject(uiManBase, nameof(showPosition));
-                uiManBase.showPosition = showPosition;
             }
 
             GUILayout.Space(2f);
