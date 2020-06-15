@@ -384,8 +384,7 @@ namespace UnuGames
         /// <summary>
         /// Hides the dialog.
         /// </summary>
-        /// <param name="content">Content.</param>
-        public void HideDialog(Type uiType)
+        public void HideDialog(Type uiType, int siblingIndex = -1)
         {
             if (this.IsInDialogTransition)
             {
@@ -402,7 +401,11 @@ namespace UnuGames
                     this.activeDialog.Pop();
 
                 BringToLayer(this.dialogRoot, this.cover, this.cover.GetSiblingIndex() - 1);
-                BringToLayer(this.dialogRoot, dialog.transform, this.cover.GetSiblingIndex() - 1);
+
+                if (siblingIndex < 0)
+                    siblingIndex = this.cover.GetSiblingIndex() - 1;
+
+                BringToLayer(this.dialogRoot, dialog.transform, siblingIndex);
 
                 UIManDialog prevDialog = null;
                 if (this.activeDialog.Count > 0)
@@ -431,9 +434,9 @@ namespace UnuGames
         /// Hides the dialog.
         /// </summary>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void HideDialog<T>()
+        public void HideDialog<T>(int siblingIndex = -1)
         {
-            HideDialog(typeof(T));
+            HideDialog(typeof(T), siblingIndex);
         }
 
         /// <summary>
