@@ -261,13 +261,13 @@ namespace UnuGames
         /// Hides the screen.
         /// </summary>
         /// <param name="content">Content.</param>
-        public void HideScreen(Type uiType)
+        public void HideScreen(Type uiType, bool inactiveWhenHidden = false)
         {
             if (this.screenDict.TryGetValue(uiType, out UIManScreen screen))
             {
                 screen.OnHide();
                 OnHideUI(screen);
-                DoAnimHide(screen);
+                DoAnimHide(screen, inactiveWhenHidden);
             }
             else
             {
@@ -279,9 +279,9 @@ namespace UnuGames
         /// Hides the screen.
         /// </summary>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void HideScreen<T>()
+        public void HideScreen<T>(bool inactiveWhenHidden = false)
         {
-            HideScreen(typeof(T));
+            HideScreen(typeof(T), inactiveWhenHidden);
         }
 
         /// <summary>
@@ -384,7 +384,7 @@ namespace UnuGames
         /// <summary>
         /// Hides the dialog.
         /// </summary>
-        public void HideDialog(Type uiType, int siblingIndex = -1)
+        public void HideDialog(Type uiType, int siblingIndex = -1, bool inactiveWhenHidden = false)
         {
             if (this.IsInDialogTransition)
             {
@@ -422,7 +422,7 @@ namespace UnuGames
                 this.IsInDialogTransition = true;
                 dialog.OnHide();
                 OnHideUI(dialog);
-                DoAnimHide(dialog);
+                DoAnimHide(dialog, inactiveWhenHidden);
             }
             else
             {
@@ -434,9 +434,9 @@ namespace UnuGames
         /// Hides the dialog.
         /// </summary>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void HideDialog<T>(int siblingIndex = -1)
+        public void HideDialog<T>(int siblingIndex = -1, bool inactiveWhenHidden = false)
         {
-            HideDialog(typeof(T), siblingIndex);
+            HideDialog(typeof(T), siblingIndex, inactiveWhenHidden);
         }
 
         /// <summary>
@@ -753,7 +753,7 @@ namespace UnuGames
         /// Dos the animation hide.
         /// </summary>
         /// <param name="ui">User interface.</param>
-        private void DoAnimHide(UIManBase ui)
+        private void DoAnimHide(UIManBase ui, bool inactiveWhenHidden)
         {
             ui.LockInput();
             if (ui.motionHide == UIMotion.CustomMecanimAnimation)
@@ -783,6 +783,9 @@ namespace UnuGames
                     ui.RectTransform.anchoredPosition3D = hidePos;
                     ui.OnHideComplete();
                     OnHideUIComplete(ui);
+
+                    if (inactiveWhenHidden)
+                        ui.gameObject.SetActive(false);
 
                     if (ui.GetUIBaseType() == UIBaseType.Dialog)
                     {
