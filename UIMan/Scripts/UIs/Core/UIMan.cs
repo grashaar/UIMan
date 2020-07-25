@@ -261,13 +261,13 @@ namespace UnuGames
         /// Hides the screen.
         /// </summary>
         /// <param name="content">Content.</param>
-        public void HideScreen(Type uiType, bool inactiveWhenHidden = false)
+        public void HideScreen(Type uiType, bool deactive = false)
         {
             if (this.screenDict.TryGetValue(uiType, out UIManScreen screen))
             {
                 screen.OnHide();
                 OnHideUI(screen);
-                DoAnimHide(screen, inactiveWhenHidden);
+                DoAnimHide(screen, deactive);
             }
             else
             {
@@ -279,9 +279,9 @@ namespace UnuGames
         /// Hides the screen.
         /// </summary>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void HideScreen<T>(bool inactiveWhenHidden = false)
+        public void HideScreen<T>(bool deactive = false)
         {
-            HideScreen(typeof(T), inactiveWhenHidden);
+            HideScreen(typeof(T), deactive);
         }
 
         /// <summary>
@@ -307,6 +307,9 @@ namespace UnuGames
 
             if (dialog.IsActive)
                 return;
+
+            if (!dialog.gameObject.activeInHierarchy)
+                dialog.gameObject.SetActive(true);
 
             if (dialog.useCover)
             {
@@ -384,7 +387,7 @@ namespace UnuGames
         /// <summary>
         /// Hides the dialog.
         /// </summary>
-        public void HideDialog(Type uiType, int siblingIndex = -1, bool inactiveWhenHidden = false)
+        public void HideDialog(Type uiType, bool deactive = false)
         {
             if (this.IsInDialogTransition)
             {
@@ -400,12 +403,10 @@ namespace UnuGames
                 if (this.activeDialog.Count > 0)
                     this.activeDialog.Pop();
 
-                BringToLayer(this.dialogRoot, this.cover, this.cover.GetSiblingIndex() - 1);
-
-                if (siblingIndex < 0)
-                    siblingIndex = this.cover.GetSiblingIndex() - 1;
+                var siblingIndex = this.cover.GetSiblingIndex() - 1;
 
                 BringToLayer(this.dialogRoot, dialog.transform, siblingIndex);
+                BringToLayer(this.dialogRoot, this.cover, siblingIndex + 1);
 
                 UIManDialog prevDialog = null;
                 if (this.activeDialog.Count > 0)
@@ -422,7 +423,7 @@ namespace UnuGames
                 this.IsInDialogTransition = true;
                 dialog.OnHide();
                 OnHideUI(dialog);
-                DoAnimHide(dialog, inactiveWhenHidden);
+                DoAnimHide(dialog, deactive);
             }
             else
             {
@@ -434,9 +435,9 @@ namespace UnuGames
         /// Hides the dialog.
         /// </summary>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void HideDialog<T>(int siblingIndex = -1, bool inactiveWhenHidden = false)
+        public void HideDialog<T>(bool deactive = false)
         {
-            HideDialog(typeof(T), siblingIndex, inactiveWhenHidden);
+            HideDialog(typeof(T), deactive);
         }
 
         /// <summary>
@@ -753,7 +754,7 @@ namespace UnuGames
         /// Dos the animation hide.
         /// </summary>
         /// <param name="ui">User interface.</param>
-        private void DoAnimHide(UIManBase ui, bool inactiveWhenHidden)
+        private void DoAnimHide(UIManBase ui, bool deactive)
         {
             ui.LockInput();
             if (ui.motionHide == UIMotion.CustomMecanimAnimation)
@@ -784,7 +785,7 @@ namespace UnuGames
                     ui.OnHideComplete();
                     OnHideUIComplete(ui);
 
-                    if (inactiveWhenHidden)
+                    if (deactive)
                         ui.gameObject.SetActive(false);
 
                     if (ui.GetUIBaseType() == UIBaseType.Dialog)
