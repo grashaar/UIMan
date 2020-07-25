@@ -166,6 +166,18 @@ namespace UnuGames
             yield return null;
         }
 
+        public void SetInvisible()
+        {
+            this.CanvasGroup.alpha = 0f;
+            LockInput();
+        }
+
+        public void SetVisible()
+        {
+            this.CanvasGroup.alpha = 1f;
+            UnlockInput();
+        }
+
         /// <summary>
         /// Locks the input.
         /// </summary>
