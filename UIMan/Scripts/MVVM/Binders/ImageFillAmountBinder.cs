@@ -10,12 +10,18 @@ namespace UnuGames.MVVM
         protected Image image;
 
         [HideInInspector]
-        public BindingField valueField = new BindingField("float");
+        public BindingField valueField = new BindingField("Fill Amount");
 
         [HideInInspector]
-        public FloatConverter valueConverter = new FloatConverter("float");
+        public BindingField durationField = new BindingField("Duration");
 
-        private readonly float timeChangeValue = 0.75f;
+        [HideInInspector]
+        public FloatConverter valueConverter = new FloatConverter("Fill Amount");
+
+        [HideInInspector]
+        public FloatConverter durationConverter = new FloatConverter("Duration");
+
+        public float duration = 0.75f;
 
         public override void Initialize(bool forceInit)
         {
@@ -25,17 +31,29 @@ namespace UnuGames.MVVM
             this.image = GetComponent<Image>();
 
             SubscribeOnChangedEvent(this.valueField, OnUpdateValue);
+            SubscribeOnChangedEvent(this.durationField, OnUpdateDuration);
         }
 
         private void OnUpdateValue(object val)
         {
             var valChange = this.valueConverter.Convert(val, this);
 
-            UITweener.Value(this.gameObject, this.timeChangeValue, this.image.fillAmount, valChange)
-                     .SetOnUpdate(UpdateValue);
+            if (this.duration <= 0f)
+            {
+                SetValue(valChange);
+                return;
+            }
+
+            UITweener.Value(this.gameObject, this.duration, this.image.fillAmount, valChange)
+                     .SetOnUpdate(SetValue);
         }
 
-        private void UpdateValue(float val)
+        private void OnUpdateDuration(object val)
+        {
+            this.duration = this.durationConverter.Convert(val, this);
+        }
+
+        private void SetValue(float val)
         {
             this.image.fillAmount = val;
         }

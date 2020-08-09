@@ -22,6 +22,9 @@ namespace UnuGames.MVVM
         public TwoWayBinding onValueChanged = new TwoWayBinding("On Value Changed");
 
         [HideInInspector]
+        public BindingField durationField = new BindingField("Duration");
+
+        [HideInInspector]
         public FloatConverter minConverter = new FloatConverter("Min");
 
         [HideInInspector]
@@ -29,6 +32,11 @@ namespace UnuGames.MVVM
 
         [HideInInspector]
         public FloatConverter valueConverter = new FloatConverter("Value");
+
+        [HideInInspector]
+        public FloatConverter durationConverter = new FloatConverter("Duration");
+
+        public float duration = 0.1f;
 
         public override void Initialize(bool forceInit)
         {
@@ -40,6 +48,7 @@ namespace UnuGames.MVVM
             SubscribeOnChangedEvent(this.minField, OnUpdateMin);
             SubscribeOnChangedEvent(this.maxField, OnUpdateMax);
             SubscribeOnChangedEvent(this.valueField, OnUpdateValue);
+            SubscribeOnChangedEvent(this.durationField, OnUpdateDuration);
 
             OnValueChanged_OnChanged(this.onValueChanged);
             this.onValueChanged.onChanged += OnValueChanged_OnChanged;
@@ -59,8 +68,21 @@ namespace UnuGames.MVVM
 
         private void OnUpdateValue(object val)
         {
-            var value = this.valueConverter.Convert(val, this);
-            this.slider.SetValueWithoutNotify(value);
+            var valChange = this.valueConverter.Convert(val, this);
+
+            if (this.duration <= 0f)
+            {
+                SetValue(valChange);
+                return;
+            }
+
+            UITweener.Value(this.gameObject, this.duration, this.slider.value, valChange)
+                     .SetOnUpdate(SetValue);
+        }
+
+        private void OnUpdateDuration(object val)
+        {
+            this.duration = this.durationConverter.Convert(val, this);
         }
 
         private void OnValueChanged(float value)
@@ -74,6 +96,11 @@ namespace UnuGames.MVVM
 
             if (value)
                 this.slider.onValueChanged.AddListener(OnValueChanged);
+        }
+
+        private void SetValue(float val)
+        {
+            this.slider.SetValueWithoutNotify(val);
         }
     }
 }
