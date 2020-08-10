@@ -25,15 +25,29 @@ namespace UnuGames
                     if (_instance == null)
                     {
                         var attributes = typeof(T).GetCustomAttributes(typeof(StartupAttribute), true);
-                        StartupType type = StartupType.Normal;
+                        var type = StartupType.Normal;
                         Type parent = null;
                         var prefabURL = "";
+
                         if (attributes != null && attributes.Length > 0)
                         {
-                            var attribute = (StartupAttribute)attributes[0];
-                            type = attribute.Type;
-                            parent = attribute.ParentType;
-                            prefabURL = attribute.PrefabURL;
+                            StartupAttribute attribute = null;
+
+                            foreach (var attr in attributes)
+                            {
+                                if (attr is StartupAttribute startupAttribute)
+                                {
+                                    attribute = startupAttribute;
+                                    break;
+                                }
+                            }
+
+                            if (attribute != null)
+                            {
+                                type = attribute.Type;
+                                parent = attribute.ParentType;
+                                prefabURL = attribute.PrefabURL;
+                            }
                         }
 
                         if (type == StartupType.Normal)
@@ -42,10 +56,10 @@ namespace UnuGames
                         }
                         else
                         {
-                            UnityEngine.Object obj = Resources.Load(Path.Combine(prefabURL, typeof(T).Name));
-                            if (obj != null)
+                            var obj = Resources.Load(Path.Combine(prefabURL, typeof(T).Name));
+                            if (obj is GameObject go)
                             {
-                                _instance = (Instantiate(obj) as GameObject).GetComponent<T>();
+                                _instance = Instantiate(go).GetComponent<T>();
                                 _instance.name = typeof(T).Name;
                             }
                             else
@@ -56,7 +70,7 @@ namespace UnuGames
 
                         if (parent != null)
                         {
-                            var parentBehavior = (MonoBehaviour)GameObject.FindObjectOfType(parent);
+                            var parentBehavior = FindObjectOfType(parent) as MonoBehaviour;
                             if (parentBehavior == null)
                             {
                                 UnuLogger.LogError("Parent object could not be found, make sure you have initial parent object before!");

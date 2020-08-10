@@ -38,6 +38,7 @@ namespace UnuGames
 
         public Transform screenRoot;
         public Transform dialogRoot;
+        public Transform activityRoot;
         public Image background;
         private RectTransform bgRectTrans;
         public Transform cover;
@@ -133,48 +134,48 @@ namespace UnuGames
 
         #region Features
 
-        public void ShowActivity(Action<UIActivity> onLoad)
+        public void GetActivity(Type uiType, Action<UIActivity> onGet)
+        {
+            if (this.activityDict.TryGetValue(uiType, out var activity))
+            {
+                onGet?.Invoke(activity);
+                return;
+            }
+
+            UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => OnGetActivity(key, asset, onGet));
+        }
+
+        public void GetActivity(Action<UIActivity> onGet)
         {
             var uiType = typeof(UIActivity);
 
             if (this.activityDict.TryGetValue(uiType, out var activity))
             {
-                onLoad?.Invoke(activity);
+                onGet?.Invoke(activity);
                 return;
             }
 
-            UIManLoader.Load<GameObject>(nameof(UIActivity), (key, asset) => OnShowActivity(key, asset, onLoad));
+            UIManLoader.Load<GameObject>(nameof(UIActivity), (key, asset) => OnGetActivity(key, asset, onGet));
         }
 
-        public void ShowActivity(Type uiType, Action<UIActivity> onLoad)
-        {
-            if (this.activityDict.TryGetValue(uiType, out var activity))
-            {
-                onLoad?.Invoke(activity);
-                return;
-            }
-
-            UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => OnShowActivity(key, asset, onLoad));
-        }
-
-        public void ShowActivity<T>(Action<T> onLoad) where T : UIActivity
+        public void GetActivity<T>(Action<T> onGet) where T : UIActivity
         {
             var uiType = typeof(T);
 
             if (this.activityDict.TryGetValue(uiType, out var activity))
             {
                 if (activity is T activityT)
-                    onLoad?.Invoke(activityT);
+                    onGet?.Invoke(activityT);
                 else
                     UnuLogger.LogError($"Asset is expected to be an instance of {uiType}, but its type is {activity.GetType()}", activity);
 
                 return;
             }
 
-            UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => OnShowActivity(key, asset, onLoad));
+            UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => OnGetActivity(key, asset, onGet));
         }
 
-        private void OnShowActivity<T>(string key, UnityObject asset, Action<T> onLoad) where T : UIActivity
+        private void OnGetActivity<T>(string key, UnityObject asset, Action<T> onGet) where T : UIActivity
         {
             if (!(asset is GameObject prefab))
             {
@@ -187,10 +188,64 @@ namespace UnuGames
             obj.name = type.Name;
 
             var activity = obj.GetComponent<T>();
-            activity.Setup(Instance.transform);
+            activity.Setup(this.activityRoot);
 
             this.activityDict[type] = activity;
-            onLoad?.Invoke(activity);
+            onGet?.Invoke(activity);
+        }
+
+        public void ShowActivity(Type uiType, UIActivity.Settings? settings = null)
+        {
+            GetActivity(uiType, x => x.Show(settings));
+        }
+
+        public void ShowActivity(Type uiType, float duration, UIActivity.Settings? settings = null,
+                                 UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(duration, settings, onComplete, args));
+        }
+
+        public void ShowActivity(Type uiType, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
+                                 UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(showDuration, hideDuration, settings, onComplete, args));
+        }
+
+        public void ShowActivity<T>(in UIActivity.Settings? settings = null)
+            where T : UIActivity
+        {
+            ShowActivity(typeof(T), settings);
+        }
+
+        public void ShowActivity<T>(float showDuration, in UIActivity.Settings? settings = null,
+                                    UIActivityAction onComplete = null, params object[] args)
+            where T : UIActivity
+        {
+            ShowActivity(typeof(T), showDuration, settings, onComplete, args);
+        }
+
+        public void ShowActivity<T>(float showDuration, float hideDuration, in UIActivity.Settings? settings = null,
+                                    UIActivityAction onComplete = null, params object[] args)
+            where T : UIActivity
+        {
+            ShowActivity(typeof(T), showDuration, hideDuration, settings, onComplete, args);
+        }
+
+        public void ShowActivity(UIActivity.Settings? settings = null)
+        {
+            ShowActivity<UIActivity>(settings);
+        }
+
+        public void ShowActivity(float duration, UIActivity.Settings? settings = null,
+                                 UIActivityAction onComplete = null, params object[] args)
+        {
+            ShowActivity<UIActivity>(duration, settings, onComplete, args);
+        }
+
+        public void ShowActivity(float showDuration, float hideDuration, UIActivity.Settings? settings = null,
+                                 UIActivityAction onComplete = null, params object[] args)
+        {
+            ShowActivity<UIActivity>(showDuration, hideDuration, settings, onComplete, args);
         }
 
         /// <summary>
@@ -473,12 +528,43 @@ namespace UnuGames
         /// <param name="name">Name.</param>
         public void LoadUnityScene(string name, Type screen, bool showLoading, params object[] args)
         {
-            Instance.cover.gameObject.SetActive(false);
+            this.cover.gameObject.SetActive(false);
 
-            if (showLoading)
-                ShowActivity(x => x.Show(SceneManager.LoadSceneAsync(name), true, false, false, false, "", OnLoadUnitySceneComplete, screen, args));
-            else
+            if (!showLoading)
+            {
                 StartCoroutine(LoadUnityScene(name, screen, args));
+                return;
+            }
+
+            GetActivity(x => x.Show(SceneManager.LoadSceneAsync(name), UIActivity.Settings.Default,
+                                    OnLoadUnitySceneComplete, screen, args));
+        }
+
+        public void LoadUnityScene(string name, Type screen, bool showLoading, float showDuration, float hideDuration,
+                                   params object[] args)
+        {
+            this.cover.gameObject.SetActive(false);
+
+            if (!showLoading)
+            {
+                StartCoroutine(LoadUnityScene(name, screen, args));
+                return;
+            }
+
+            GetActivity(x => x.Show(SceneManager.LoadSceneAsync(name), showDuration, hideDuration, UIActivity.Settings.Default,
+                                    OnLoadUnitySceneComplete, screen, args));
+        }
+
+        public void LoadUnityScene<T>(string name, bool showLoading, params object[] args)
+            where T : UIManScreen
+        {
+            LoadUnityScene(name, typeof(T), showLoading, args);
+        }
+
+        public void LoadUnityScene<T>(string name, bool showLoading, float showDuration, float hideDuration, params object[] args)
+            where T : UIManScreen
+        {
+            LoadUnityScene(name, typeof(T), showLoading, showDuration, hideDuration, args);
         }
 
         /// <summary>
@@ -497,14 +583,14 @@ namespace UnuGames
             if (this.CurrentScreen != null)
                 HideScreen(this.CurrentScreen.UIType);
 
-            OnLoadUnitySceneComplete(screen, args);
+            OnLoadUnitySceneComplete(null, screen, args);
         }
 
         /// <summary>
         /// Raises the load unity scene complete event.
         /// </summary>
         /// <param name="args">Arguments.</param>
-        private void OnLoadUnitySceneComplete(params object[] args)
+        private void OnLoadUnitySceneComplete(UIActivity sender, params object[] args)
         {
             StartCoroutine(WaitForTransitionComplete(args));
         }
@@ -516,13 +602,13 @@ namespace UnuGames
                 yield return null;
             }
 
-            var screen = (Type)args[0];
+            var screenType = (Type)args[0];
             object[] screenArgs = null;
 
             if (args.Length > 1)
                 screenArgs = (object[])args[1];
 
-            Instance.ShowScreen(screen, screenArgs);
+            ShowScreen(screenType, screenArgs);
         }
 
         /// <summary>

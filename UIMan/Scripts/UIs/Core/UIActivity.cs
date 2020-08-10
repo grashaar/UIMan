@@ -1,149 +1,198 @@
 ﻿using System;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace UnuGames
 {
-    public class UIActivity : MonoBehaviour
+    public delegate void UIActivityAction(UIActivity sender, params object[] args);
+
+    public partial class UIActivity : MonoBehaviour
     {
-        public GameObject icon;
-        public Image background;
         public Image cover;
+        public Image background;
+        public GameObject icon;
 
-        public bool isWorking { get; private set; }
+        private CanvasGroup canvasGroup;
+        private GraphicRaycaster graphicRaycaster;
 
-        private Action<object[]> callback;
-        private object[] callbackArgs;
+        public bool isLoading { get; private set; }
 
-        public float Progress { get; private set; }
+        public float progress { get; private set; }
+
+        private bool deactivateOnHide;
+        private UIActivityAction onComplete;
+        private object[] onCompleteArgs;
+
+        protected void Awake()
+        {
+            this.canvasGroup = GetComponent<CanvasGroup>();
+            this.graphicRaycaster = GetComponent<GraphicRaycaster>();
+
+            OnAwake();
+        }
+
+        protected virtual void OnAwake() { }
 
         public void Setup(Transform root)
         {
             this.transform.SetParent(root, false);
         }
 
-        private IEnumerator WaitTask(IEnumerator coroutine)
+        public void Show(Settings? settings = null)
         {
-            yield return StartCoroutine(coroutine);
-
-            DoCallback();
-            Hide();
+            Show(false, 0f, settings);
         }
 
-        private IEnumerator WaitTask(AsyncOperation asyncTask)
+        public void Show(AsyncOperation task, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
         {
-            while (!asyncTask.isDone)
-            {
-                this.Progress = asyncTask.progress;
-                ShowValue(this.Progress);
-
-                yield return null;
-            }
-
-            DoCallback();
-            Hide();
+            Show(task, false, 0f, 0f, settings, onComplete, args);
         }
 
-        private IEnumerator WaitTask(UnityWebRequest request)
+        public void Show(IEnumerator task, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
         {
-            while (!request.isDone)
-            {
-                this.Progress = request.downloadProgress;
-                ShowValue(this.Progress);
-
-                yield return null;
-            }
-
-            DoCallback();
-            Hide();
+            Show(task, false, 0f, 0f, settings, onComplete, args);
         }
 
-        private void DoCallback()
+        public void Show(UnityWebRequest task, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
         {
-            if (this.callback != null)
-            {
-                this.callback(this.callbackArgs);
-                this.callback = null;
-            }
+            Show(task, false, 0f, 0f, settings, onComplete, args);
         }
 
-        private void Setting(bool showIcon, bool showCover, bool showBackground, bool showProgress, string tip)
+        public void Show(Func<Task> task, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
         {
-            this.icon.SetActive(showIcon);
-            this.cover.enabled = showCover;
-            this.background.enabled = showBackground;
-
-            SetShowProgress(showProgress);
-            ShowTip(tip);
+            Show(task, false, 0f, 0f, settings, onComplete, args);
         }
 
-        private void Begin(Action<object[]> callback = null, params object[] args)
+        public void Show<T>(Func<Task<T>> task, Action<T> onTaskComplete, Settings? settings = null,
+                            UIActivityAction onComplete = null, params object[] args)
         {
-            this.callback = callback;
-            this.callbackArgs = args;
-            this.isWorking = true;
+            Show(task, onTaskComplete, false, 0f, 0f, settings, onComplete, args);
         }
 
-        public void Show(bool showIcon = true, bool showCover = true, bool showBackground = false,
-                         bool showProgress = false, string tip = "")
+        public void Show(float showDuration, Settings? settings = null)
         {
-            Begin();
-            Setting(showIcon, showCover, showBackground, showProgress, tip);
+            Show(true, showDuration, settings);
         }
 
-        public void Show(AsyncOperation task, bool showIcon = true, bool showCover = true, bool showBackground = false,
-                         bool showProgress = false, string tip = "", Action<object[]> callback = null, params object[] args)
+        public void Show(float showDuration, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
         {
-            Begin(callback, args);
-            Setting(showIcon, showCover, showBackground, showProgress, tip);
-            StartCoroutine(WaitTask(task));
+            Show(true, showDuration, settings, onComplete, args);
         }
 
-        public void Show(IEnumerator task, bool showIcon = true, bool showCover = true, bool showBackground = false,
-                         bool showProgress = false, string tip = "", Action<object[]> callback = null, params object[] args)
+        public void Show(float showDuration, float hideDuration, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
         {
-            Begin(callback, args);
-            Setting(showIcon, showCover, showBackground, showProgress, tip);
-            StartCoroutine(WaitTask(task));
+            Show(true, showDuration, hideDuration, settings, onComplete, args);
         }
 
-        public void Show(UnityWebRequest task, bool showIcon = true, bool showCover = true, bool showBackground = false,
-                         bool showProgress = false, string tip = "", Action<object[]> callback = null, params object[] args)
+        public void Show(AsyncOperation task, float showDuration, float hideDuration, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
         {
-            Begin(callback, args);
-            Setting(showIcon, showCover, showBackground, showProgress, tip);
-            StartCoroutine(WaitTask(task));
+            Show(task, true, showDuration, hideDuration, settings, onComplete, args);
+        }
+
+        public void Show(IEnumerator task, float showDuration, float hideDuration, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
+        {
+            Show(task, true, showDuration, hideDuration, settings, onComplete, args);
+        }
+
+        public void Show(UnityWebRequest task, float showDuration, float hideDuration, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
+        {
+            Show(task, true, showDuration, hideDuration, settings, onComplete, args);
+        }
+
+        public void Show(Func<Task> task, float showDuration, float hideDuration, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
+        {
+            Show(task, true, showDuration, hideDuration, settings, onComplete, args);
+        }
+
+        public void Show<T>(Func<Task<T>> task, Action<T> onTaskComplete, float showDuration, float hideDuration,
+                            Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            Show(task, onTaskComplete, true, showDuration, hideDuration, settings,  onComplete, args);
         }
 
         public void Hide()
         {
-            this.isWorking = false;
-            Setting(false, false, false, false, "");
+            var deactive = this.deactivateOnHide;
+
+            this.isLoading = false;
+            ApplySettings(default);
+            UnblockInput();
+
+            if (deactive)
+                this.gameObject.SetActive(false);
+        }
+
+        public void Hide(float duration)
+        {
+            if (duration <= 0f)
+                Hide();
+            else
+                GetFadeTweener(duration, 0f).SetOnComplete(Hide);
+        }
+
+        public void BlockInput()
+        {
+            if (this.graphicRaycaster)
+                this.graphicRaycaster.enabled = true;
+
+            if (!this.canvasGroup)
+                return;
+
+            this.canvasGroup.interactable = true;
+            this.canvasGroup.blocksRaycasts = true;
+        }
+
+        public void UnblockInput()
+        {
+            if (this.graphicRaycaster)
+                this.graphicRaycaster.enabled = false;
+
+            if (!this.canvasGroup)
+                return;
+
+            this.canvasGroup.interactable = false;
+            this.canvasGroup.blocksRaycasts = false;
         }
 
         protected virtual void SetShowProgress(bool value) { }
 
-        public virtual void ShowTip(string value) { }
-
         public virtual void ShowValue(float value) { }
 
-        public void ShowImage(Sprite sprite)
+        public void ShowBackground(Sprite sprite)
         {
+            if (!this.background)
+                return;
+
             this.background.enabled = true;
             this.background.sprite = sprite;
         }
 
-        public void ShowImage(string spritePath)
+        public void ShowBackground(string spritePath)
         {
+            if (!this.background)
+                return;
+
             this.background.enabled = true;
             UIManLoader.Load<Sprite>(spritePath, OnLoadedImage);
         }
 
-        public void HideImage()
+        public void HideBackground()
         {
-            this.background.enabled = false;
+            if (this.background)
+                this.background.enabled = false;
         }
 
         private void OnLoadedImage(string key, UnityEngine.Object asset)

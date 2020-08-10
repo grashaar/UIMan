@@ -11,7 +11,9 @@ namespace UnuGames
     public class StartupAttribute : Attribute
     {
         public StartupType Type { get; set; }
+
         public Type ParentType { get; set; }
+
         public string PrefabURL { get; set; }
 
         public StartupAttribute(StartupType type = StartupType.Normal)
@@ -25,9 +27,7 @@ namespace UnuGames
         {
             this.Type = type;
             this.ParentType = parentType;
-            this.PrefabURL = prefabURL;
-            if (this.PrefabURL == null)
-                prefabURL = "";
+            this.PrefabURL = prefabURL ?? "";
         }
     }
 }
