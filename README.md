@@ -50,6 +50,7 @@ This is an [example](https://github.com/grashaar/uiman-examples/blob/master/Asse
 * `UnuLogger` is now a static class, all of its members are refactored into a private inner `DefaultLogger` class which implements `IUnuLogger` interface
 * `UnuLogger` can now take another implementation of `IUnuLogger` interface as a substitute for the `DefaultLogger`
 * Improve `UIActivity` and `UIMan.ShowActivity`
+* Add `EnumAdapter<T>`
 
 ### 1.3.0
 * Support two-way data binding via `TwoWayBinding` class
