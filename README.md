@@ -36,6 +36,21 @@ This is an [example](https://github.com/grashaar/uiman-examples/blob/master/Asse
 
 ## Changlog
 
+### 1.4.0
+#### Breaking Changes
+* `NumberBinder`: rename the field `timeChange` to `duration`
+* `ImageFillAmountBinder`: rename the binding field from "float" to "Fill Amount", rename the field `timeChange` to `duration`
+* `ProgressBarBinder`: rename the binding field of from "float" to "Value", rename the field `changeTime` to `duration`, remove `tweenValueChange`
+* Rename `UIActivityIndicator` to `UIActivity`
+* Rename `UIMan.Loading` method to `ShowActivity`
+
+#### Improvements
+* Add more binding fields to `ImageFillAmountBinder`, `NumberBinder`, `ProgressBarBinder`, `SliderBinder`, `TextBinder`
+* Add `IUnuLogger` interface
+* `UnuLogger` is now a static class, all of its members are refactored into a private inner `DefaultLogger` class which implements `IUnuLogger` interface
+* `UnuLogger` can now take another implementation of `IUnuLogger` interface as a substitute for the `DefaultLogger`
+* Improve `UIActivity` and `UIMan.ShowActivity`
+
 ### 1.3.0
 * Support two-way data binding via `TwoWayBinding` class
 * Implement `ToggleBinder`, `SliderBinder`, `ScrollbarBinder`, `DropdownBinder`
