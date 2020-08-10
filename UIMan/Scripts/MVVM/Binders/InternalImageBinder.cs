@@ -94,7 +94,7 @@ namespace UnuGames.MVVM
             }
             else
             {
-                Debug.LogError($"Asset of key={key} is not a Sprite.");
+                UnuLogger.LogError($"Asset of key={key} is not a Sprite.");
                 this.image.sprite = null;
             }
 

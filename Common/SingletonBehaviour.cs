@@ -50,7 +50,7 @@ namespace UnuGames
                             }
                             else
                             {
-                                Debug.LogError("Manager could not be found, make sure you have put prefab into resources with the right name!");
+                                UnuLogger.LogError("Manager could not be found, make sure you have put prefab into resources with the right name!");
                             }
                         }
 
@@ -59,7 +59,7 @@ namespace UnuGames
                             var parentBehavior = (MonoBehaviour)GameObject.FindObjectOfType(parent);
                             if (parentBehavior == null)
                             {
-                                Debug.LogError("Parent object could not be found, make sure you have initial parent object before!");
+                                UnuLogger.LogError("Parent object could not be found, make sure you have initial parent object before!");
                             }
                             else
                             {

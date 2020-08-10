@@ -623,7 +623,7 @@ namespace UnuGames
         {
             if (!(asset is GameObject prefab))
             {
-                Debug.LogError($"Asset of key={key} is not a prefab.");
+                UnuLogger.LogError($"Asset of key={key} is not a prefab.");
                 return;
             }
 
@@ -635,7 +635,7 @@ namespace UnuGames
             if (!screen)
             {
                 Destroy(obj);
-                Debug.LogError($"{obj} does not contain any component derived from UIManScreen.");
+                UnuLogger.LogError($"{obj} does not contain any component derived from UIManScreen.");
                 return;
             }
 
@@ -657,7 +657,7 @@ namespace UnuGames
         {
             if (!(asset is GameObject prefab))
             {
-                Debug.LogError($"Asset of key={key} is not a prefab.");
+                UnuLogger.LogError($"Asset of key={key} is not a prefab.");
                 return;
             }
 
@@ -669,7 +669,7 @@ namespace UnuGames
             if (!dialogue)
             {
                 Destroy(obj);
-                Debug.LogError($"{obj} does not contain any component derived from UIManDialogue.");
+                UnuLogger.LogError($"{obj} does not contain any component derived from UIManDialogue.");
                 return;
             }
 
@@ -689,7 +689,7 @@ namespace UnuGames
         {
             if (!(asset is Texture2D texture))
             {
-                Debug.LogError($"Asset of key={key} is not a Texture2D.");
+                UnuLogger.LogError($"Asset of key={key} is not a Texture2D.");
                 return;
             }
 
@@ -989,7 +989,7 @@ namespace UnuGames
         {
             if (!(asset is GameObject prefab))
             {
-                Debug.LogError($"Asset of key={key} is not a prefab.");
+                UnuLogger.LogError($"Asset of key={key} is not a prefab.");
                 return;
             }
 
@@ -1027,7 +1027,7 @@ namespace UnuGames
 
                 default:
                     Destroy(obj);
-                    Debug.LogError($"{obj} does not contain any component derived from either UIManScreen or UIManDialogue.");
+                    UnuLogger.LogError($"{obj} does not contain any component derived from either UIManScreen or UIManDialogue.");
                     break;
             }
         }

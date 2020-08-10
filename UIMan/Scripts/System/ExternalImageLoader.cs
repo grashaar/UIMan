@@ -68,7 +68,7 @@ namespace UnuGames
 
                 if (www.isNetworkError || www.isHttpError)
                 {
-                    Debug.LogError(www.error);
+                    UnuLogger.LogError(www.error);
                     this.errorUrls.Add(kv.Key);
                 }
                 else

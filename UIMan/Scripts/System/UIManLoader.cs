@@ -35,7 +35,7 @@ namespace UnuGames
             if (_loader != null)
                 return true;
 
-            Debug.LogError($"{nameof(UIManLoader)} has not been initialized yet. Please call {nameof(UIManLoader)}.{nameof(Initialize)} method before {nameof(UIMan)} is used.");
+            UnuLogger.LogError($"{nameof(UIManLoader)} has not been initialized yet. Please call {nameof(UIManLoader)}.{nameof(Initialize)} method before {nameof(UIMan)} is used.");
             return false;
         }
 
@@ -46,7 +46,7 @@ namespace UnuGames
 
             if (string.IsNullOrEmpty(key))
             {
-                Debug.LogWarning("Key is null or empty.");
+                UnuLogger.LogWarning("Key is null or empty.");
                 return;
             }
 
@@ -90,19 +90,19 @@ namespace UnuGames
         {
             if (string.IsNullOrEmpty(key))
             {
-                Debug.LogError("Key is null or empty.");
+                UnuLogger.LogError("Key is null or empty.");
                 return;
             }
 
             if (!result)
             {
-                Debug.LogError($"Result with key={key} is null.");
+                UnuLogger.LogError($"Result with key={key} is null.");
                 return;
             }
 
             if (!_requests.ContainsKey(key) || _requests[key] == null)
             {
-                Debug.LogError($"No request has been registered by key={key}.");
+                UnuLogger.LogError($"No request has been registered by key={key}.");
                 return;
             }
 
@@ -147,7 +147,7 @@ namespace UnuGames
             {
                 if (!result)
                 {
-                    Debug.LogException(new ArgumentNullException(nameof(result)));
+                    UnuLogger.LogException(new ArgumentNullException(nameof(result)));
                     return;
                 }
 

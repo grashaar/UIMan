@@ -110,7 +110,7 @@ namespace UnuGames.MVVM
             }
             else
             {
-                Debug.LogError($"Asset of key={key} is not a SpriteAtlas.");
+                UnuLogger.LogError($"Asset of key={key} is not a SpriteAtlas.");
                 SetLoadedAtlas(this.atlas);
             }
 

@@ -252,7 +252,7 @@ namespace UnuGames
         public void OnListenerAdding(string eventType, Delegate listenerBeingAdded)
         {
 #if LOG_ALL_MESSAGES || LOG_ADD_LISTENER
-			Debug.Log("MESSENGER OnListenerAdding \t\"" + eventType + "\"\t{" + listenerBeingAdded.Target + " -> " + listenerBeingAdded.Method + "}");
+			UnuLogger.Log("MESSENGER OnListenerAdding \t\"" + eventType + "\"\t{" + listenerBeingAdded.Target + " -> " + listenerBeingAdded.Method + "}");
 #endif
 
             if (!this.Routers.ContainsKey(eventType))
@@ -270,7 +270,7 @@ namespace UnuGames
         public bool OnListenerRemoving(string eventType, Delegate listenerBeingRemoved)
         {
 #if LOG_ALL_MESSAGES
-			Debug.Log("MESSENGER OnListenerRemoving \t\"" + eventType + "\"\t{" + listenerBeingRemoved.Target + " -> " + listenerBeingRemoved.Method + "}");
+			UnuLogger.Log("MESSENGER OnListenerRemoving \t\"" + eventType + "\"\t{" + listenerBeingRemoved.Target + " -> " + listenerBeingRemoved.Method + "}");
 #endif
 
             var success = true;
