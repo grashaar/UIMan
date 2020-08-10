@@ -13,19 +13,18 @@ using UnityEngine.UI;
 
 namespace UnuGames
 {
+    using UnityObject = UnityEngine.Object;
+
     [Startup(StartupType.Prefab)]
     public class UIMan : SingletonBehaviour<UIMan>
     {
-        // Constants
-        private const string ACTIVITY_INDICATOR_NAME = nameof(UIActivityIndicator);
-
         // Configuration
         private UIManConfig config;
 
         // Caches
         private readonly Dictionary<Type, UIManScreen> screenDict = new Dictionary<Type, UIManScreen>();
-
         private readonly Dictionary<Type, UIManDialog> dialogDict = new Dictionary<Type, UIManDialog>();
+        private readonly Dictionary<Type, UIActivity> activityDict = new Dictionary<Type, UIActivity>();
         private readonly Dictionary<Type, string> prefabURLCache = new Dictionary<Type, string>();
 
         // Transition queue
@@ -79,39 +78,8 @@ namespace UnuGames
 
         public string CurrentUnityScene { get; set; }
 
-        private UIActivityIndicator uiLoading;
-
-        public void Loading(Action<UIActivityIndicator> callback)
-        {
-            if (this.uiLoading)
-            {
-                callback?.Invoke(this.uiLoading);
-                return;
-            }
-
-            UIManLoader.Load<GameObject>(ACTIVITY_INDICATOR_NAME, (key, asset) => OnLoading(key, asset, callback));
-        }
-
-        private void OnLoading(string key, UnityEngine.Object asset, Action<UIActivityIndicator> callback)
-        {
-            if (!(asset is GameObject prefab))
-            {
-                Debug.LogError($"Asset of key={key} is not a prefab.");
-                return;
-            }
-
-            var obj = Instantiate(prefab) as GameObject;
-            obj.name = ACTIVITY_INDICATOR_NAME;
-            this.uiLoading = obj.GetComponent<UIActivityIndicator>();
-            this.uiLoading.Setup(UIMan.Instance.transform);
-
-            callback?.Invoke(this.uiLoading);
-        }
-
         public override void Initialize()
         {
-            this.uiLoading = GetComponentInChildren<UIActivityIndicator>();
-
             this.config = Resources.Load<UIManConfig>("UIManConfig");
             this.bgRectTrans = this.background.GetComponent<RectTransform>();
 
@@ -147,7 +115,7 @@ namespace UnuGames
         /// <param name="root">Root.</param>
         /// <param name="ui">User interface.</param>
         /// <param name="step">Step.</param>
-        private static void BringToLayer(Transform root, Transform ui, int layer)
+        private static void BringToLayer(Transform ui, int layer)
         {
             ui.SetSiblingIndex(layer);
         }
@@ -155,9 +123,8 @@ namespace UnuGames
         /// <summary>
         /// Sends to back.
         /// </summary>
-        /// <param name="root">Root.</param>
         /// <param name="ui">User interface.</param>
-        private static void SendToBack(Transform root, Transform ui)
+        private static void SendToBack(Transform ui)
         {
             ui.SetSiblingIndex(0);
         }
@@ -165,6 +132,66 @@ namespace UnuGames
         #endregion Layer indexer
 
         #region Features
+
+        public void ShowActivity(Action<UIActivity> onLoad)
+        {
+            var uiType = typeof(UIActivity);
+
+            if (this.activityDict.TryGetValue(uiType, out var activity))
+            {
+                onLoad?.Invoke(activity);
+                return;
+            }
+
+            UIManLoader.Load<GameObject>(nameof(UIActivity), (key, asset) => OnShowActivity(key, asset, onLoad));
+        }
+
+        public void ShowActivity(Type uiType, Action<UIActivity> onLoad)
+        {
+            if (this.activityDict.TryGetValue(uiType, out var activity))
+            {
+                onLoad?.Invoke(activity);
+                return;
+            }
+
+            UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => OnShowActivity(key, asset, onLoad));
+        }
+
+        public void ShowActivity<T>(Action<T> onLoad) where T : UIActivity
+        {
+            var uiType = typeof(T);
+
+            if (this.activityDict.TryGetValue(uiType, out var activity))
+            {
+                if (activity is T activityT)
+                    onLoad?.Invoke(activityT);
+                else
+                    UnuLogger.LogError($"Asset is expected to be an instance of {uiType}, but its type is {activity.GetType()}", activity);
+
+                return;
+            }
+
+            UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => OnShowActivity(key, asset, onLoad));
+        }
+
+        private void OnShowActivity<T>(string key, UnityObject asset, Action<T> onLoad) where T : UIActivity
+        {
+            if (!(asset is GameObject prefab))
+            {
+                UnuLogger.LogError($"Asset of key={key} is not a prefab.");
+                return;
+            }
+
+            var type = typeof(T);
+            var obj = Instantiate(prefab);
+            obj.name = type.Name;
+
+            var activity = obj.GetComponent<T>();
+            activity.Setup(Instance.transform);
+
+            this.activityDict[type] = activity;
+            onLoad?.Invoke(activity);
+        }
 
         /// <summary>
         ///
@@ -405,8 +432,8 @@ namespace UnuGames
 
                 var siblingIndex = this.cover.GetSiblingIndex() - 1;
 
-                BringToLayer(this.dialogRoot, dialog.transform, siblingIndex);
-                BringToLayer(this.dialogRoot, this.cover, siblingIndex + 1);
+                BringToLayer(dialog.transform, siblingIndex);
+                BringToLayer(this.cover, siblingIndex + 1);
 
                 UIManDialog prevDialog = null;
                 if (this.activeDialog.Count > 0)
@@ -449,7 +476,7 @@ namespace UnuGames
             Instance.cover.gameObject.SetActive(false);
 
             if (showLoading)
-                Loading(x => x.Show(SceneManager.LoadSceneAsync(name), true, false, false, false, "", OnLoadUnitySceneComplete, screen, args));
+                ShowActivity(x => x.Show(SceneManager.LoadSceneAsync(name), true, false, false, false, "", OnLoadUnitySceneComplete, screen, args));
             else
                 StartCoroutine(LoadUnityScene(name, screen, args));
         }
@@ -505,10 +532,10 @@ namespace UnuGames
         public static void SetNativeLoading(bool isLoading)
         {
 #if UNITY_IOS || UNITY_ANDROID
-		if(isLoading)
-		Handheld.StartActivityIndicator();
-		else
-		Handheld.StopActivityIndicator();
+            if(isLoading)
+                Handheld.StartActivityIndicator();
+            else
+                Handheld.StopActivityIndicator();
 #endif
         }
 
@@ -619,7 +646,7 @@ namespace UnuGames
         /// </summary>
         /// <param name="prefab">Prefab.</param>
         /// <param name="args">Arguments.</param>
-        private void PreprocessScreen(string key, UnityEngine.Object asset, Type uiType, bool seal, params object[] args)
+        private void PreprocessScreen(string key, UnityObject asset, Type uiType, bool seal, params object[] args)
         {
             if (!(asset is GameObject prefab))
             {
@@ -627,7 +654,7 @@ namespace UnuGames
                 return;
             }
 
-            var obj = Instantiate(prefab) as GameObject;
+            var obj = Instantiate(prefab);
             obj.name = uiType.Name;
 
             var screen = obj.GetComponent<UIManScreen>();
@@ -653,7 +680,7 @@ namespace UnuGames
         /// </summary>
         /// <param name="prefab">Prefab.</param>
         /// <param name="args">Arguments.</param>
-        private void PreprocessDialogue(string key, UnityEngine.Object asset, Type uiType, UICallback callbacks, params object[] args)
+        private void PreprocessDialogue(string key, UnityObject asset, Type uiType, UICallback callbacks, params object[] args)
         {
             if (!(asset is GameObject prefab))
             {
@@ -661,7 +688,7 @@ namespace UnuGames
                 return;
             }
 
-            var obj = Instantiate(prefab) as GameObject;
+            var obj = Instantiate(prefab);
             obj.name = uiType.Name;
 
             var dialogue = obj.GetComponent<UIManDialog>();
@@ -675,7 +702,7 @@ namespace UnuGames
 
             dialogue.Transform.SetParent(this.dialogRoot, false);
             dialogue.RectTransform.localScale = Vector3.one;
-            this.dialogDict.Add(uiType, dialogue as UIManDialog);
+            this.dialogDict.Add(uiType, dialogue);
             this.IsLoadingDialog = false;
 
             ShowDialog(uiType, callbacks, args);
@@ -685,7 +712,7 @@ namespace UnuGames
         /// Sets the screen background.
         /// </summary>
         /// <param name="texture">Texture.</param>
-        private void SetScreenBackground(string key, UnityEngine.Object asset)
+        private void SetScreenBackground(string key, UnityObject asset)
         {
             if (!(asset is Texture2D texture))
             {
@@ -905,7 +932,7 @@ namespace UnuGames
         public void DestroyUI<T>()
         {
             Type uiType = typeof(T);
-            var dialog = uiType.BaseType == typeof(UIManDialog) ? true : false;
+            var dialog = uiType.BaseType == typeof(UIManDialog);
 
             UIManBase ui = null;
 
@@ -935,7 +962,7 @@ namespace UnuGames
         public T GetHandler<T>() where T : UIManBase
         {
             Type uiType = typeof(T);
-            var dialog = uiType.BaseType == typeof(UIManDialog) ? true : false;
+            var dialog = uiType.BaseType == typeof(UIManDialog);
 
             if (dialog)
             {
@@ -985,7 +1012,7 @@ namespace UnuGames
             UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessPreload(key, asset, uiType));
         }
 
-        private void PreprocessPreload(string key, UnityEngine.Object asset, Type uiType)
+        private void PreprocessPreload(string key, UnityObject asset, Type uiType)
         {
             if (!(asset is GameObject prefab))
             {
@@ -993,7 +1020,7 @@ namespace UnuGames
                 return;
             }
 
-            var obj = Instantiate(prefab) as GameObject;
+            var obj = Instantiate(prefab);
             obj.name = uiType.Name;
 
             var canvasGroup = obj.GetComponent<CanvasGroup>();

@@ -183,10 +183,10 @@ namespace UnuGames
             EditorHelper.GetPrefab<UIMan>();
         }
 
-        [MenuItem("UIMan/Prefab/Find UIActivityIndicator", false, 4)]
-        private static void FindUIActivityIndicator()
+        [MenuItem("UIMan/Prefab/Find UIActivity", false, 4)]
+        private static void FindUIActivity()
         {
-            EditorHelper.GetPrefab<UIActivityIndicator>();
+            EditorHelper.GetPrefab<UIActivity>();
         }
 
         [MenuItem("UIMan/Configuration", false)]
