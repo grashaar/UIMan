@@ -238,7 +238,7 @@ namespace UnuGames
         /// <param name="seal">If set to <c>true</c> seal.</param>
         /// <param name="args">Arguments.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void ShowScreen<T>(bool seal, params object[] args)
+        public void ShowScreen<T>(bool seal, params object[] args) where T : UIManScreen
         {
             ShowScreen(typeof(T), seal, args);
         }
@@ -258,7 +258,7 @@ namespace UnuGames
         /// </summary>
         /// <param name="args">Arguments.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void ShowScreen<T>(params object[] args)
+        public void ShowScreen<T>(params object[] args) where T : UIManScreen
         {
             ShowScreen(typeof(T), args);
         }
@@ -306,7 +306,7 @@ namespace UnuGames
         /// Hides the screen.
         /// </summary>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void HideScreen<T>(bool deactive = false)
+        public void HideScreen<T>(bool deactive = false) where T : UIManScreen
         {
             HideScreen(typeof(T), deactive);
         }
@@ -361,7 +361,7 @@ namespace UnuGames
         /// <param name="callbacks">Callbacks.</param>
         /// <param name="args">Arguments.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void ShowDialog<T>(UICallback callbacks, params object[] args)
+        public void ShowDialog<T>(UICallback callbacks, params object[] args) where T : UIManDialog
         {
             ShowDialog(typeof(T), callbacks, args);
         }
@@ -376,7 +376,7 @@ namespace UnuGames
             ShowDialog(uiType, null, args);
         }
 
-        public void ShowDialog<T>(params object[] args)
+        public void ShowDialog<T>(params object[] args) where T : UIManDialog
         {
             ShowDialog(typeof(T), null, args);
         }
@@ -462,7 +462,7 @@ namespace UnuGames
         /// Hides the dialog.
         /// </summary>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void HideDialog<T>(bool deactive = false)
+        public void HideDialog<T>(bool deactive = false) where T : UIManDialog
         {
             HideDialog(typeof(T), deactive);
         }
@@ -916,7 +916,7 @@ namespace UnuGames
             }
         }
 
-        public bool IsShowingDialog<T>()
+        public bool IsShowingDialog<T>() where T : UIManDialog
         {
             Type uiType = typeof(T);
 
@@ -929,7 +929,7 @@ namespace UnuGames
             return false;
         }
 
-        public void DestroyUI<T>()
+        public void DestroyUI<T>() where T : UIManBase
         {
             Type uiType = typeof(T);
             var dialog = uiType.BaseType == typeof(UIManDialog);
@@ -985,7 +985,7 @@ namespace UnuGames
         /// </summary>
         /// <param name="uiman">Uiman.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void Preload<T>()
+        public void Preload<T>() where T : UIManBase
         {
             Preload(typeof(T));
         }
