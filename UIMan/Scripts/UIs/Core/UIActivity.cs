@@ -34,16 +34,14 @@ namespace UnuGames
             OnAwake();
         }
 
-        protected virtual void OnAwake() { }
-
         public void Setup(Transform root)
         {
             this.transform.SetParent(root, false);
         }
 
-        public void Show(Settings? settings = null)
+        public void Show(Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
-            Show(false, 0f, settings);
+            Show(false, 0f, settings, onComplete, args);
         }
 
         public void Show(AsyncOperation task, Settings? settings = null,
@@ -74,11 +72,6 @@ namespace UnuGames
                             UIActivityAction onComplete = null, params object[] args)
         {
             Show(task, onTaskComplete, false, 0f, 0f, settings, onComplete, args);
-        }
-
-        public void Show(float showDuration, Settings? settings = null)
-        {
-            Show(true, showDuration, settings);
         }
 
         public void Show(float showDuration, Settings? settings = null,
@@ -125,22 +118,20 @@ namespace UnuGames
 
         public void Hide()
         {
-            var deactive = this.deactivateOnHide;
-
-            this.isLoading = false;
-            ApplySettings(default);
-            UnblockInput();
-
-            if (deactive)
-                this.gameObject.SetActive(false);
+            OnHide();
+            HideInternal();
         }
 
         public void Hide(float duration)
         {
             if (duration <= 0f)
+            {
                 Hide();
-            else
-                GetFadeTweener(duration, 0f).SetOnComplete(Hide);
+                return;
+            }
+
+            OnHide();
+            GetFadeTweener(duration, 0f).SetOnComplete(HideInternal);
         }
 
         public void BlockInput()
@@ -166,6 +157,16 @@ namespace UnuGames
             this.canvasGroup.interactable = false;
             this.canvasGroup.blocksRaycasts = false;
         }
+
+        protected virtual void OnAwake() { }
+
+        protected virtual void OnShow() { }
+
+        protected virtual void OnShowComplete() { }
+
+        protected virtual void OnHide() { }
+
+        protected virtual void OnHideComplete() { }
 
         protected virtual void SetShowProgress(bool value) { }
 

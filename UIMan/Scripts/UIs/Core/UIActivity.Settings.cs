@@ -19,6 +19,16 @@
                 this.deactivateOnHide = deactivateOnHide;
             }
 
+            public Settings With(bool? showIcon = null, bool? showCover = null, bool? showBackground = null,
+                                 bool? showProgress = null, bool? deactivateOnHide = null)
+            {
+                return new Settings(showIcon ?? this.showIcon,
+                                    showCover ?? this.showCover,
+                                    showBackground ?? this.showBackground,
+                                    showProgress ?? this.showProgress,
+                                    deactivateOnHide ?? this.deactivateOnHide);
+            }
+
             public void Deconstruct(out bool showIcon, out bool showCover, out bool showBackground,
                                     out bool showProgress, out bool deactivateOnHide)
             {

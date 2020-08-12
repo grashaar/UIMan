@@ -8,41 +8,43 @@ namespace UnuGames
 {
     public partial class UIActivity
     {
-        private void ApplySettings(Settings? value = null)
-        {
-            var settings = value ?? Settings.Default;
+        private static readonly object[] _noArgs = new object[0];
 
+        private void ApplySettings(in Settings value)
+        {
             if (this.icon)
-                this.icon.SetActive(settings.showIcon);
+                this.icon.SetActive(value.showIcon);
 
             if (this.cover)
-                this.cover.enabled = settings.showCover;
+                this.cover.enabled = value.showCover;
 
             if (this.background)
-                this.background.enabled = settings.showBackground;
+                this.background.enabled = value.showBackground;
 
-            this.deactivateOnHide = settings.deactivateOnHide;
+            this.deactivateOnHide = value.deactivateOnHide;
 
-            SetShowProgress(settings.showProgress);
-            BlockInput();
+            SetShowProgress(value.showProgress);
         }
 
-        private void Begin(UIActivityAction onComplete = null, params object[] args)
+        private void Begin(UIActivityAction onComplete, object[] args)
         {
             this.onComplete = onComplete;
-            this.onCompleteArgs = args;
+            this.onCompleteArgs = args ?? _noArgs;
             this.isLoading = true;
 
             if (!this.gameObject.activeSelf)
                 this.gameObject.SetActive(true);
         }
 
-        private void OnShowComplete()
+        private void InvokeOnShowComplete()
         {
+            OnShowComplete();
+
             if (this.onComplete != null)
             {
                 this.onComplete(this, this.onCompleteArgs);
                 this.onComplete = null;
+                this.onCompleteArgs = _noArgs;
             }
         }
 
@@ -53,7 +55,7 @@ namespace UnuGames
         {
             yield return StartCoroutine(coroutine);
 
-            OnShowComplete();
+            InvokeOnShowComplete();
             Hide();
         }
 
@@ -67,7 +69,7 @@ namespace UnuGames
                 yield return null;
             }
 
-            OnShowComplete();
+            InvokeOnShowComplete();
             Hide();
         }
 
@@ -81,7 +83,7 @@ namespace UnuGames
                 yield return null;
             }
 
-            OnShowComplete();
+            InvokeOnShowComplete();
             Hide();
         }
 
@@ -89,7 +91,7 @@ namespace UnuGames
         {
             await task();
 
-            OnShowComplete();
+            InvokeOnShowComplete();
             Hide();
         }
 
@@ -98,13 +100,13 @@ namespace UnuGames
             var result = await task();
             onTaskComplete?.Invoke(result);
 
-            OnShowComplete();
+            InvokeOnShowComplete();
             Hide();
         }
 
         private void WaitTask(float hideDuration)
         {
-            OnShowComplete();
+            InvokeOnShowComplete();
             Hide(hideDuration);
         }
 
@@ -112,7 +114,7 @@ namespace UnuGames
         {
             yield return StartCoroutine(coroutine);
 
-            OnShowComplete();
+            InvokeOnShowComplete();
             Hide(hideDuration);
         }
 
@@ -126,7 +128,7 @@ namespace UnuGames
                 yield return null;
             }
 
-            OnShowComplete();
+            InvokeOnShowComplete();
             Hide(hideDuration);
         }
 
@@ -140,7 +142,7 @@ namespace UnuGames
                 yield return null;
             }
 
-            OnShowComplete();
+            InvokeOnShowComplete();
             Hide(hideDuration);
         }
 
@@ -148,7 +150,7 @@ namespace UnuGames
         {
             await task();
 
-            OnShowComplete();
+            InvokeOnShowComplete();
             Hide(hideDuration);
         }
 
@@ -157,7 +159,7 @@ namespace UnuGames
             var result = await task();
             onTaskComplete?.Invoke(result);
 
-            OnShowComplete();
+            InvokeOnShowComplete();
             Hide(hideDuration);
         }
 
@@ -167,15 +169,35 @@ namespace UnuGames
                             .SetOnUpdate(x => this.canvasGroup.alpha = x);
         }
 
-        private void OnShow(float duration)
+        private void ShowInternal(in Settings? settings)
         {
-            if (duration <= 0f)
-                OnShowComplete();
-            else
-                GetFadeTweener(duration, 1f).SetOnComplete(OnShowComplete);
+            OnShow();
+            ApplySettings(settings ?? Settings.Default);
+            BlockInput();
         }
 
-        private void OnShow(float showDuration, float hideDuration)
+        private void HideInternal()
+        {
+            var willDeactivate = this.deactivateOnHide;
+
+            this.isLoading = false;
+            ApplySettings(default);
+            UnblockInput();
+            OnHideComplete();
+
+            if (willDeactivate && this.gameObject.activeSelf)
+                this.gameObject.SetActive(false);
+        }
+
+        private void FadeShow(float duration)
+        {
+            if (duration <= 0f)
+                InvokeOnShowComplete();
+            else
+                GetFadeTweener(duration, 1f).SetOnComplete(InvokeOnShowComplete);
+        }
+
+        private void FadeShow(float showDuration, float hideDuration)
         {
             if (showDuration <= 0f)
                 WaitTask(hideDuration);
@@ -183,7 +205,7 @@ namespace UnuGames
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(hideDuration));
         }
 
-        private void OnShow(AsyncOperation task, float showDuration, float hideDuration)
+        private void FadeShow(AsyncOperation task, float showDuration, float hideDuration)
         {
             if (showDuration <= 0f)
                 StartCoroutine(WaitTask(task, hideDuration));
@@ -191,7 +213,7 @@ namespace UnuGames
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => StartCoroutine(WaitTask(task, hideDuration)));
         }
 
-        private void OnShow(IEnumerator task, float showDuration, float hideDuration)
+        private void FadeShow(IEnumerator task, float showDuration, float hideDuration)
         {
             if (showDuration <= 0f)
                 StartCoroutine(WaitTask(task, hideDuration));
@@ -199,7 +221,7 @@ namespace UnuGames
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => StartCoroutine(WaitTask(task, hideDuration)));
         }
 
-        private void OnShow(UnityWebRequest task, float showDuration, float hideDuration)
+        private void FadeShow(UnityWebRequest task, float showDuration, float hideDuration)
         {
             if (showDuration <= 0f)
                 StartCoroutine(WaitTask(task, hideDuration));
@@ -207,7 +229,7 @@ namespace UnuGames
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => StartCoroutine(WaitTask(task, hideDuration)));
         }
 
-        private void OnShow(Func<Task> task, float showDuration, float hideDuration)
+        private void FadeShow(Func<Task> task, float showDuration, float hideDuration)
         {
             if (showDuration <= 0f)
                 WaitTask(task, hideDuration);
@@ -215,7 +237,7 @@ namespace UnuGames
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(task, hideDuration));
         }
 
-        private void OnShow<T>(Func<Task<T>> task, Action<T> onTaskComplete, float showDuration, float hideDuration)
+        private void FadeShow<T>(Func<Task<T>> task, Action<T> onTaskComplete, float showDuration, float hideDuration)
         {
             if (showDuration <= 0f)
                 WaitTask(task, onTaskComplete, hideDuration);
@@ -223,33 +245,28 @@ namespace UnuGames
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(task, onTaskComplete, hideDuration));
         }
 
-        private void Show(bool fade, float showDuration, Settings? settings = null)
-        {
-            Begin();
-            ApplySettings(settings);
-
-            if (CanFade(fade))
-                OnShow(showDuration);
-        }
-
         private void Show(bool fade, float showDuration, Settings? settings = null,
                           UIActivityAction onComplete = null, params object[] args)
         {
             Begin(onComplete, args);
-            ApplySettings(settings);
+            ShowInternal(settings);
 
             if (CanFade(fade))
-                OnShow(showDuration);
+                FadeShow(showDuration);
+            else
+                InvokeOnShowComplete();
         }
 
         private void Show(bool fade, float showDuration, float hideDuration, Settings? settings = null,
                           UIActivityAction onComplete = null, params object[] args)
         {
             Begin(onComplete, args);
-            ApplySettings(settings);
+            ShowInternal(settings);
 
             if (CanFade(fade))
-                OnShow(showDuration, hideDuration);
+                FadeShow(showDuration, hideDuration);
+            else
+                InvokeOnShowComplete();
         }
 
         private void Show(AsyncOperation task, bool fade, float showDuration, float hideDuration, Settings? settings = null,
@@ -259,10 +276,10 @@ namespace UnuGames
                 throw new ArgumentNullException(nameof(task));
 
             Begin(onComplete, args);
-            ApplySettings(settings);
+            ShowInternal(settings);
 
             if (CanFade(fade))
-                OnShow(task, showDuration, hideDuration);
+                FadeShow(task, showDuration, hideDuration);
             else
                 StartCoroutine(WaitTask(task));
         }
@@ -274,10 +291,10 @@ namespace UnuGames
                 throw new ArgumentNullException(nameof(task));
 
             Begin(onComplete, args);
-            ApplySettings(settings);
+            ShowInternal(settings);
 
             if (CanFade(fade))
-                OnShow(task, showDuration, hideDuration);
+                FadeShow(task, showDuration, hideDuration);
             else
                 StartCoroutine(WaitTask(task));
         }
@@ -289,10 +306,10 @@ namespace UnuGames
                 throw new ArgumentNullException(nameof(task));
 
             Begin(onComplete, args);
-            ApplySettings(settings);
+            ShowInternal(settings);
 
             if (CanFade(fade))
-                OnShow(task, showDuration, hideDuration);
+                FadeShow(task, showDuration, hideDuration);
             else
                 StartCoroutine(WaitTask(task));
         }
@@ -304,10 +321,10 @@ namespace UnuGames
                 throw new ArgumentNullException(nameof(task));
 
             Begin(onComplete, args);
-            ApplySettings(settings);
+            ShowInternal(settings);
 
             if (CanFade(fade))
-                OnShow(task, showDuration, hideDuration);
+                FadeShow(task, showDuration, hideDuration);
             else
                 WaitTask(task);
         }
@@ -319,10 +336,10 @@ namespace UnuGames
                 throw new ArgumentNullException(nameof(task));
 
             Begin(onComplete, args);
-            ApplySettings(settings);
+            ShowInternal(settings);
 
             if (CanFade(fade))
-                OnShow(task, onTaskComplete, showDuration, hideDuration);
+                FadeShow(task, onTaskComplete, showDuration, hideDuration);
             else
                 WaitTask(task, onTaskComplete);
         }
