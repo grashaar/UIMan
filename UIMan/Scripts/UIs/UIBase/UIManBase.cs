@@ -46,7 +46,7 @@ namespace UnuGames
             get
             {
                 if (this.uiType == null)
-                    this.uiType = this.GetType();
+                    this.uiType = GetType();
                 return this.uiType;
             }
         }
@@ -68,6 +68,12 @@ namespace UnuGames
         }
 
         public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Whether to call <see cref="Deactivate"/> after the user interface is hidden.
+        /// <para>NOTE: The value is set by <see cref="UIMan"/>.</para>
+        /// </summary>
+        public bool ShouldDeactivateAfterHidden { get; set; }
 
         /// <summary>
         /// Gets the type of the user interface.
@@ -116,6 +122,24 @@ namespace UnuGames
         public virtual void OnHideComplete()
         {
             this.State = UIState.Hide;
+        }
+
+        /// <summary>
+        /// Raisesd the activate event before <see cref="OnShow(object[])"/>.
+        /// </summary>
+        public virtual void Activate()
+        {
+            if (!this.gameObject.activeSelf)
+                this.gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Raises the deactivate event after <see cref="OnHideComplete"/>.
+        /// </summary>
+        public virtual void Deactivate()
+        {
+            if (this.gameObject.activeSelf)
+                this.gameObject.SetActive(false);
         }
 
         /// <summary>

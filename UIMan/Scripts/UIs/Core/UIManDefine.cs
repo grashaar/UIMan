@@ -46,12 +46,16 @@ namespace UnuGames
 
         public UITransitionType TransitionType { get; set; }
 
-        public UIDialogQueueData(Type uiType, UITransitionType transition, object[] args, UICallback callbacks = null)
+        public bool DeactivateAfterHidden { get; set; }
+
+        public UIDialogQueueData(Type uiType, UITransitionType transition, object[] args, UICallback callbacks = null,
+                                 bool deactivateAfterHidden = false)
         {
             this.UIType = uiType;
             this.TransitionType = transition;
             this.Args = args;
             this.Callbacks = callbacks;
+            this.DeactivateAfterHidden = deactivateAfterHidden;
         }
     }
 

@@ -268,6 +268,9 @@ namespace UnuGames
             if (!screen.gameObject.activeInHierarchy)
                 screen.gameObject.SetActive(true);
 
+            screen.ShouldDeactivateAfterHidden = false;
+            screen.Activate();
+
             if (screen.useBackground)
             {
                 this.background.gameObject.SetActive(true);
@@ -343,13 +346,13 @@ namespace UnuGames
         /// Hides the screen.
         /// </summary>
         /// <param name="content">Content.</param>
-        public void HideScreen(Type uiType, bool deactive = false)
+        public void HideScreen(Type uiType, bool deactivate = false)
         {
             if (this.screenDict.TryGetValue(uiType, out UIManScreen screen))
             {
                 screen.OnHide();
                 OnHideUI(screen);
-                DoAnimHide(screen, deactive);
+                DoAnimHide(screen, deactivate);
             }
             else
             {
@@ -361,9 +364,9 @@ namespace UnuGames
         /// Hides the screen.
         /// </summary>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void HideScreen<T>(bool deactive = false) where T : UIManScreen
+        public void HideScreen<T>(bool deactivate = false) where T : UIManScreen
         {
-            HideScreen(typeof(T), deactive);
+            HideScreen(typeof(T), deactivate);
         }
 
         /// <summary>
@@ -392,6 +395,9 @@ namespace UnuGames
 
             if (!dialog.gameObject.activeInHierarchy)
                 dialog.gameObject.SetActive(true);
+
+            dialog.ShouldDeactivateAfterHidden = false;
+            dialog.Activate();
 
             if (dialog.useCover)
             {
@@ -469,11 +475,11 @@ namespace UnuGames
         /// <summary>
         /// Hides the dialog.
         /// </summary>
-        public void HideDialog(Type uiType, bool deactive = false)
+        public void HideDialog(Type uiType, bool deactivate = false)
         {
             if (this.IsInDialogTransition)
             {
-                EnqueueDialog(uiType, UITransitionType.Hide, null, null);
+                EnqueueDialog(uiType, UITransitionType.Hide, null, null, deactivate);
                 return;
             }
 
@@ -491,8 +497,10 @@ namespace UnuGames
                 BringToLayer(this.cover, siblingIndex + 1);
 
                 UIManDialog prevDialog = null;
+
                 if (this.activeDialog.Count > 0)
                     this.dialogDict.TryGetValue(this.activeDialog.Peek(), out prevDialog);
+
                 if (prevDialog != null && prevDialog.useCover)
                 {
                     this.cover.gameObject.SetActive(true);
@@ -505,7 +513,7 @@ namespace UnuGames
                 this.IsInDialogTransition = true;
                 dialog.OnHide();
                 OnHideUI(dialog);
-                DoAnimHide(dialog, deactive);
+                DoAnimHide(dialog, deactivate);
             }
             else
             {
@@ -517,9 +525,9 @@ namespace UnuGames
         /// Hides the dialog.
         /// </summary>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void HideDialog<T>(bool deactive = false) where T : UIManDialog
+        public void HideDialog<T>(bool deactivate = false) where T : UIManDialog
         {
-            HideDialog(typeof(T), deactive);
+            HideDialog(typeof(T), deactivate);
         }
 
         /// <summary>
@@ -867,17 +875,20 @@ namespace UnuGames
         /// Dos the animation hide.
         /// </summary>
         /// <param name="ui">User interface.</param>
-        private void DoAnimHide(UIManBase ui, bool deactive)
+        private void DoAnimHide(UIManBase ui, bool deactivate)
         {
             ui.LockInput();
+
             if (ui.motionHide == UIMotion.CustomMecanimAnimation)
             {
                 // Custom animation use animator
+                ui.ShouldDeactivateAfterHidden = deactivate;
                 ui.animRoot.EnableAndPlay(UIManDefine.ANIM_HIDE);
             }
             else if (ui.motionHide == UIMotion.CustomScriptAnimation)
             {
                 // Custom animation use overrided function
+                ui.ShouldDeactivateAfterHidden = deactivate;
                 ui.animRoot.Disable();
                 StartCoroutine(DelayDequeueDialog(ui.AnimationHide(), ui, false));
             }
@@ -898,14 +909,14 @@ namespace UnuGames
                     ui.OnHideComplete();
                     OnHideUIComplete(ui);
 
-                    if (deactive)
-                        ui.gameObject.SetActive(false);
-
                     if (ui.GetUIBaseType() == UIBaseType.Dialog)
                     {
                         this.IsInDialogTransition = false;
                         DequeueDialog();
                     }
+
+                    if (deactivate)
+                        ui.Deactivate();
                 });
             }
         }
@@ -957,9 +968,10 @@ namespace UnuGames
         /// <param name="transition">Transition.</param>
         /// <param name="args">Arguments.</param>
         /// <param name="callback">Callback.</param>
-        private void EnqueueDialog(Type uiType, UITransitionType transition, object[] args, UICallback callback)
+        private void EnqueueDialog(Type uiType, UITransitionType transition, object[] args, UICallback callback,
+                                   bool deactivateAfterHidden = false)
         {
-            var data = new UIDialogQueueData(uiType, transition, args, callback);
+            var data = new UIDialogQueueData(uiType, transition, args, callback, deactivateAfterHidden);
             this.dialogQueue.Enqueue(data);
         }
 
@@ -997,7 +1009,7 @@ namespace UnuGames
                 }
                 else if (transition.TransitionType == UITransitionType.Hide)
                 {
-                    HideDialog(transition.UIType);
+                    HideDialog(transition.UIType, transition.DeactivateAfterHidden);
                 }
             }
         }
