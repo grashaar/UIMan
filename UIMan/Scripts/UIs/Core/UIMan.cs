@@ -137,12 +137,12 @@ namespace UnuGames
 
         public bool IsScreenType(Type type)
         {
-            return type != null && typeof(UIManDialog).IsAssignableFrom(type);
+            return type != null && typeof(UIManScreen).IsAssignableFrom(type);
         }
 
         public bool IsDialogType(Type type)
         {
-            return type != null && typeof(UIManScreen).IsAssignableFrom(type);
+            return type != null && typeof(UIManDialog).IsAssignableFrom(type);
         }
 
         public bool IsActivityType(Type type)
