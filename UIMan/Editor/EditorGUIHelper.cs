@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
@@ -1251,7 +1251,7 @@ namespace UnuGames
     public static class CommonColor
     {
         public static readonly Color LightGreen = new Color(0.2f, 1f, 0.35f);
-        public static readonly Color LightRed = new Color(1f, 0.3f, 0.3f);
+        public static readonly Color LightRed = new Color(1f, 0.419f, 0.419f);
         public static readonly Color LightBlue = new Color(0f, 0.85f, 1f);
         public static readonly Color LightOrange = new Color(1f, 0.733f, 0.478f);
         public static readonly Color Orange = new Color(1f, 0.56f, 0.14f);
@@ -1274,7 +1274,7 @@ namespace UnuGames
 
         public static Color GetGreen(float alpha = 1f)
         {
-            var color = EditorGUIUtility.isProSkin ? LightBlue : Color.blue;
+            var color = EditorGUIUtility.isProSkin ? LightGreen : Color.green;
             color.a = alpha;
 
             return color;
@@ -1282,7 +1282,7 @@ namespace UnuGames
 
         public static Color GetRed(float alpha = 1f)
         {
-            var color = EditorGUIUtility.isProSkin ? LightBlue : Color.blue;
+            var color = EditorGUIUtility.isProSkin ? LightRed : Color.red;
             color.a = alpha;
 
             return color;
