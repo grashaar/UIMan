@@ -112,7 +112,7 @@ namespace UnuGames
             InitializeTextStyle();
 
             GUILayout.BeginHorizontal(EditorStyles.toolbar);
-            GUI.backgroundColor = new Color(1f, 1f, 1f, 0.5f);
+            GUI.backgroundColor = CommonColor.GetBackgroundColor(0.5f);
             GUI.SetNextControlName("Search");
             this.searchText = EditorGUILayout.TextField("", this.searchText, this.searchToobar, GUILayout.MinWidth(95));
             EditorGUI.FocusTextInControl("Search");
@@ -134,7 +134,7 @@ namespace UnuGames
             }
 
             GUILayout.EndHorizontal();
-            GUI.backgroundColor = Color.white;
+            GUI.backgroundColor = CommonColor.GetBackgroundColor();
 
             this.scrollPosition = EditorGUILayout.BeginScrollView(this.scrollPosition);
 
@@ -330,7 +330,7 @@ namespace UnuGames
 
             if (this._onLeftButtonClick != null && !string.IsNullOrEmpty(this._leftButtonText))
             {
-                if (GUILayout.Button(this._leftButtonText, this.toolbarButtonStyle, GUILayout.Width(50)))
+                if (GUILayout.Button(this._leftButtonText, this.toolbarButtonStyle, GUILayout.Width(60)))
                 {
                     this._onLeftButtonClick?.Invoke(null);
                 }
@@ -426,8 +426,8 @@ namespace UnuGames
             {
                 if (i == this._selected)
                 {
-                    this.menuItemStyle.normal.textColor = Color.blue;
-                    this.buttonStyle.normal.textColor = Color.blue;
+                    this.menuItemStyle.normal.textColor = CommonColor.GetBlue();
+                    this.buttonStyle.normal.textColor = CommonColor.GetBlue();
                 }
                 else
                 {
@@ -581,8 +581,8 @@ namespace UnuGames
 
                 if (i == this._selected)
                 {
-                    this.menuItemStyle.normal.textColor = Color.blue;
-                    this.buttonStyle.normal.textColor = Color.blue;
+                    this.menuItemStyle.normal.textColor = CommonColor.GetBlue();
+                    this.buttonStyle.normal.textColor = CommonColor.GetBlue();
                 }
                 else
                 {
@@ -917,7 +917,7 @@ namespace UnuGames
             Color textColor = Color.gray;
 
             if (this._property.HasChange)
-                textColor = Color.black;
+                textColor = CommonColor.GetTextColor();
 
             if (ColorButton.Draw("S", CommonColor.LightGreen, textColor, buttonWidth))
             {
@@ -1012,7 +1012,7 @@ namespace UnuGames
             if (headerLabel == null)
             {
                 headerLabel = new GUIStyle();
-                headerLabel.normal.textColor = Color.black;
+                headerLabel.normal.textColor = CommonColor.GetTextColor();
                 headerLabel.fontStyle = FontStyle.Bold;
                 headerLabel.alignment = TextAnchor.MiddleLeft;
             }
@@ -1031,7 +1031,7 @@ namespace UnuGames
             if (titleLabel == null)
             {
                 titleLabel = new GUIStyle();
-                titleLabel.normal.textColor = Color.black;
+                titleLabel.normal.textColor = CommonColor.GetTextColor();
                 titleLabel.fontStyle = FontStyle.Bold;
                 titleLabel.fontSize += 15;
                 titleLabel.alignment = TextAnchor.MiddleCenter;
@@ -1048,7 +1048,7 @@ namespace UnuGames
             if (subTitleLabel == null)
             {
                 subTitleLabel = new GUIStyle();
-                subTitleLabel.normal.textColor = Color.black;
+                subTitleLabel.normal.textColor = CommonColor.GetTextColor();
                 subTitleLabel.fontStyle = FontStyle.Bold;
                 subTitleLabel.fontSize += 12;
                 subTitleLabel.alignment = TextAnchor.MiddleCenter;
@@ -1145,9 +1145,10 @@ namespace UnuGames
     {
         private static GUISkin skin;
 
-        public static GUIStyle RichText(bool wordWrap = false)
+        public static GUIStyle RichText(bool wordWrap = false, Color? color = null)
         {
             var style = new GUIStyle();
+            style.normal.textColor = color.HasValue ? color.Value : CommonColor.GetTextColor();
             style.richText = true;
             style.wordWrap = wordWrap;
             return style;
@@ -1249,9 +1250,66 @@ namespace UnuGames
 
     public static class CommonColor
     {
-        public static Color LightGreen = new Color(0.2f, 1, 0.35f);
-        public static Color LightRed = new Color(1, 0.3f, 0.3f);
-        public static Color LightBlue = new Color(0, 0.85f, 1);
-        public static Color LightOrange = new Color(1, 0.56f, 0.14f);
+        public static readonly Color LightGreen = new Color(0.2f, 1f, 0.35f);
+        public static readonly Color LightRed = new Color(1f, 0.3f, 0.3f);
+        public static readonly Color LightBlue = new Color(0f, 0.85f, 1f);
+        public static readonly Color LightOrange = new Color(1f, 0.733f, 0.478f);
+        public static readonly Color Orange = new Color(1f, 0.56f, 0.14f);
+        public static readonly Color LightGray = new Color(0.76f, 0.76f, 0.76f);
+        public static Color GetTextColor(float alpha = 1f)
+        {
+            var color = EditorGUIUtility.isProSkin ? Color.white : Color.black;
+            color.a = alpha;
+
+            return color;
+        }
+
+        public static Color GetBackgroundColor(float alpha = 1f)
+        {
+            var color = EditorGUIUtility.isProSkin ? Color.gray : Color.white;
+            color.a = alpha;
+
+            return color;
+        }
+
+        public static Color GetGreen(float alpha = 1f)
+        {
+            var color = EditorGUIUtility.isProSkin ? LightBlue : Color.blue;
+            color.a = alpha;
+
+            return color;
+        }
+
+        public static Color GetRed(float alpha = 1f)
+        {
+            var color = EditorGUIUtility.isProSkin ? LightBlue : Color.blue;
+            color.a = alpha;
+
+            return color;
+        }
+
+        public static Color GetBlue(float alpha = 1f)
+        {
+            var color = EditorGUIUtility.isProSkin ? LightBlue : Color.blue;
+            color.a = alpha;
+
+            return color;
+        }
+
+        public static Color GetOrange(float alpha = 1f)
+        {
+            var color = EditorGUIUtility.isProSkin ? LightOrange : Orange;
+            color.a = alpha;
+
+            return color;
+        }
+
+        public static Color GetGray(float alpha = 1f)
+        {
+            var color = EditorGUIUtility.isProSkin ? LightGray : Color.gray;
+            color.a = alpha;
+
+            return color;
+        }
     }
 }

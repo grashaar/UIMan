@@ -44,12 +44,12 @@ namespace UnuGames
 
             GUILayout.Space(10);
             LabelHelper.HeaderLabel("Type");
-            LineHelper.Draw(Color.gray);
+            LineHelper.Draw(CommonColor.GetGray());
             this.baseTypePopup.Draw();
 
             GUILayout.Space(10);
             LabelHelper.HeaderLabel("Namespace");
-            LineHelper.Draw(Color.gray);
+            LineHelper.Draw(CommonColor.GetGray());
             this.namespaceField.Draw(GUIContent.none, 0);
 
             GUILayout.Space(10);

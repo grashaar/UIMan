@@ -377,7 +377,7 @@ namespace UnuGames
             // Title
             GUILayout.Space(2);
             LabelHelper.TitleLabel(_selectedType.Name);
-            LineHelper.Draw(Color.gray);
+            LineHelper.Draw(CommonColor.GetGray());
 
             // Common
             GUILayout.Space(2);
@@ -492,7 +492,7 @@ namespace UnuGames
             }
 
             GUILayout.EndHorizontal();
-            LineHelper.Draw(Color.gray);
+            LineHelper.Draw(CommonColor.GetGray());
         }
 
         private void CachePropertiesDrawer(bool clearCurrentCache = false)

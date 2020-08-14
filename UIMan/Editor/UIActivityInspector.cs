@@ -26,7 +26,7 @@ namespace UnuGames
 
             GUI.backgroundColor = orgBgColor;
 
-            LineHelper.Draw(Color.gray);
+            LineHelper.Draw(CommonColor.GetGray());
 
 #if ODIN_INSPECTOR
             EditorGUILayout.Space();

@@ -32,14 +32,14 @@ namespace UnuGames
             var uiManBase = (UIManBase)this.target;
             this.orgBgColor = GUI.backgroundColor;
 
-            GUI.backgroundColor = CommonColor.LightOrange;
+            GUI.backgroundColor = CommonColor.GetOrange();
             GUILayout.BeginHorizontal("Box");
             LabelHelper.HeaderLabel(string.Format("UIMan View Model ({0})", uiManBase.GetUIBaseType()));
             GUILayout.EndHorizontal();
 
             GUI.backgroundColor = this.orgBgColor;
 
-            LineHelper.Draw(Color.gray);
+            LineHelper.Draw(CommonColor.GetGray());
 
             EditorGUILayout.Space();
             LabelHelper.HeaderLabel("General");
@@ -227,7 +227,7 @@ namespace UnuGames
 
             GUILayout.Space(2f);
             GUILayout.EndVertical();
-            LineHelper.Draw(Color.gray);
+            LineHelper.Draw(CommonColor.GetGray());
 
             EditorGUILayout.Space();
             LabelHelper.HeaderLabel("Custom fields");

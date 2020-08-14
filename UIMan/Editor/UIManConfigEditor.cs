@@ -31,7 +31,7 @@ public class UIManConfigEditor : Editor
         }
 
         LabelHelper.TitleLabel("UIMan Configuration");
-        LineHelper.Draw(Color.blue);
+        LineHelper.Draw(CommonColor.GetBlue());
         EditorGUILayout.Space();
 
         GUILayout.BeginVertical("Box");
@@ -45,7 +45,7 @@ public class UIManConfigEditor : Editor
         GUILayout.BeginHorizontal("Box");
         GUILayout.Label("<b>Warning:</b> This configuration use to set default path of prefabs/images for UI.\n\n" +
                         "If you don't want to use this default path for your Screen/Dialog, apply UIDescriptor to your class to define custom path.",
-                        EditorGUIHelper.RichText(true));
+                        EditorGUIHelper.RichText(true, CommonColor.GetOrange()));
         GUILayout.EndHorizontal();
 
         EditorUtility.SetDirty(this.target);

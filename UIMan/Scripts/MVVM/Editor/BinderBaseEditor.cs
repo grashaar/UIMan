@@ -177,7 +177,7 @@ namespace UnuGames.MVVM
 
             if (dataMembers == null)
             {
-                EditorGUILayout.LabelField("<color=red>No target context found!</color>", EditorGUIHelper.RichText());
+                EditorGUILayout.LabelField("No target context found!", EditorGUIHelper.RichText(color: CommonColor.GetRed()));
                 GUILayout.EndHorizontal();
             }
             else
@@ -225,7 +225,7 @@ namespace UnuGames.MVVM
                     {
                         GUILayout.BeginHorizontal();
                         EditorGUILayout.PrefixLabel(" ");
-                        GUILayout.Label("<color=red>None observable field!</color>", EditorGUIHelper.RichText());
+                        GUILayout.Label("None observable field!", EditorGUIHelper.RichText(color: CommonColor.GetRed()));
                         GUILayout.EndHorizontal();
                     }
                 }

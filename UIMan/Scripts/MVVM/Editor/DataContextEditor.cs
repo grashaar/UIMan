@@ -33,7 +33,7 @@ namespace UnuGames.MVVM
             else if (context.type == ContextType.MonoBehaviour)
             {
                 EditorGUI.BeginChangeCheck();
-                var contextViewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, (Object)context.viewModel, typeof(ViewModelBehaviour), true);
+                var contextViewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, context.viewModel, typeof(ViewModelBehaviour), true);
 
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -45,14 +45,15 @@ namespace UnuGames.MVVM
                 {
                     GUILayout.BeginHorizontal();
                     EditorGUILayout.PrefixLabel(" ");
-                    EditorGUILayout.LabelField("<color=blue>[" + context.viewModel.GetCachedType().FullName + "]</color>", EditorGUIHelper.RichText());
+                    EditorGUILayout.LabelField("[" + context.viewModel.GetCachedType().FullName + "]",
+                                               EditorGUIHelper.RichText(color: CommonColor.GetBlue()));
                     GUILayout.EndHorizontal();
                 }
             }
             else if (context.type == ContextType.Property)
             {
                 EditorGUI.BeginChangeCheck();
-                var contextViewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, (Object)context.viewModel, typeof(ViewModelBehaviour), true);
+                var contextViewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, context.viewModel, typeof(ViewModelBehaviour), true);
 
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -115,7 +116,7 @@ namespace UnuGames.MVVM
                         {
                             GUILayout.BeginHorizontal();
                             EditorGUILayout.PrefixLabel(" ");
-                            GUILayout.Label("<color=red>None observable field/property!</color>", EditorGUIHelper.RichText());
+                            GUILayout.Label("None observable field/property!", EditorGUIHelper.RichText(color: CommonColor.GetRed()));
                             GUILayout.EndHorizontal();
                         }
                     }
