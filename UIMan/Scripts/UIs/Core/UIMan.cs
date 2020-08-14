@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnuGames.MVVM;
 
 namespace UnuGames
 {
@@ -90,9 +91,9 @@ namespace UnuGames
             {
                 for (var i = 0; i < screens.Length; i++)
                 {
-                    this.screenDict.Add(screens[i].UIType, screens[i]);
+                    this.screenDict.Add(screens[i].Type, screens[i]);
                 }
-                this.CurrentScreen = this.screenDict[screens[screens.Length - 1].UIType];
+                this.CurrentScreen = this.screenDict[screens[screens.Length - 1].Type];
             }
         }
 
@@ -134,8 +135,29 @@ namespace UnuGames
 
         #region Features
 
+        public bool IsScreenType(Type type)
+        {
+            return type != null && typeof(UIManDialog).IsAssignableFrom(type);
+        }
+
+        public bool IsDialogType(Type type)
+        {
+            return type != null && typeof(UIManScreen).IsAssignableFrom(type);
+        }
+
+        public bool IsActivityType(Type type)
+        {
+            return type != null && typeof(UIActivity).IsAssignableFrom(type);
+        }
+
         public void GetActivity(Type uiType, Action<UIActivity> onGet)
         {
+            if (!IsActivityType(uiType))
+            {
+                UnuLogger.LogError("UI type must be derived from UIActivity");
+                return;
+            }
+
             if (this.activityDict.TryGetValue(uiType, out var activity))
             {
                 onGet?.Invoke(activity);
@@ -199,10 +221,10 @@ namespace UnuGames
             GetActivity(uiType, x => x.Show(settings));
         }
 
-        public void ShowActivity(Type uiType, float duration, UIActivity.Settings? settings = null,
+        public void ShowActivity(Type uiType, float showDuration, UIActivity.Settings? settings = null,
                                  UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity(uiType, x => x.Show(duration, settings, onComplete, args));
+            GetActivity(uiType, x => x.Show(showDuration, settings, onComplete, args));
         }
 
         public void ShowActivity(Type uiType, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
@@ -211,50 +233,44 @@ namespace UnuGames
             GetActivity(uiType, x => x.Show(showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(in UIActivity.Settings? settings = null)
+        public void ShowActivity<T>(UIActivity.Settings? settings = null)
             where T : UIActivity
         {
-            ShowActivity(typeof(T), settings);
+            GetActivity<T>(x => x.Show(settings));
         }
 
-        public void ShowActivity<T>(float showDuration, in UIActivity.Settings? settings = null,
+        public void ShowActivity<T>(float showDuration, UIActivity.Settings? settings = null,
                                     UIActivityAction onComplete = null, params object[] args)
             where T : UIActivity
         {
-            ShowActivity(typeof(T), showDuration, settings, onComplete, args);
+            GetActivity<T>(x => x.Show(showDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(float showDuration, float hideDuration, in UIActivity.Settings? settings = null,
+        public void ShowActivity<T>(float showDuration, float hideDuration, UIActivity.Settings? settings = null,
                                     UIActivityAction onComplete = null, params object[] args)
             where T : UIActivity
         {
-            ShowActivity(typeof(T), showDuration, hideDuration, settings, onComplete, args);
+            GetActivity<T>(x => x.Show(showDuration, hideDuration, settings, onComplete, args));
         }
 
         public void ShowActivity(UIActivity.Settings? settings = null)
         {
-            ShowActivity<UIActivity>(settings);
+            GetActivity<UIActivity>(x => x.Show(settings));
         }
 
-        public void ShowActivity(float duration, UIActivity.Settings? settings = null,
+        public void ShowActivity(float showDuration, UIActivity.Settings? settings = null,
                                  UIActivityAction onComplete = null, params object[] args)
         {
-            ShowActivity<UIActivity>(duration, settings, onComplete, args);
+            GetActivity<UIActivity>(x => x.Show(showDuration, settings, onComplete, args));
         }
 
         public void ShowActivity(float showDuration, float hideDuration, UIActivity.Settings? settings = null,
                                  UIActivityAction onComplete = null, params object[] args)
         {
-            ShowActivity<UIActivity>(showDuration, hideDuration, settings, onComplete, args);
+            GetActivity<UIActivity>(x => x.Show(showDuration, hideDuration, settings, onComplete, args));
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="content">Content.</param>
-        /// <param name="seal">If set to <c>true</c> seal.</param>
-        /// <param name="args">Arguments.</param>
-        private void ShowScreen(Type uiType, bool seal, params object[] args)
+        private void ShowScreen_Internal(Type uiType, bool seal, params object[] args)
         {
             if (this.CurrentScreen != null && this.CurrentScreen.State != UIState.Busy && this.CurrentScreen.State != UIState.Hide)
                 this.CurrentScreen.HideMe();
@@ -291,6 +307,23 @@ namespace UnuGames
         }
 
         /// <summary>
+        ///
+        /// </summary>
+        /// <param name="content">Content.</param>
+        /// <param name="seal">If set to <c>true</c> seal.</param>
+        /// <param name="args">Arguments.</param>
+        public void ShowScreen(Type uiType, bool seal, params object[] args)
+        {
+            if (!IsScreenType(uiType))
+            {
+                UnuLogger.LogError("UI type must be derived from UIManScreen");
+                return;
+            }
+
+            ShowScreen_Internal(uiType, seal, args);
+        }
+
+        /// <summary>
         /// Shows the screen.
         /// </summary>
         /// <param name="seal">If set to <c>true</c> seal.</param>
@@ -298,7 +331,7 @@ namespace UnuGames
         /// <typeparam name="T">The 1st type parameter.</typeparam>
         public void ShowScreen<T>(bool seal, params object[] args) where T : UIManScreen
         {
-            ShowScreen(typeof(T), seal, args);
+            ShowScreen_Internal(typeof(T), seal, args);
         }
 
         /// <summary>
@@ -306,9 +339,15 @@ namespace UnuGames
         /// </summary>
         /// <param name="content">Content.</param>
         /// <param name="args">Arguments.</param>
-        private void ShowScreen(Type uiType, params object[] args)
+        public void ShowScreen(Type uiType, params object[] args)
         {
-            ShowScreen(uiType, false, args);
+            if (!IsScreenType(uiType))
+            {
+                UnuLogger.LogError("UI type must be derived from UIManScreen");
+                return;
+            }
+
+            ShowScreen_Internal(uiType, false, args);
         }
 
         /// <summary>
@@ -318,7 +357,7 @@ namespace UnuGames
         /// <typeparam name="T">The 1st type parameter.</typeparam>
         public void ShowScreen<T>(params object[] args) where T : UIManScreen
         {
-            ShowScreen(typeof(T), args);
+            ShowScreen_Internal(typeof(T), false, args);
         }
 
         /// <summary>
@@ -339,14 +378,10 @@ namespace UnuGames
             OnBack(this.CurrentScreen, beforeScreen, args);
 
             this.screenQueue.RemoveAt(this.screenQueue.Count - 1);
-            ShowScreen(beforeScreen.UIType, true, args);
+            ShowScreen(beforeScreen.Type, true, args);
         }
 
-        /// <summary>
-        /// Hides the screen.
-        /// </summary>
-        /// <param name="content">Content.</param>
-        public void HideScreen(Type uiType, bool deactivate = false)
+        private void HideScreen_Internal(Type uiType, bool deactivate = false)
         {
             if (this.screenDict.TryGetValue(uiType, out UIManScreen screen))
             {
@@ -363,19 +398,28 @@ namespace UnuGames
         /// <summary>
         /// Hides the screen.
         /// </summary>
-        /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void HideScreen<T>(bool deactivate = false) where T : UIManScreen
+        /// <param name="content">Content.</param>
+        public void HideScreen(Type uiType, bool deactivate = false)
         {
-            HideScreen(typeof(T), deactivate);
+            if (!IsScreenType(uiType))
+            {
+                UnuLogger.LogError("UI type must be derived from UIManScreen");
+                return;
+            }
+
+            HideScreen_Internal(uiType, deactivate);
         }
 
         /// <summary>
-        /// Shows the dialog.
+        /// Hides the screen.
         /// </summary>
-        /// <param name="type">Type.</param>
-        /// <param name="callbacks">Callbacks.</param>
-        /// <param name="args">Arguments.</param>
-        private void ShowDialog(Type uiType, UICallback callbacks, params object[] args)
+        /// <typeparam name="T">The 1st type parameter.</typeparam>
+        public void HideScreen<T>(bool deactivate = false) where T : UIManScreen
+        {
+            HideScreen_Internal(typeof(T), deactivate);
+        }
+
+        private void ShowDialog_Internal(Type uiType, UICallback callbacks, params object[] args)
         {
             if (this.IsInDialogTransition || this.IsLoadingDialog)
             {
@@ -419,12 +463,29 @@ namespace UnuGames
         /// <summary>
         /// Shows the dialog.
         /// </summary>
+        /// <param name="type">Type.</param>
+        /// <param name="callbacks">Callbacks.</param>
+        /// <param name="args">Arguments.</param>
+        public void ShowDialog(Type uiType, UICallback callbacks, params object[] args)
+        {
+            if (!IsDialogType(uiType))
+            {
+                UnuLogger.LogError("UI type must be derived from UIManDialog");
+                return;
+            }
+
+            ShowDialog_Internal(uiType, callbacks, args);
+        }
+
+        /// <summary>
+        /// Shows the dialog.
+        /// </summary>
         /// <param name="callbacks">Callbacks.</param>
         /// <param name="args">Arguments.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
         public void ShowDialog<T>(UICallback callbacks, params object[] args) where T : UIManDialog
         {
-            ShowDialog(typeof(T), callbacks, args);
+            ShowDialog_Internal(typeof(T), callbacks, args);
         }
 
         /// <summary>
@@ -434,12 +495,18 @@ namespace UnuGames
         /// <param name="args">Arguments.</param>
         public void ShowDialog(Type uiType, params object[] args)
         {
-            ShowDialog(uiType, null, args);
+            if (!IsDialogType(uiType))
+            {
+                UnuLogger.LogError("UI type must be derived from UIManDialog");
+                return;
+            }
+
+            ShowDialog_Internal(uiType, null, args);
         }
 
         public void ShowDialog<T>(params object[] args) where T : UIManDialog
         {
-            ShowDialog(typeof(T), null, args);
+            ShowDialog_Internal(typeof(T), null, args);
         }
 
         /// <summary>
@@ -472,10 +539,7 @@ namespace UnuGames
             ShowDialog<UIPopupDialog>(uiCallbacks, title, message, buttonYes, buttonNo, callbackArgs);
         }
 
-        /// <summary>
-        /// Hides the dialog.
-        /// </summary>
-        public void HideDialog(Type uiType, bool deactivate = false)
+        private void HideDialog_Internal(Type uiType, bool deactivate = false)
         {
             if (this.IsInDialogTransition)
             {
@@ -524,43 +588,69 @@ namespace UnuGames
         /// <summary>
         /// Hides the dialog.
         /// </summary>
+        public void HideDialog(Type uiType, bool deactivate = false)
+        {
+            if (!IsDialogType(uiType))
+            {
+                UnuLogger.LogError("UI type must be derived from UIManDialog");
+                return;
+            }
+
+            HideDialog_Internal(uiType, deactivate);
+        }
+
+        /// <summary>
+        /// Hides the dialog.
+        /// </summary>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
         public void HideDialog<T>(bool deactivate = false) where T : UIManDialog
         {
-            HideDialog(typeof(T), deactivate);
+            HideDialog_Internal(typeof(T), deactivate);
         }
 
         /// <summary>
         /// Loads the unity scene.
         /// </summary>
         /// <param name="name">Name.</param>
-        public void LoadUnityScene(string name, Type screen, bool showLoading, params object[] args)
+        public void LoadUnityScene(string name, Type screenType, bool showLoading, params object[] args)
         {
+            if (!IsScreenType(screenType))
+            {
+                UnuLogger.LogError("Screen type must be derived from UIManScreen");
+                return;
+            }
+
             this.cover.gameObject.SetActive(false);
 
             if (!showLoading)
             {
-                StartCoroutine(LoadUnityScene(name, screen, args));
+                StartCoroutine(LoadUnityScene(name, screenType, args));
                 return;
             }
 
             GetActivity(x => x.Show(SceneManager.LoadSceneAsync(name), UIActivity.Settings.Default,
-                                    OnLoadUnitySceneComplete, screen, args));
+                                    OnLoadUnitySceneComplete, screenType, args));
         }
 
-        public void LoadUnityScene(string name, Type screen, bool showLoading, float showDuration, float hideDuration,
+        public void LoadUnityScene(string name, Type screenType, bool showLoading, float showDuration, float hideDuration,
                                    params object[] args)
         {
+            if (!IsScreenType(screenType))
+            {
+                UnuLogger.LogError("Screen type must be derived from UIManScreen");
+                return;
+            }
+
             this.cover.gameObject.SetActive(false);
 
             if (!showLoading)
             {
-                StartCoroutine(LoadUnityScene(name, screen, args));
+                StartCoroutine(LoadUnityScene(name, screenType, args));
                 return;
             }
 
             GetActivity(x => x.Show(SceneManager.LoadSceneAsync(name), showDuration, hideDuration, UIActivity.Settings.Default,
-                                    OnLoadUnitySceneComplete, screen, args));
+                                    OnLoadUnitySceneComplete, screenType, args));
         }
 
         public void LoadUnityScene<T>(string name, bool showLoading, params object[] args)
@@ -589,7 +679,7 @@ namespace UnuGames
             this.IsLoadingUnityScene = false;
 
             if (this.CurrentScreen != null)
-                HideScreen(this.CurrentScreen.UIType);
+                HideScreen(this.CurrentScreen.Type);
 
             OnLoadUnitySceneComplete(null, screen, args);
         }
@@ -1027,14 +1117,19 @@ namespace UnuGames
             return false;
         }
 
-        public void DestroyUI<T>() where T : UIManBase
+        public void DestroyUI(Type uiType)
         {
-            Type uiType = typeof(T);
-            var dialog = uiType.BaseType == typeof(UIManDialog);
+            ViewModelBehaviour ui = null;
 
-            UIManBase ui = null;
-
-            if (dialog)
+            if (IsScreenType(uiType))
+            {
+                if (this.screenDict.ContainsKey(uiType))
+                {
+                    ui = this.screenDict[uiType];
+                    this.screenDict.Remove(uiType);
+                }
+            }
+            else if (IsDialogType(uiType))
             {
                 if (this.dialogDict.ContainsKey(uiType))
                 {
@@ -1042,13 +1137,17 @@ namespace UnuGames
                     this.dialogDict.Remove(uiType);
                 }
             }
+            else if (IsActivityType(uiType))
+            {
+                if (this.activityDict.ContainsKey(uiType))
+                {
+                    ui = this.activityDict[uiType];
+                    this.activityDict.Remove(uiType);
+                }
+            }
             else
             {
-                if (this.screenDict.ContainsKey(uiType))
-                {
-                    ui = this.screenDict[uiType];
-                    this.screenDict.Remove(uiType);
-                }
+                UnuLogger.LogError("UI type must be derived from either UIManScreen, UIManDialog, or UIActivity");
             }
 
             if (ui != null)
@@ -1057,57 +1156,124 @@ namespace UnuGames
             }
         }
 
-        public T GetHandler<T>() where T : UIManBase
+        public void DestroyUI<T>() where T : ViewModelBehaviour
         {
-            Type uiType = typeof(T);
-            var dialog = uiType.BaseType == typeof(UIManDialog);
+            DestroyUI(typeof(T));
+        }
 
-            if (dialog)
+        public ViewModelBehaviour GetHandler(Type uiType)
+        {
+            if (IsScreenType(uiType))
+            {
+                if (this.screenDict.ContainsKey(uiType))
+                    return this.screenDict[uiType];
+                else
+                    return null;
+            }
+            else if (IsDialogType(uiType))
             {
                 if (this.dialogDict.ContainsKey(uiType))
-                    return (T)(object)this.dialogDict[uiType];
+                    return this.dialogDict[uiType];
+                else
+                    return null;
+            }
+            else if (IsActivityType(uiType))
+            {
+                if (this.activityDict.ContainsKey(uiType))
+                    return this.activityDict[uiType];
                 else
                     return null;
             }
             else
             {
-                if (this.screenDict.ContainsKey(uiType))
-                    return (T)(object)this.screenDict[uiType];
-                else
-                    return null;
+                UnuLogger.LogError("UI type must be derived from either UIManScreen, UIManDialog, or UIActivity");
+                return null;
             }
         }
 
+        public T GetHandler<T>() where T : ViewModelBehaviour
+        {
+            Type uiType = typeof(T);
+
+            if (IsScreenType(uiType))
+            {
+                if (this.screenDict.ContainsKey(uiType))
+                    return this.screenDict[uiType] as T;
+                else
+                    return null;
+            }
+            else if (IsDialogType(uiType))
+            {
+                if (this.dialogDict.ContainsKey(uiType))
+                    return this.dialogDict[uiType] as T;
+                else
+                    return null;
+            }
+            else if (IsActivityType(uiType))
+            {
+                if (this.activityDict.ContainsKey(uiType))
+                    return this.activityDict[uiType] as T;
+                else
+                    return null;
+            }
+            else
+            {
+                UnuLogger.LogError("UI type must be derived from either UIManScreen, UIManDialog, or UIActivity");
+                return null;
+            }
+        }
+
+        public bool TryGetHandler(Type uiType, out ViewModelBehaviour handler)
+        {
+            return handler = GetHandler(uiType);
+        }
+
+        public bool TryGetHandler<T>(out T handler) where T : ViewModelBehaviour
+        {
+            return handler = GetHandler<T>();
+        }
+
         /// <summary>
-        /// Preload the specified uiman.
+        /// Preload the specified UIMan.
         /// </summary>
-        /// <param name="uiman">Uiman.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void Preload<T>() where T : UIManBase
+        public void Preload<T>() where T : ViewModelBehaviour
         {
             Preload(typeof(T));
         }
 
         /// <summary>
-        /// Preload the specified uiType.
+        /// Preload the specified UIMan
         /// </summary>
         /// <param name="uiType">User interface type.</param>
         public void Preload(Type uiType)
         {
-            // Ignore if preloaded
-            if (uiType.BaseType == typeof(UIManScreen))
+            var isSupported = false;
+
+            if (isSupported = IsScreenType(uiType))
             {
                 if (this.screenDict.ContainsKey(uiType))
                     return;
             }
-            else
+            else if (isSupported = IsDialogType(uiType))
             {
                 if (this.dialogDict.ContainsKey(uiType))
                     return;
             }
+            else if (isSupported = IsActivityType(uiType))
+            {
+                if (this.activityDict.ContainsKey(uiType))
+                    return;
+            }
 
-            // Preload
-            UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessPreload(key, asset, uiType));
+            if (isSupported)
+            {
+                UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessPreload(key, asset, uiType));
+            }
+            else
+            {
+                UnuLogger.LogError("UI type must be derived from either UIManScreen, UIManDialog, or UIActivity");
+            }
         }
 
         private void PreprocessPreload(string key, UnityObject asset, Type uiType)
@@ -1124,9 +1290,9 @@ namespace UnuGames
             var canvasGroup = obj.GetComponent<CanvasGroup>();
 
             if (canvasGroup)
-                canvasGroup.alpha = 0;
+                canvasGroup.alpha = 0f;
 
-            var uiBase = obj.GetComponent<UIManBase>();
+            var uiBase = obj.GetComponent<ViewModelBehaviour>();
 
             switch (uiBase)
             {
@@ -1150,9 +1316,17 @@ namespace UnuGames
                     dialogue.ForceState(UIState.Hide);
                     break;
 
+                case UIActivity activity:
+                    activity.Transform.SetParent(this.activityRoot, false);
+                    activity.RectTransform.localScale = Vector3.one;
+
+                    if (!this.activityDict.ContainsKey(uiType))
+                        this.activityDict.Add(uiType, activity);
+                    break;
+
                 default:
                     Destroy(obj);
-                    UnuLogger.LogError($"{obj} does not contain any component derived from either UIManScreen or UIManDialogue.");
+                    UnuLogger.LogError($"{obj} does not contain any component derived from either UIManScreen, UIManDialogue or UIActivity.");
                     break;
             }
         }

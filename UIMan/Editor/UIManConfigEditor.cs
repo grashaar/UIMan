@@ -6,14 +6,16 @@ using UnuGames;
 public class UIManConfigEditor : Editor
 {
     private readonly GUIContent namespaceGUI = new GUIContent("Namespace: ", "The default namespace for generated classes is UnuGames");
-    private readonly GUIContent screenGUI = new GUIContent("Screen: ", "The default path for the system find and load screen's prefab");
-    private readonly GUIContent dialogGUI = new GUIContent("Dialog: ", "The default path for the system find and load dialog's prefab");
-    private readonly GUIContent bgGUI = new GUIContent("Background: ", "The default path for the system find and load background image");
+    private readonly GUIContent screenGUI = new GUIContent("Screen: ", "The default path for the system find and load Screen prefab");
+    private readonly GUIContent dialogGUI = new GUIContent("Dialog: ", "The default path for the system find and load Dialog prefab");
+    private readonly GUIContent activityGUI = new GUIContent("Activity: ", "The default path for the system find and load Activity prefab");
+    private readonly GUIContent bgGUI = new GUIContent("Background: ", "The default path for the system find and load Background image");
     private readonly GUIContent animRootGUI = new GUIContent("Animation: ", "The default path for the system to generate animator and animations into that");
 
     private TextFieldHelper namespaceField;
     private PathBrowser screenPath;
     private PathBrowser dialogPath;
+    private PathBrowser activityPath;
     private PathBrowser bgPath;
     private PathBrowser animPath;
 
@@ -21,11 +23,16 @@ public class UIManConfigEditor : Editor
     {
         var config = this.target as UIManConfig;
 
-        if (this.namespaceField == null || this.screenPath == null || this.dialogPath == null || this.bgPath == null)
+        if (this.namespaceField == null ||
+            this.screenPath == null ||
+            this.dialogPath == null ||
+            this.activityPath == null ||
+            this.bgPath == null)
         {
             this.namespaceField = new TextFieldHelper(config.classNamespace);
             this.screenPath = new PathBrowser(config.screenPrefabFolder, Application.dataPath);
             this.dialogPath = new PathBrowser(config.dialogPrefabFolder, Application.dataPath);
+            this.activityPath = new PathBrowser(config.activityPrefabFolder, Application.dataPath);
             this.bgPath = new PathBrowser(config.backgroundRootFolder, Application.dataPath);
             this.animPath = new PathBrowser(config.animRootFolder, Application.dataPath);
         }
@@ -35,11 +42,54 @@ public class UIManConfigEditor : Editor
         EditorGUILayout.Space();
 
         GUILayout.BeginVertical("Box");
-        config.classNamespace = this.namespaceField.Draw(this.namespaceGUI);
-        config.screenPrefabFolder = this.screenPath.Draw(this.screenGUI);
-        config.dialogPrefabFolder = this.dialogPath.Draw(this.dialogGUI);
-        config.backgroundRootFolder = this.bgPath.Draw(this.bgGUI);
-        config.animRootFolder = this.animPath.Draw(this.animRootGUI);
+        var changed = this.namespaceField.Draw(this.namespaceGUI, out var classNamespace);
+
+        if (changed)
+        {
+            Undo.RecordObject(config, nameof(classNamespace));
+            config.classNamespace = classNamespace;
+        }
+
+        changed = this.screenPath.Draw(this.screenGUI, out var screenPrefabFolder);
+
+        if (changed)
+        {
+            Undo.RecordObject(config, nameof(screenPrefabFolder));
+            config.screenPrefabFolder = screenPrefabFolder;
+        }
+
+        changed = this.dialogPath.Draw(this.dialogGUI, out var dialogPrefabFolder);
+
+        if (changed)
+        {
+            Undo.RecordObject(config, nameof(dialogPrefabFolder));
+            config.dialogPrefabFolder = dialogPrefabFolder;
+        }
+
+        changed = this.activityPath.Draw(this.activityGUI, out var activityPrefabFolder);
+
+        if (changed)
+        {
+            Undo.RecordObject(config, nameof(activityPrefabFolder));
+            config.activityPrefabFolder = activityPrefabFolder;
+        }
+
+        changed = this.bgPath.Draw(this.bgGUI, out var backgroundRootFolder);
+
+        if (changed)
+        {
+            Undo.RecordObject(config, nameof(backgroundRootFolder));
+            config.backgroundRootFolder = backgroundRootFolder;
+        }
+
+        changed = this.animPath.Draw(this.animRootGUI, out var animRootFolder);
+
+        if (changed)
+        {
+            Undo.RecordObject(config, nameof(animRootFolder));
+            config.animRootFolder = animRootFolder;
+        }
+
         GUILayout.EndVertical();
 
         GUILayout.BeginHorizontal("Box");

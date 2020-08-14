@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UnuGames.MVVM;
@@ -13,12 +12,6 @@ namespace UnuGames
         private TextFieldHelper namespaceField;
         private EditablePopup baseTypePopup;
 
-        private readonly string[] arrSupportType = new string[3] {
-            nameof(ObservableModel),
-            nameof(UIManScreen),
-            nameof(UIManDialog)
-        };
-
         private bool inited = false;
         private string typeName = "NewViewModel";
 
@@ -30,7 +23,7 @@ namespace UnuGames
                 {
                     var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>();
                     this.namespaceField = new TextFieldHelper(config.classNamespace);
-                    this.baseTypePopup = new EditablePopup(this.arrSupportType, config.name, null);
+                    this.baseTypePopup = new EditablePopup(UIGenerator.GetSupportTypes(), config.name, null);
                 }
                 this.minSize = new Vector2(300, 160);
                 this.maxSize = this.minSize;
@@ -61,20 +54,25 @@ namespace UnuGames
 
                 if (config != null)
                 {
-                    if (this.baseTypePopup.SelectedItem == this.arrSupportType[0])
+                    if (UIGenerator.IsObservableModelType(this.baseTypePopup.SelectedItem))
                     {
                         lastPath = config.modelScriptFolder;
                         this.typeName = "NewViewModel";
                     }
-                    else if (this.baseTypePopup.SelectedItem == this.arrSupportType[1])
+                    else if (UIGenerator.IsScreenType(this.baseTypePopup.SelectedItem))
                     {
                         lastPath = config.screenScriptFolder;
                         this.typeName = "UINewScreen";
                     }
-                    else if (this.baseTypePopup.SelectedItem == this.arrSupportType[2])
+                    else if (UIGenerator.IsDialogType(this.baseTypePopup.SelectedItem))
                     {
                         lastPath = config.dialogScriptFolder;
                         this.typeName = "UINewDialog";
+                    }
+                    else if (UIGenerator.IsActivityType(this.baseTypePopup.SelectedItem))
+                    {
+                        lastPath = config.activityScriptFolder;
+                        this.typeName = "UINewActivity";
                     }
                 }
 
@@ -86,20 +84,21 @@ namespace UnuGames
 
                     lastPath = Path.GetDirectoryName(lastPath).Replace("\\", "/").Replace(Application.dataPath, "");
 
-                    if (this.baseTypePopup.SelectedItem == this.arrSupportType[0])
+                    if (UIGenerator.IsObservableModelType(this.baseTypePopup.SelectedItem))
                     {
                         config.modelScriptFolder = lastPath;
-                        config.generatingTypeIsDialog = false;
                     }
-                    else if (this.baseTypePopup.SelectedItem == this.arrSupportType[1])
+                    else if (UIGenerator.IsScreenType(this.baseTypePopup.SelectedItem))
                     {
                         config.screenScriptFolder = lastPath;
-                        config.generatingTypeIsDialog = false;
                     }
-                    else if (this.baseTypePopup.SelectedItem == this.arrSupportType[2])
+                    else if (UIGenerator.IsDialogType(this.baseTypePopup.SelectedItem))
                     {
                         config.dialogScriptFolder = lastPath;
-                        config.generatingTypeIsDialog = true;
+                    }
+                    else if (UIGenerator.IsActivityType(this.baseTypePopup.SelectedItem))
+                    {
+                        config.activityScriptFolder = lastPath;
                     }
 
                     EditorUtility.SetDirty(config);
@@ -120,7 +119,7 @@ namespace UnuGames
 
             if (this.typeName.Length <= 1 ||
                 (!this.typeName.Substring(0, 2).Equals("UI") &&
-                 !this.baseTypePopup.SelectedItem.Equals(UIGenerator.GetSupportTypeName(0))))
+                 !UIGenerator.IsObservableModelType(this.baseTypePopup.SelectedItem)))
             {
                 this.typeName = "UI" + this.typeName;
                 warn = true;
@@ -131,20 +130,21 @@ namespace UnuGames
             var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>(false);
             var savePath = "";
 
-            if (this.baseType.Equals(UIGenerator.GetSupportTypeName(0)))
+            if (UIGenerator.IsObservableModelType(this.baseType))
             {
                 savePath = config.modelScriptFolder;
-                config.generatingTypeIsDialog = false;
             }
-            else if (this.baseType.Equals(UIGenerator.GetSupportTypeName(1)))
+            else if (UIGenerator.IsScreenType(this.baseType))
             {
                 savePath = config.screenScriptFolder;
-                config.generatingTypeIsDialog = false;
             }
-            else if (this.baseType.Equals(UIGenerator.GetSupportTypeName(2)))
+            else if (UIGenerator.IsDialogType(this.baseType))
             {
                 savePath = config.dialogScriptFolder;
-                config.generatingTypeIsDialog = true;
+            }
+            else if (UIGenerator.IsActivityType(this.baseType))
+            {
+                savePath = config.activityScriptFolder;
             }
 
             savePath = Application.dataPath + "/" + savePath + "/" + this.typeName + ".cs";
@@ -155,18 +155,21 @@ namespace UnuGames
                 return;
             }
 
-            var paths = Regex.Split(savePath, "/");
             var inheritance = string.Empty;
+            config.generatingBaseType = this.baseType;
 
-            if (this.baseType != this.arrSupportType[0])
+            if (!UIGenerator.IsObservableModelType(this.baseType))
                 config.generatingType = this.typeName;
             else
+            {
+                config.generatingType = null;
                 inheritance = $" : {this.baseType}";
+            }
 
             var code = UIManCodeGenerator.GenerateType(this.typeName, inheritance, false, config, this.namespaceField.Text);
             UIManCodeGenerator.SaveScript(savePath, code, true);
 
-            if (this.baseType != this.arrSupportType[0])
+            if (!UIGenerator.IsObservableModelType(this.baseType))
                 GenerateHandler(savePath);
 
             AssetDatabase.Refresh(ImportAssetOptions.Default);
@@ -183,7 +186,8 @@ namespace UnuGames
         {
             var handlerScriptPath = UIManCodeGenerator.GeneratPathWithSubfix(scriptPath, ".Handler.cs");
             var config = EditorHelper.GetOrCreateScriptableObject<UIManConfig>(false);
-            var handlerCode = UIManCodeGenerator.GenerateHandler(this.typeName, this.baseType, config, this.namespaceField.Text);
+            var isActivity = UIGenerator.IsActivityType(this.baseType);
+            var handlerCode = UIManCodeGenerator.GenerateHandler(this.typeName, this.baseType, isActivity, config, this.namespaceField.Text);
 
             UIManCodeGenerator.SaveScript(handlerScriptPath, handlerCode, false, this.typeName, this.baseType);
         }

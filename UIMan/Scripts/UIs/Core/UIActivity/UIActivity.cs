@@ -4,24 +4,32 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using UnuGames.MVVM;
 
 namespace UnuGames
 {
     public delegate void UIActivityAction(UIActivity sender, params object[] args);
 
-    public partial class UIActivity : MonoBehaviour
+    public partial class UIActivity : ViewModelBehaviour
     {
+        [HideInInspector]
         public Image cover;
-        public Image background;
+
+        [HideInInspector]
         public GameObject icon;
 
-        private CanvasGroup canvasGroup;
-        private GraphicRaycaster graphicRaycaster;
+        [HideInInspector]
+        public bool useBackgroundBinding = false;
+
+        [HideInInspector]
+        public Image background;
 
         public bool isLoading { get; private set; }
 
         public float progress { get; private set; }
 
+        private CanvasGroup canvasGroup;
+        private GraphicRaycaster graphicRaycaster;
         private bool deactivateOnHide;
         private UIActivityAction onComplete;
         private object[] onCompleteArgs;
@@ -170,7 +178,7 @@ namespace UnuGames
 
         protected virtual void SetShowProgress(bool value) { }
 
-        public virtual void ShowValue(float value) { }
+        public virtual void SetProgress(float value) { }
 
         public void ShowBackground(Sprite sprite)
         {
@@ -181,17 +189,27 @@ namespace UnuGames
             this.background.sprite = sprite;
         }
 
-        public void ShowBackground(string spritePath)
+        public void ShowBackground(string sprite)
         {
+            if (this.useBackgroundBinding)
+            {
+                this.BackgroundEnabled = true;
+                this.Background = sprite;
+                return;
+            }
+
             if (!this.background)
                 return;
 
             this.background.enabled = true;
-            UIManLoader.Load<Sprite>(spritePath, OnLoadedImage);
+            UIManLoader.Load<Sprite>(sprite, OnLoadedImage);
         }
 
         public void HideBackground()
         {
+            if (this.useBackgroundBinding)
+                this.BackgroundEnabled = false;
+
             if (this.background)
                 this.background.enabled = false;
         }

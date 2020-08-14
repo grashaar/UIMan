@@ -242,10 +242,25 @@ namespace UnuGames
 #endif
 
             EditorGUILayout.Space();
-            if (ColorButton.Draw("Edit View (UI)", CommonColor.LightGreen, GUILayout.Height(25)))
+
+            if (ColorButton.Draw("Edit Handler (View Logic)", CommonColor.LightGreen, GUILayout.Height(25)))
+            {
+                var handler = UIManCodeGenerator.GetScriptPathByType(this.target.GetType());
+                handler = handler.Replace(".cs", ".Handler.cs");
+
+                UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(handler, 1, 1);
+            }
+
+            if (ColorButton.Draw("Edit View", CommonColor.LightGreen, GUILayout.Height(25)))
+            {
+                AssetDatabase.OpenAsset(this.target);
+            }
+
+            if (ColorButton.Draw("Edit View (Within Context)", CommonColor.LightGreen, GUILayout.Height(25)))
             {
                 GameObject prefabInstance;
-                Object obj = FindObjectOfType(uiManBase.UIType);
+                Object obj = FindObjectOfType(uiManBase.Type);
+
                 if (obj != null)
                 {
                     prefabInstance = ((MonoBehaviour)obj).gameObject;
@@ -254,18 +269,13 @@ namespace UnuGames
                 {
                     var isDialog = uiManBase.GetUIBaseType() == UIBaseType.Dialog;
                     prefabInstance = PrefabUtility.InstantiatePrefab(uiManBase.gameObject) as GameObject;
+
                     if (isDialog)
                         prefabInstance.transform.SetParent(UIMan.Instance.dialogRoot, false);
                     else
                         prefabInstance.transform.SetParent(UIMan.Instance.screenRoot, false);
                 }
                 Selection.activeGameObject = prefabInstance;
-            }
-            if (ColorButton.Draw("Edit View Logic (Handler)", CommonColor.LightGreen, GUILayout.Height(25)))
-            {
-                var handler = UIManCodeGenerator.GetScriptPathByType(this.target.GetType());
-                handler = handler.Replace(".cs", ".Handler.cs");
-                UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(handler, 1);
             }
         }
     }

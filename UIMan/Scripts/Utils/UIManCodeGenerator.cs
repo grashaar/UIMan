@@ -28,7 +28,8 @@ namespace UnuGames
         #endregion TAGS and REGIONS
 
         private const string TYPE_TEMPLATE_PATH = "TypeTemplate";
-        private const string HANDLER_TEMPLATE_PATH = "HandlerTemplate";
+        private const string HANDLER_TEMPLATE = "HandlerTemplate";
+        private const string ACTIVITY_HANDLER_TEMPLATE = "ActivityHandlerTemplate";
 
         private const string DEFAULT_NAMESPACE = "UnuGames";
 
@@ -63,10 +64,12 @@ namespace UnuGames
             return code;
         }
 
-        public static string GenerateHandler(string modelName, string baseType, UIManConfig config, string customNamespace = null)
+        public static string GenerateHandler(string modelName, string baseType, bool isActivity, UIManConfig config,
+                                             string customNamespace = null)
         {
             var code = "";
-            var text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(HANDLER_TEMPLATE_PATH));
+            var template = isActivity ? ACTIVITY_HANDLER_TEMPLATE : HANDLER_TEMPLATE;
+            var text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(template));
 
             if (text != null)
             {

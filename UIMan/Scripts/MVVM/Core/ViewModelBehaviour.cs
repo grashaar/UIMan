@@ -42,6 +42,19 @@ namespace UnuGames.MVVM
             }
         }
 
+        private Type type;
+
+        public Type Type
+        {
+            get
+            {
+                if (this.type == null)
+                    this.type = GetType();
+
+                return this.type;
+            }
+        }
+
         /// <summary>
         /// Notify the property which has change to all binder that has been subcribed with property name and value.
         /// </summary>

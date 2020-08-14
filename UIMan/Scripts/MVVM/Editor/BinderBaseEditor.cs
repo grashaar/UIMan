@@ -223,9 +223,9 @@ namespace UnuGames.MVVM
                     var attributes = curMember.GetCustomAttributes(typeof(UIManPropertyAttribute), false);
                     if (attributes == null || attributes.Length == 0)
                     {
-                        GUILayout.BeginHorizontal();
+                        GUILayout.BeginHorizontal("Box");
                         EditorGUILayout.PrefixLabel(" ");
-                        GUILayout.Label("None observable field!", EditorGUIHelper.RichText(color: CommonColor.GetRed()));
+                        GUILayout.Label("Binding field must be decorated with either [UIManProperty] or [UIManAutoProperty] attribute!", EditorGUIHelper.RichText(true, CommonColor.GetRed()));
                         GUILayout.EndHorizontal();
                     }
                 }

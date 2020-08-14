@@ -12,14 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 010af554679ddb14ca8f5288595dcdde, type: 3}
   m_Name: UIManConfig
   m_EditorClassIdentifier: 
-  classNamespace: 
-  dialogPrefabFolder: Dev/UIMan/Addressables/Dialogs/
-  screenPrefabFolder: Dev/UIMan/Addressables/Screens/
-  backgroundRootFolder: Dev/UIMan/Addressables/Backgrounds/
-  animRootFolder: Dev/UIMan/Animations/
-  modelScriptFolder: /Dev/Scripts
-  dialogScriptFolder: /Dev/Scripts
-  screenScriptFolder: /Dev/Scripts
-  selectedType: UIStartScreen
+  classNamespace: Game.UI
+  screenPrefabFolder: Game/Prefabs/Screens/
+  dialogPrefabFolder: Game/Prefabs/Dialogs/
+  activityPrefabFolder: Game/Prefabs/Activities/
+  backgroundRootFolder: Game/Backgrounds/
+  animRootFolder: Game/Animations/
+  modelScriptFolder: 
+  screenScriptFolder: 
+  dialogScriptFolder: 
+  activityScriptFolder: 
+  selectedType: 
   generatingType: 
-  generatingTypeIsDialog: 1
+  generatingBaseType: 

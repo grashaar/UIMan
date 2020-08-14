@@ -64,7 +64,7 @@ namespace UnuGames
             while (!asyncTask.isDone)
             {
                 this.progress = asyncTask.progress;
-                ShowValue(this.progress);
+                SetProgress(this.progress);
 
                 yield return null;
             }
@@ -78,7 +78,7 @@ namespace UnuGames
             while (!request.isDone)
             {
                 this.progress = request.downloadProgress;
-                ShowValue(this.progress);
+                SetProgress(this.progress);
 
                 yield return null;
             }
@@ -123,7 +123,7 @@ namespace UnuGames
             while (!asyncTask.isDone)
             {
                 this.progress = asyncTask.progress;
-                ShowValue(this.progress);
+                SetProgress(this.progress);
 
                 yield return null;
             }
@@ -137,7 +137,7 @@ namespace UnuGames
             while (!request.isDone)
             {
                 this.progress = request.downloadProgress;
-                ShowValue(this.progress);
+                SetProgress(this.progress);
 
                 yield return null;
             }

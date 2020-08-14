@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
@@ -491,8 +491,9 @@ namespace UnuGames
     public class UIManTypeListView
     {
         private const string Model = "<Model>";
-        private const string Dialog = "<Dialog>";
         private const string Screen = "<Screen>";
+        private const string Dialog = "<Dialog>";
+        private const string Activity = "<Activity>";
 
         private GUIStyle menuItemStyle;
         private GUIStyle buttonStyle;
@@ -525,7 +526,9 @@ namespace UnuGames
             };
         }
 
-        public void SetData(int selectedIndex, string[] screenTypes, string[] dialogTypes, string[] modelTypes, bool selectOnMouseHover, Action<string> onSelected, string filterString, EditorWindow window, Action<int> onSelectedIndex = null)
+        public void SetData(int selectedIndex, string[] screenTypes, string[] dialogTypes, string[] activityTypes,
+                            string[] modelTypes, bool selectOnMouseHover, Action<string> onSelected, string filterString,
+                            EditorWindow window, Action<int> onSelectedIndex = null)
         {
             this._selected = selectedIndex;
             this._selectOnMouseHover = selectOnMouseHover;
@@ -544,6 +547,9 @@ namespace UnuGames
 
             this._viewItems.Add(Dialog);
             this._viewItems.AddRange(dialogTypes);
+
+            this._viewItems.Add(Activity);
+            this._viewItems.AddRange(activityTypes);
         }
 
         public void Draw()
@@ -563,6 +569,14 @@ namespace UnuGames
                     continue;
                 }
 
+                if (string.Equals(this._viewItems[i], Screen))
+                {
+                    GUILayout.Space(i == 0 ? 4 : 10);
+                    LabelHelper.SubTitleLabel(nameof(UIManScreen));
+                    GUILayout.Space(2);
+                    continue;
+                }
+
                 if (string.Equals(this._viewItems[i], Dialog))
                 {
                     GUILayout.Space(i == 0 ? 4 : 10);
@@ -571,10 +585,10 @@ namespace UnuGames
                     continue;
                 }
 
-                if (string.Equals(this._viewItems[i], Screen))
+                if (string.Equals(this._viewItems[i], Activity))
                 {
                     GUILayout.Space(i == 0 ? 4 : 10);
-                    LabelHelper.SubTitleLabel(nameof(UIManScreen));
+                    LabelHelper.SubTitleLabel(nameof(UIActivity));
                     GUILayout.Space(2);
                     continue;
                 }
@@ -1081,6 +1095,27 @@ namespace UnuGames
             return this.Text;
         }
 
+        public bool Draw(GUIContent label, out string text, float width = 100f)
+        {
+            var changed = false;
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(label, GUILayout.Width(width));
+
+            EditorGUI.BeginChangeCheck();
+            this.Text = EditorGUILayout.TextField(this.Text);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                changed = true;
+            }
+
+            GUILayout.EndHorizontal();
+
+            text = this.Text;
+            return changed;
+        }
+
         public TextFieldHelper(string text)
         {
             this.Text = text;
@@ -1090,6 +1125,7 @@ namespace UnuGames
     public class PathBrowser
     {
         public string SelectedPath { get; set; }
+
         public string StripPattern { get; set; }
 
         public string Draw(GUIContent label)
@@ -1104,7 +1140,7 @@ namespace UnuGames
                 {
                     if (!newPath.Contains(Application.dataPath))
                     {
-                        EditorUtility.DisplayDialog("Error", "Cannot save file outside of project's asset folder!", "OK");
+                        EditorUtility.DisplayDialog("Error", "Cannot save file outside of Assets folder!", "OK");
                     }
                     else
                     {
@@ -1117,6 +1153,44 @@ namespace UnuGames
             GUILayout.EndHorizontal();
 
             return this.SelectedPath;
+        }
+
+        public bool Draw(GUIContent label, out string path)
+        {
+            var changed = false;
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(label, GUILayout.Width(100));
+            EditorGUI.BeginChangeCheck();
+            this.SelectedPath = EditorGUILayout.TextField(this.SelectedPath);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                changed = true;
+            }
+
+            if (GUILayout.Button("Browse", GUILayout.Height(15)))
+            {
+                var newPath = EditorUtility.OpenFolderPanel("Select folder", this.SelectedPath, "");
+                if (!string.IsNullOrEmpty(newPath))
+                {
+                    if (!newPath.Contains(Application.dataPath))
+                    {
+                        EditorUtility.DisplayDialog("Error", "Cannot save file outside of Assets folder!", "OK");
+                    }
+                    else
+                    {
+                        newPath = NormalizePath(newPath);
+                        this.SelectedPath = newPath;
+                        changed = true;
+                    }
+                }
+            }
+
+            GUILayout.EndHorizontal();
+
+            path = this.SelectedPath;
+            return changed;
         }
 
         public PathBrowser(string defaultPath, string stripPattern)

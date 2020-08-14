@@ -39,18 +39,6 @@ namespace UnuGames
         [HideInInspector]
         public float animHideTime = 0.25f;
 
-        private Type uiType;
-
-        public Type UIType
-        {
-            get
-            {
-                if (this.uiType == null)
-                    this.uiType = GetType();
-                return this.uiType;
-            }
-        }
-
         public UIState State { get; private set; }
 
         private CanvasGroup canvasGroup;
@@ -158,11 +146,11 @@ namespace UnuGames
         {
             if (GetUIBaseType() == UIBaseType.Screen)
             {
-                UIMan.Instance.HideScreen(this.UIType);
+                UIMan.Instance.HideScreen(this.Type);
             }
             else
             {
-                UIMan.Instance.HideDialog(this.UIType);
+                UIMan.Instance.HideDialog(this.Type);
             }
         }
 

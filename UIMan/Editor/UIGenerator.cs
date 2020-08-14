@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using UnuGames.MVVM;
 
 namespace UnuGames
@@ -15,6 +16,7 @@ namespace UnuGames
         private static UIGenerator _container;
         private static string[] _screenTypes;
         private static string[] _dialogTypes;
+        private static string[] _activityTypes;
         private static string[] _modelTypes;
         private static float _typeAreaWidth = 250f;
         private static float _propertiesAreaWidth = 640f;
@@ -28,10 +30,11 @@ namespace UnuGames
         private static string _currentScriptPath = null;
         private static string _handlerScriptPath = null;
 
-        private readonly static string[] _arrSupportType = new string[3] {
+        private readonly static string[] _supportTypes = new string[] {
             nameof(ObservableModel),
             nameof(UIManScreen),
-            nameof(UIManDialog)
+            nameof(UIManDialog),
+            nameof(UIActivity)
         };
 
         private static bool _reload = true;
@@ -42,15 +45,56 @@ namespace UnuGames
         private TextFieldHelper namespaceField;
         private EditablePopup baseTypePopup;
 
-        public static string GetSupportTypeName(int index)
+        public static string[] GetSupportTypes()
         {
-            return _arrSupportType[index];
+            return _supportTypes;
+        }
+
+        public static bool IsObservableModelType(string type)
+        {
+            return !string.IsNullOrEmpty(type) && _supportTypes[0].Equals(type);
+        }
+
+        public static bool IsScreenType(string type)
+        {
+            return !string.IsNullOrEmpty(type) && _supportTypes[1].Equals(type);
+        }
+
+        public static bool IsDialogType(string type)
+        {
+            return !string.IsNullOrEmpty(type) && _supportTypes[2].Equals(type);
+        }
+
+        public static bool IsActivityType(string type)
+        {
+            return !string.IsNullOrEmpty(type) && _supportTypes[3].Equals(type);
+        }
+
+        public static bool IsObservableModelType(Type type)
+        {
+            return type != null && typeof(ObservableModel).IsAssignableFrom(type);
+        }
+
+        public static bool IsScreenType(Type type)
+        {
+            return type != null && typeof(UIManScreen).IsAssignableFrom(type);
+        }
+
+        public static bool IsDialogType(Type type)
+        {
+            return type != null && typeof(UIManDialog).IsAssignableFrom(type);
+        }
+
+        public static bool IsActivityType(Type type)
+        {
+            return type != null && typeof(UIActivity).IsAssignableFrom(type);
         }
 
         public static bool IsViewModelExisted(string name)
         {
             return ArrayUtility.Contains(_screenTypes, name) ||
                    ArrayUtility.Contains(_dialogTypes, name) ||
+                   ArrayUtility.Contains(_activityTypes, name) ||
                    ArrayUtility.Contains(_modelTypes, name);
         }
 
@@ -60,8 +104,9 @@ namespace UnuGames
             UIManEditorReflection.RefreshAssemblies(false);
             _screenTypes = UIManEditorReflection.GetAllTypes<UIManScreen>(true);
             _dialogTypes = UIManEditorReflection.GetAllTypes<UIManDialog>(true);
+            _activityTypes = UIManEditorReflection.GetAllTypes<UIActivity>(true);
             _modelTypes = UIManEditorReflection.GetAllTypes<ObservableModel>(true);
-            _container = EditorWindow.GetWindow<UIGenerator>(true, "UIMan - UI Generator");
+            _container = GetWindow<UIGenerator>(true, "UIMan - UI Generator");
             _container.minSize = new Vector2(900, 600);
             _container.maxSize = _container.minSize;
             GetConfig();
@@ -237,7 +282,7 @@ namespace UnuGames
             GUILayout.EndHorizontal();
         }
 
-        private void TypeWindow(int id = 0)
+        private void TypeWindow()
         {
             GUILayout.BeginVertical();
 
@@ -253,7 +298,8 @@ namespace UnuGames
             if (this.listTypes == null)
                 this.listTypes = new UIManTypeListView();
 
-            this.listTypes.SetData(-1, _screenTypes, _dialogTypes, _modelTypes, false, OnSelecType, this.searchField.KeyWord, this);
+            this.listTypes.SetData(-1, _screenTypes, _dialogTypes, _activityTypes, _modelTypes,
+                                   false, OnSelecType, this.searchField.KeyWord, this);
             this.listTypes.Draw();
 
             if (_reload && _config != null)
@@ -431,7 +477,7 @@ namespace UnuGames
 
             if (!File.Exists(_handlerScriptPath))
             {
-                if (ColorButton.Draw("Generate Type Handler", CommonColor.LightGreen, GUILayout.Height(30)))
+                if (ColorButton.Draw("Generate Handler", CommonColor.LightGreen, GUILayout.Height(30)))
                 {
                     var backupCode = UIManCodeGenerator.DeleteScript(_handlerScriptPath);
                     GenerateHandler(backupCode, _selectedType.BaseType.Name);
@@ -439,26 +485,36 @@ namespace UnuGames
             }
             else
             {
-                if (ColorButton.Draw("Edit Type Handler", CommonColor.LightBlue, GUILayout.Height(30)))
+                if (ColorButton.Draw("Edit Handler", CommonColor.LightBlue, GUILayout.Height(30)))
                 {
                     var handler = UIManCodeGenerator.GetScriptPathByType(_selectedType);
                     handler = handler.Replace(".cs", ".Handler.cs");
-                    UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(handler, 1);
+
+                    UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(handler, 1, 1);
                 }
             }
 
-            if (ColorButton.Draw("Edit Type View", CommonColor.LightBlue, GUILayout.Height(30)))
+            if (ColorButton.Draw("Edit View", CommonColor.LightBlue, GUILayout.Height(30)))
+            {
+                var prefabFolder = GetUIPrefabPath(_selectedType);
+                var prefabFile = _selectedType.Name + PREFAB_EXT;
+                var prefabPath = Path.Combine("Assets", prefabFolder, prefabFile);
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+                AssetDatabase.OpenAsset(prefab);
+            }
+
+            if (ColorButton.Draw("Edit View (Within Context)", CommonColor.LightBlue, GUILayout.Height(30)))
             {
                 GameObject prefabInstance;
                 UnityEngine.Object obj = FindObjectOfType(_selectedType);
+
                 if (obj != null)
                 {
                     prefabInstance = ((MonoBehaviour)obj).gameObject;
                 }
                 else
                 {
-                    var isDialog = _selectedType.BaseType == typeof(UIManDialog);
-                    var prefabFolder = GetUIPrefabPath(_selectedType, isDialog);
+                    var prefabFolder = GetUIPrefabPath(_selectedType);
                     var prefabFile = _selectedType.Name + PREFAB_EXT;
                     var prefabPath = Path.Combine(prefabFolder, prefabFile);
                     GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
@@ -468,10 +524,13 @@ namespace UnuGames
                     }
 
                     prefabInstance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
-                    if (isDialog)
-                        prefabInstance.transform.SetParent(UIMan.Instance.dialogRoot, false);
-                    else
+
+                    if (IsScreenType(_selectedType))
                         prefabInstance.transform.SetParent(UIMan.Instance.screenRoot, false);
+                    else if (IsDialogType(_selectedType))
+                        prefabInstance.transform.SetParent(UIMan.Instance.dialogRoot, false);
+                    else if (IsActivityType(_selectedType))
+                        prefabInstance.transform.SetParent(UIMan.Instance.activityRoot, false);
                 }
                 Selection.activeGameObject = prefabInstance;
             }
@@ -483,8 +542,7 @@ namespace UnuGames
                 AssetDatabase.DeleteAsset(cs);
                 AssetDatabase.DeleteAsset(handler);
 
-                var isDialog = _selectedType.BaseType == typeof(UIManDialog);
-                var prefabFolder = GetUIPrefabPath(_selectedType, isDialog);
+                var prefabFolder = GetUIPrefabPath(_selectedType);
                 var prefabFile = _selectedType.Name + PREFAB_EXT;
                 var prefabPath = UIManDefine.ASSETS_FOLDER + prefabFolder + prefabFile;
                 AssetDatabase.DeleteAsset(prefabPath);
@@ -535,7 +593,7 @@ namespace UnuGames
             _selectedTypeIsSealed = _selectedType.IsSealed;
             _selectedProperties = _selectedType.GetUIManProperties(true);
             this.namespaceField = new TextFieldHelper(_selectedType.Namespace);
-            this.baseTypePopup = new EditablePopup(_arrSupportType, _selectedType.BaseType.Name, OnChangeBaseType);
+            this.baseTypePopup = new EditablePopup(_supportTypes, _selectedType.BaseType.Name, OnChangeBaseType);
             _currentScriptPath = UIManCodeGenerator.GetScriptPathByType(_selectedType);
             _handlerScriptPath = UIManCodeGenerator.GeneratPathWithSubfix(_currentScriptPath, ".Handler.cs");
             CachePropertiesDrawer();
@@ -612,7 +670,7 @@ namespace UnuGames
             var handlerCode = backupCode;
 
             if (string.IsNullOrEmpty(handlerCode))
-                handlerCode = UIManCodeGenerator.GenerateHandler(_selectedType.Name, baseType, _config, this.namespaceField.Text);
+                handlerCode = UIManCodeGenerator.GenerateHandler(_selectedType.Name, baseType, IsActivityType(baseType), _config, this.namespaceField.Text);
             else
                 handlerCode = handlerCode.Replace($": {_selectedType.BaseType.Name}", $": {baseType}");
 
@@ -626,29 +684,82 @@ namespace UnuGames
 
         private void MakePrefab()
         {
-            if (!string.IsNullOrEmpty(_config.generatingType))
+            if (string.IsNullOrEmpty(_config.generatingType))
+                return;
+
+            if (IsActivityType(_config.generatingBaseType))
             {
-                GameObject prefabTemplate = FindAssetObject<GameObject>("@UI_PREFAB_TEMPLATE", PREFAB_EXT);
-                if (prefabTemplate != null)
+                MakeActivityPrefab();
+                return;
+            }
+
+            var isScreen = IsScreenType(_config.generatingBaseType);
+            var isDialog = IsDialogType(_config.generatingBaseType);
+
+            if (isScreen || isDialog)
+            {
+                MakeScreenOrDialogPrefab(isDialog);
+            }
+        }
+
+        private void MakeActivityPrefab()
+        {
+            var prefabTemplate = FindAssetObject<GameObject>("@UI_ACTIVITY_PREFAB_TEMPLATE", PREFAB_EXT);
+
+            if (prefabTemplate != null)
+            {
+                var newPrefab = Instantiate(prefabTemplate);
+                var generatedType = UIManEditorReflection.GetTypeByName(_config.generatingType);
+
+                if (generatedType != null)
                 {
-                    GameObject newPrefab = Instantiate(prefabTemplate);
-                    Type generatedType = UIManEditorReflection.GetTypeByName(_config.generatingType);
-                    if (generatedType != null)
-                    {
-                        var newVM = (ViewModelBehaviour)newPrefab.AddComponent(generatedType);
-                        newPrefab.name = _config.generatingType;
-                        newPrefab.GetComponent<DataContext>().viewModel = newVM;
-                    }
-
-                    var newPrefabPath = UIManDefine.ASSETS_FOLDER + (_config.generatingTypeIsDialog ? _config.dialogPrefabFolder : _config.screenPrefabFolder);
-                    EditorUtils.CreatePath(newPrefabPath);
-                    PrefabUtility.SaveAsPrefabAsset(newPrefab, newPrefabPath + "/" + _config.generatingType + PREFAB_EXT);
-
-                    DestroyImmediate(newPrefab);
+                    var newVM = newPrefab.AddComponent(generatedType) as UIActivity;
+                    newPrefab.name = _config.generatingType;
+                    newPrefab.GetComponent<DataContext>().viewModel = newVM;
+                    newVM.cover = newPrefab.GetComponent<Image>();
+                    newVM.background = newPrefab.transform.GetChild(0).GetComponent<Image>();
+                    newVM.icon = newPrefab.transform.GetChild(1).gameObject;
                 }
 
-                _config.generatingType = null;
+                var newPrefabPath = UIManDefine.ASSETS_FOLDER + _config.activityPrefabFolder;
+
+                EditorUtils.CreatePath(newPrefabPath);
+                PrefabUtility.SaveAsPrefabAsset(newPrefab, newPrefabPath + "/" + _config.generatingType + PREFAB_EXT);
+
+                DestroyImmediate(newPrefab);
             }
+
+            _config.generatingType = null;
+            _config.generatingBaseType = null;
+        }
+
+        private void MakeScreenOrDialogPrefab(bool isDialog)
+        {
+            var prefabTemplate = FindAssetObject<GameObject>("@UI_BASE_PREFAB_TEMPLATE", PREFAB_EXT);
+
+            if (prefabTemplate != null)
+            {
+                var newPrefab = Instantiate(prefabTemplate);
+                var generatedType = UIManEditorReflection.GetTypeByName(_config.generatingType);
+
+                if (generatedType != null)
+                {
+                    var newVM = newPrefab.AddComponent(generatedType) as ViewModelBehaviour;
+                    newPrefab.name = _config.generatingType;
+                    newPrefab.GetComponent<DataContext>().viewModel = newVM;
+                }
+
+                var folder = isDialog ? _config.dialogPrefabFolder : _config.screenPrefabFolder;
+                var newPrefabPath = UIManDefine.ASSETS_FOLDER + folder;
+
+                EditorUtils.CreatePath(newPrefabPath);
+                PrefabUtility.SaveAsPrefabAsset(newPrefab, newPrefabPath + "/" + _config.generatingType + PREFAB_EXT);
+
+                DestroyImmediate(newPrefab);
+            }
+
+            _config.generatingType = null;
+            _config.generatingBaseType = null;
         }
 
         private T FindAssetObject<T>(string name, string extension) where T : UnityEngine.Object
@@ -671,23 +782,32 @@ namespace UnuGames
             return obj;
         }
 
-        private string GetUIPrefabPath(Type uiType, bool isDialog)
+        private string GetUIPrefabPath(Type uiType)
         {
             var attributes = uiType.GetCustomAttributes(typeof(UIDescriptorAttribute), true);
             string url;
+
             if (attributes != null && attributes.Length > 0)
             {
                 url = ((UIDescriptorAttribute)attributes[0]).Url;
             }
             else
             {
-                if (isDialog)
+                if (IsScreenType(uiType))
+                {
+                    url = _config.screenPrefabFolder;
+                }
+                else if (IsDialogType(uiType))
                 {
                     url = _config.dialogPrefabFolder;
                 }
+                else if (IsActivityType(uiType))
+                {
+                    url = _config.activityPrefabFolder;
+                }
                 else
                 {
-                    url = _config.screenPrefabFolder;
+                    url = string.Empty;
                 }
             }
 

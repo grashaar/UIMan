@@ -29,6 +29,7 @@ namespace UnuGames
 
                 if (type.BaseType == typeof(UIManScreen) ||
                     type.BaseType == typeof(UIManDialog) ||
+                    type.BaseType == typeof(UIActivity) ||
                     type.BaseType == typeof(ObservableModel))
                 {
                     if (!uiManTypes.Contains(type.Name))
