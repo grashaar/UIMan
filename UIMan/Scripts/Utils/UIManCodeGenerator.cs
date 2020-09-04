@@ -28,8 +28,8 @@ namespace UnuGames
         #endregion TAGS and REGIONS
 
         private const string TYPE_TEMPLATE_PATH = "TypeTemplate";
-        private const string HANDLER_TEMPLATE = "HandlerTemplate";
-        private const string ACTIVITY_HANDLER_TEMPLATE = "ActivityHandlerTemplate";
+        private const string UIMANBASE_HANDLER_TEMPLATE = "UIManBaseHandlerTemplate";
+        private const string UIACTIVITY_HANDLER_TEMPLATE = "UIActivityHandlerTemplate";
 
         private const string DEFAULT_NAMESPACE = "UnuGames";
 
@@ -68,7 +68,7 @@ namespace UnuGames
                                              string customNamespace = null)
         {
             var code = "";
-            var template = isActivity ? ACTIVITY_HANDLER_TEMPLATE : HANDLER_TEMPLATE;
+            var template = isActivity ? UIACTIVITY_HANDLER_TEMPLATE : UIMANBASE_HANDLER_TEMPLATE;
             var text = AssetDatabase.LoadAssetAtPath<TextAsset>(Getpath(template));
 
             if (text != null)
