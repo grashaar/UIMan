@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Serialization;
 
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
@@ -10,16 +10,6 @@ namespace UnuGames
 {
     public class UIProgressBar : MonoBehaviour, IProgressBar
     {
-        public enum HorizontalOrigins
-        {
-            Left, Right
-        }
-
-        public enum VerticalOrigins
-        {
-            Top, Bottom
-        }
-
         [SerializeField, HideInInspector]
         private RectTransform rectTransform = null;
 
@@ -32,74 +22,67 @@ namespace UnuGames
         [SerializeField, HideInInspector]
         private Image foregroundImage = null;
 
-        [Header("Progress")]
-        [SerializeField]
-        [Range(0, 1)]
+        [SerializeField, Range(0f, 1f)]
         private float value = 0;
 
+#if ODIN_INSPECTOR
+        [FoldoutGroup("Horizontal"), LabelText("Enable")]
+#else
         [Space]
         [Header("Horizonal")]
-#if ODIN_INSPECTOR
-        [LabelText("Enable")]
 #endif
         [SerializeField]
         private bool horizontal = true;
 
 #if ODIN_INSPECTOR
-        [LabelText("Thumb")]
+        [FoldoutGroup("Horizontal"), LabelText("Thumb")]
 #endif
         [SerializeField]
         private RectTransform horizontalThumb = null;
 
 #if ODIN_INSPECTOR
-        [LabelText("Origin")]
+        [FoldoutGroup("Horizontal"), LabelText("Thumb Origin")]
 #endif
         [SerializeField]
         private HorizontalOrigins horizontalThumbOrigin = HorizontalOrigins.Left;
 
-        [FormerlySerializedAs("autoMaxWidth")]
+#if ODIN_INSPECTOR
+        [FoldoutGroup("Horizontal")]
+#endif
         [SerializeField]
-        private bool autoWidth = true;
+        private BarSize width = BarSize.Default;
 
-        [FormerlySerializedAs("maxWidth")]
-        [SerializeField]
-        private float width = 0;
-
+#if ODIN_INSPECTOR
+        [FoldoutGroup("Vertical"), LabelText("Enable")]
+#else
         [Space]
         [Header("Vertical")]
-#if ODIN_INSPECTOR
-        [LabelText("Enable")]
 #endif
         [SerializeField]
         private bool vertical = true;
 
 #if ODIN_INSPECTOR
-        [LabelText("Thumb")]
+        [FoldoutGroup("Vertical"), LabelText("Thumb")]
 #endif
         [SerializeField]
         private RectTransform verticalThumb = null;
 
 #if ODIN_INSPECTOR
-        [LabelText("Origin")]
+        [FoldoutGroup("Vertical"), LabelText("Thumb Origin")]
 #endif
         [SerializeField]
         private VerticalOrigins verticalThumbOrigin = VerticalOrigins.Top;
 
+#if ODIN_INSPECTOR
+        [FoldoutGroup("Vertical")]
+#endif
         [SerializeField]
-        private bool autoHeight = true;
-
-        [SerializeField]
-        private float height = 0;
+        private BarSize height = BarSize.Default;
 
         public float Value
         {
             get { return this.value; }
-
-            set
-            {
-                this.value = value;
-                UpdateVisual();
-            }
+            set { this.value = value; UpdateVisual(); }
         }
 
         public bool Horizontal
@@ -116,14 +99,14 @@ namespace UnuGames
 
         public bool AutoWidth
         {
-            get { return this.autoWidth; }
-            set { this.autoWidth = value; UpdateAutoWidth(); }
+            get { return this.width.Auto; }
+            set { this.width.Auto = value; UpdateAutoWidth(); }
         }
 
         public float Width
         {
-            get { return this.width; }
-            set { this.width = value; UpdateAutoWidth(); }
+            get { return this.width.Value; }
+            set { this.width.Value = value; UpdateAutoWidth(); }
         }
 
         public bool Vertical
@@ -140,14 +123,14 @@ namespace UnuGames
 
         public bool AutoHeight
         {
-            get { return this.autoHeight; }
-            set { this.autoHeight = value; UpdateAutoHeight(); }
+            get { return this.height.Auto; }
+            set { this.height.Auto = value; UpdateAutoHeight(); }
         }
 
         public float Height
         {
-            get { return this.height; }
-            set { this.height = value; UpdateAutoHeight(); }
+            get { return this.height.Value; }
+            set { this.height.Value = value; UpdateAutoHeight(); }
         }
 
         private void Awake()
@@ -164,14 +147,14 @@ namespace UnuGames
 
         private void UpdateAutoWidth()
         {
-            if (this.autoWidth)
-                this.width = this.rectTransform.rect.width;
+            if (this.width.Auto)
+                this.width.Value = this.rectTransform.rect.width;
         }
 
         private void UpdateAutoHeight()
         {
-            if (this.autoHeight)
-                this.height = this.rectTransform.rect.height;
+            if (this.height.Auto)
+                this.height.Value = this.rectTransform.rect.height;
         }
 
         private void UpdateVisual()
@@ -193,21 +176,21 @@ namespace UnuGames
                 return;
             }
 
-            var newRect = this.foreground.sizeDelta;
+            var size = this.foreground.sizeDelta;
 
             if (this.horizontal)
             {
-                var newWidth = this.value * this.width;
-                newRect.x = newWidth;
+                var newWidth = this.value * this.width.Value;
+                size.x = newWidth;
             }
 
             if (this.vertical)
             {
-                var newHeight = this.value * this.height;
-                newRect.y = newHeight;
+                var newHeight = this.value * this.height.Value;
+                size.y = newHeight;
             }
 
-            this.foreground.sizeDelta = newRect;
+            this.foreground.sizeDelta = size;
         }
 
         private void UpdateHorizontalThumb()
@@ -230,7 +213,7 @@ namespace UnuGames
 
             var newPos = this.horizontalThumb.anchoredPosition;
             var halfWidth = this.horizontalThumb.rect.width / 2f;
-            var newValue = this.value * this.width - halfWidth;
+            var newValue = this.value * this.width.Value - halfWidth;
             newPos.x = this.horizontalThumbOrigin == HorizontalOrigins.Left ? newValue : -newValue;
 
             this.horizontalThumb.anchoredPosition = newPos;
@@ -256,7 +239,7 @@ namespace UnuGames
 
             var newPos = this.verticalThumb.anchoredPosition;
             var halfHeight = this.verticalThumb.rect.height / 2f;
-            var newValue = this.value * this.height - halfHeight;
+            var newValue = this.value * this.height.Value - halfHeight;
             newPos.y = this.verticalThumbOrigin == VerticalOrigins.Bottom ? newValue : -newValue;
 
             this.verticalThumb.anchoredPosition = newPos;
@@ -278,5 +261,40 @@ namespace UnuGames
         }
 
 #endif
+
+        public enum HorizontalOrigins
+        {
+            Left, Right
+        }
+
+        public enum VerticalOrigins
+        {
+            Top, Bottom
+        }
+
+#if ODIN_INSPECTOR
+        [InlineProperty]
+#endif
+        [Serializable]
+        private struct BarSize
+        {
+#if ODIN_INSPECTOR
+            [HorizontalGroup, LabelWidth(35)]
+#endif
+            public bool Auto;
+
+#if ODIN_INSPECTOR
+            [HorizontalGroup, HideLabel, HideIf(nameof(Auto))]
+#endif
+            public float Value;
+
+            public BarSize(bool auto, float size)
+            {
+                this.Auto = auto;
+                this.Value = size;
+            }
+
+            public static BarSize Default { get; } = new BarSize(true, 0f);
+        }
     }
 }
