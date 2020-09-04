@@ -217,10 +217,12 @@ namespace UnuGames.MVVM
 
                 GUILayout.EndHorizontal();
 
-                MemberInfo curMember = this.binder.GetMemberInfo(dataMembers[selectedIndex], MemberTypes.Property, MemberTypes.Field);
+                var curMember = this.binder.GetMemberInfo(dataMembers[selectedIndex], MemberTypes.Property, MemberTypes.Field);
+
                 if (curMember != null)
                 {
                     var attributes = curMember.GetCustomAttributes(typeof(UIManPropertyAttribute), false);
+
                     if (attributes == null || attributes.Length == 0)
                     {
                         GUILayout.BeginHorizontal("Box");

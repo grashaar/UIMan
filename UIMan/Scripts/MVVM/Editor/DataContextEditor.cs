@@ -7,6 +7,8 @@ namespace UnuGames.MVVM
     [CustomEditor(typeof(DataContext))]
     public class DataContextEditor : Editor
     {
+        private static readonly System.Type _type = typeof(ViewModelBehaviour);
+
         private readonly GUIContent lblType = new GUIContent("Type");
         private readonly GUIContent lblContext = new GUIContent("Context");
 
@@ -33,12 +35,12 @@ namespace UnuGames.MVVM
             else if (context.type == ContextType.MonoBehaviour)
             {
                 EditorGUI.BeginChangeCheck();
-                var contextViewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, context.viewModel, typeof(ViewModelBehaviour), true);
+                var viewModel = EditorGUILayout.ObjectField(this.lblContext, context.viewModel, _type, true);
 
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RecordObject(this.target, "Select ViewModel");
-                    context.viewModel = contextViewModel;
+                    context.viewModel = viewModel as ViewModelBehaviour;
                 }
 
                 if (context.viewModel.GetCachedType() != null)
@@ -53,12 +55,12 @@ namespace UnuGames.MVVM
             else if (context.type == ContextType.Property)
             {
                 EditorGUI.BeginChangeCheck();
-                var contextViewModel = (ViewModelBehaviour)EditorGUILayout.ObjectField(this.lblContext, context.viewModel, typeof(ViewModelBehaviour), true);
+                var viewModel = EditorGUILayout.ObjectField(this.lblContext, context.viewModel, _type, true);
 
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RecordObject(this.target, "Select ViewModel");
-                    context.viewModel = contextViewModel;
+                    context.viewModel = viewModel as ViewModelBehaviour;
                 }
 
                 var viewMembers = context.viewModel.GetAllMembers(false, true, false, false, MemberTypes.Field, MemberTypes.Property);
@@ -69,6 +71,7 @@ namespace UnuGames.MVVM
                     if (string.IsNullOrEmpty(context.propertyName))
                     {
                         context.propertyName = dataMembers[0];
+                        this.selected = 0;
                     }
                     else
                     {
@@ -108,18 +111,22 @@ namespace UnuGames.MVVM
 
                     GUILayout.EndHorizontal();
 
-                    MemberInfo curMember = context.viewModel.GetMemberInfo(dataMembers[this.selected], MemberTypes.Property, MemberTypes.Field);
+                    var dataMember = dataMembers[this.selected];
+                    var curMember = context.viewModel.GetMemberInfo(dataMember, MemberTypes.Property, MemberTypes.Field);
+
                     if (curMember != null)
                     {
                         var attributes = curMember.GetCustomAttributes(typeof(UIManPropertyAttribute), false);
+
                         if (attributes == null || attributes.Length == 0)
                         {
-                            GUILayout.BeginHorizontal();
+                            GUILayout.BeginHorizontal("Box");
                             EditorGUILayout.PrefixLabel(" ");
-                            GUILayout.Label("None observable field/property!", EditorGUIHelper.RichText(color: CommonColor.GetRed()));
+                            GUILayout.Label("Field/Property must be decorated with either [UIManProperty] or [UIManAutoProperty] attribute!", EditorGUIHelper.RichText(true, CommonColor.GetRed()));
                             GUILayout.EndHorizontal();
                         }
                     }
+
                     GUILayout.EndVertical();
                 }
 
