@@ -2,6 +2,7 @@
 
 namespace UnuGames
 {
+    [CreateAssetMenu(fileName = "UIManConfig", menuName = "UIMan/UIMan Config")]
     public class UIManConfig : ScriptableObject
     {
         public string classNamespace;
