@@ -13,7 +13,7 @@ namespace UnuGames
         [HideInInspector]
         public bool useCover = true;
 
-        private UICallback m_callbacks;
+        private UICallback callbacks;
 
         public override UIBaseType GetUIBaseType()
         {
@@ -22,23 +22,23 @@ namespace UnuGames
 
         public void SetCallbacks(UICallback callbacks)
         {
-            this.m_callbacks = callbacks;
+            this.callbacks = callbacks;
         }
 
         public void Callback(int index, params object[] args)
         {
-            if (this.m_callbacks == null || index > this.m_callbacks.Callbacks.Count - 1)
-            {
-                if (this.State != UIState.Busy && this.State != UIState.Hide)
-                    HideMe();
-
-                return;
-            }
-
             if (this.State != UIState.Busy && this.State != UIState.Hide)
                 HideMe();
 
-            this.m_callbacks.Callbacks[index]?.Invoke(args);
+            this.callbacks?.Invoke(index, args);
+        }
+
+        public void Callback(params object[] args)
+        {
+            if (this.State != UIState.Busy && this.State != UIState.Hide)
+                HideMe();
+
+            this.callbacks?.Invoke(args);
         }
     }
 }
