@@ -21,6 +21,9 @@ namespace UnuGames
             if (this.background)
                 this.background.enabled = value.showBackground;
 
+            if (value.alphaOnShow.HasValue)
+                SetAlpha(value.alphaOnShow.Value);
+
             this.deactivateOnHide = value.deactivateOnHide;
 
             SetShowProgress(value.showProgress);
@@ -166,8 +169,11 @@ namespace UnuGames
         private UITweener GetFadeTweener(float duration, float endAlpha)
         {
             return UITweener.Alpha(this.gameObject, duration, this.canvasGroup.alpha, endAlpha)
-                            .SetOnUpdate(x => this.canvasGroup.alpha = x);
+                            .SetOnUpdate(SetAlpha);
         }
+
+        private void SetAlpha(float value)
+            => this.canvasGroup.alpha = value;
 
         private void ShowInternal(in Settings? settings)
         {
