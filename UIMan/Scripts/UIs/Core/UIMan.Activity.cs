@@ -216,15 +216,15 @@ namespace UnuGames
             GetActivity(uiType, x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(Type uiType, Func<Task<T>> task, UIActivity.Settings? settings = null)
+        public void ShowActivity<T>(Type uiType, Func<Task<T>> task, Action<T> onTaskResult, UIActivity.Settings? settings = null)
         {
-            GetActivity(uiType, x => x.Show(task, settings));
+            GetActivity(uiType, x => x.Show(task, onTaskResult, settings));
         }
 
-        public void ShowActivity<T>(Type uiType, Func<Task<T>> task, float showDuration, float hideDuration,
+        public void ShowActivity<T>(Type uiType, Func<Task<T>> task, Action<T> onTaskResult, float showDuration, float hideDuration,
                                     UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity(uiType, x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
+            GetActivity(uiType, x => x.Show(task, onTaskResult, showDuration, hideDuration, settings, onComplete, args));
         }
 
         public void ShowActivity<T>(AsyncOperation task, UIActivity.Settings? settings = null)
@@ -336,15 +336,15 @@ namespace UnuGames
             GetActivity<UIActivity>(x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(Func<Task<T>> task, UIActivity.Settings? settings = null)
+        public void ShowActivity<T>(Func<Task<T>> task, Action<T> onTaskResult, UIActivity.Settings? settings = null)
         {
-            GetActivity<UIActivity>(x => x.Show(task, settings));
+            GetActivity<UIActivity>(x => x.Show(task, onTaskResult, settings));
         }
 
-        public void ShowActivity<T>(Func<Task<T>> task, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
-                                 UIActivityAction onComplete = null, params object[] args)
+        public void ShowActivity<T>(Func<Task<T>> task, Action<T> onTaskResult, float showDuration, float hideDuration,
+                                    UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity<UIActivity>(x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
+            GetActivity<UIActivity>(x => x.Show(task, onTaskResult, showDuration, hideDuration, settings, onComplete, args));
         }
     }
 }

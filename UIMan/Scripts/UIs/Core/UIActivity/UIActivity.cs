@@ -76,10 +76,10 @@ namespace UnuGames
             Show(task, false, 0f, 0f, settings, onComplete, args);
         }
 
-        public void Show<T>(Func<Task<T>> task, Action<T> onTaskComplete, Settings? settings = null,
+        public void Show<T>(Func<Task<T>> task, Action<T> onTaskResult, Settings? settings = null,
                             UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, onTaskComplete, false, 0f, 0f, settings, onComplete, args);
+            Show(task, onTaskResult, false, 0f, 0f, settings, onComplete, args);
         }
 
         public void Show(float showDuration, Settings? settings = null,
@@ -118,10 +118,10 @@ namespace UnuGames
             Show(task, true, showDuration, hideDuration, settings, onComplete, args);
         }
 
-        public void Show<T>(Func<Task<T>> task, Action<T> onTaskComplete, float showDuration, float hideDuration,
+        public void Show<T>(Func<Task<T>> task, Action<T> onTaskResult, float showDuration, float hideDuration,
                             Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, onTaskComplete, true, showDuration, hideDuration, settings,  onComplete, args);
+            Show(task, onTaskResult, true, showDuration, hideDuration, settings,  onComplete, args);
         }
 
         public void Hide()
@@ -171,6 +171,8 @@ namespace UnuGames
         protected virtual void OnShow() { }
 
         protected virtual void OnShowComplete() { }
+
+        protected virtual void OnTaskComplete() { }
 
         protected virtual void OnHide() { }
 

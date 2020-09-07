@@ -39,10 +39,8 @@ namespace UnuGames
                 this.gameObject.SetActive(true);
         }
 
-        private void InvokeOnShowComplete()
+        private void InvokeOnComplete()
         {
-            OnShowComplete();
-
             if (this.onComplete != null)
             {
                 this.onComplete(this, this.onCompleteArgs);
@@ -56,14 +54,19 @@ namespace UnuGames
 
         private IEnumerator WaitTask(IEnumerator coroutine)
         {
+            OnShowComplete();
+
             yield return StartCoroutine(coroutine);
 
-            InvokeOnShowComplete();
+            InvokeOnComplete();
+            OnTaskComplete();
             Hide();
         }
 
         private IEnumerator WaitTask(AsyncOperation asyncTask)
         {
+            OnShowComplete();
+
             while (!asyncTask.isDone)
             {
                 this.progress = asyncTask.progress;
@@ -72,12 +75,15 @@ namespace UnuGames
                 yield return null;
             }
 
-            InvokeOnShowComplete();
+            InvokeOnComplete();
+            OnTaskComplete();
             Hide();
         }
 
         private IEnumerator WaitTask(UnityWebRequest request)
         {
+            OnShowComplete();
+
             while (!request.isDone)
             {
                 this.progress = request.downloadProgress;
@@ -86,43 +92,57 @@ namespace UnuGames
                 yield return null;
             }
 
-            InvokeOnShowComplete();
+            InvokeOnComplete();
+            OnTaskComplete();
             Hide();
         }
 
         private async void WaitTask(Func<Task> task)
         {
+            OnShowComplete();
+
             await task();
 
-            InvokeOnShowComplete();
+            InvokeOnComplete();
+            OnTaskComplete();
             Hide();
         }
 
-        private async void WaitTask<T>(Func<Task<T>> task, Action<T> onTaskComplete)
+        private async void WaitTask<T>(Func<Task<T>> task, Action<T> onTaskResult)
         {
-            var result = await task();
-            onTaskComplete?.Invoke(result);
+            OnShowComplete();
 
-            InvokeOnShowComplete();
+            var result = await task();
+            onTaskResult?.Invoke(result);
+
+            InvokeOnComplete();
+            OnTaskComplete();
             Hide();
         }
 
         private void WaitTask(float hideDuration)
         {
-            InvokeOnShowComplete();
+            OnShowComplete();
+            InvokeOnComplete();
+            OnTaskComplete();
             Hide(hideDuration);
         }
 
         private IEnumerator WaitTask(IEnumerator coroutine, float hideDuration)
         {
+            OnShowComplete();
+
             yield return StartCoroutine(coroutine);
 
-            InvokeOnShowComplete();
+            InvokeOnComplete();
+            OnTaskComplete();
             Hide(hideDuration);
         }
 
         private IEnumerator WaitTask(AsyncOperation asyncTask, float hideDuration)
         {
+            OnShowComplete();
+
             while (!asyncTask.isDone)
             {
                 this.progress = asyncTask.progress;
@@ -131,12 +151,15 @@ namespace UnuGames
                 yield return null;
             }
 
-            InvokeOnShowComplete();
+            InvokeOnComplete();
+            OnTaskComplete();
             Hide(hideDuration);
         }
 
         private IEnumerator WaitTask(UnityWebRequest request, float hideDuration)
         {
+            OnShowComplete();
+
             while (!request.isDone)
             {
                 this.progress = request.downloadProgress;
@@ -145,24 +168,31 @@ namespace UnuGames
                 yield return null;
             }
 
-            InvokeOnShowComplete();
+            InvokeOnComplete();
+            OnTaskComplete();
             Hide(hideDuration);
         }
 
         private async void WaitTask(Func<Task> task, float hideDuration)
         {
+            OnShowComplete();
+
             await task();
 
-            InvokeOnShowComplete();
+            InvokeOnComplete();
+            OnTaskComplete();
             Hide(hideDuration);
         }
 
-        private async void WaitTask<T>(Func<Task<T>> task, Action<T> onTaskComplete, float hideDuration)
+        private async void WaitTask<T>(Func<Task<T>> task, Action<T> onTaskResult, float hideDuration)
         {
-            var result = await task();
-            onTaskComplete?.Invoke(result);
+            OnShowComplete();
 
-            InvokeOnShowComplete();
+            var result = await task();
+            onTaskResult?.Invoke(result);
+
+            InvokeOnComplete();
+            OnTaskComplete();
             Hide(hideDuration);
         }
 
@@ -198,9 +228,9 @@ namespace UnuGames
         private void FadeShow(float duration)
         {
             if (duration <= 0f)
-                InvokeOnShowComplete();
+                InvokeOnComplete();
             else
-                GetFadeTweener(duration, 1f).SetOnComplete(InvokeOnShowComplete);
+                GetFadeTweener(duration, 1f).SetOnComplete(InvokeOnComplete);
         }
 
         private void FadeShow(float showDuration, float hideDuration)
@@ -243,12 +273,12 @@ namespace UnuGames
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(task, hideDuration));
         }
 
-        private void FadeShow<T>(Func<Task<T>> task, Action<T> onTaskComplete, float showDuration, float hideDuration)
+        private void FadeShow<T>(Func<Task<T>> task, Action<T> onTaskResult, float showDuration, float hideDuration)
         {
             if (showDuration <= 0f)
-                WaitTask(task, onTaskComplete, hideDuration);
+                WaitTask(task, onTaskResult, hideDuration);
             else
-                GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(task, onTaskComplete, hideDuration));
+                GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(task, onTaskResult, hideDuration));
         }
 
         private void Show(bool fade, float showDuration, Settings? settings = null,
@@ -260,7 +290,7 @@ namespace UnuGames
             if (CanFade(fade))
                 FadeShow(showDuration);
             else
-                InvokeOnShowComplete();
+                InvokeOnComplete();
         }
 
         private void Show(bool fade, float showDuration, float hideDuration, Settings? settings = null,
@@ -272,7 +302,7 @@ namespace UnuGames
             if (CanFade(fade))
                 FadeShow(showDuration, hideDuration);
             else
-                InvokeOnShowComplete();
+                InvokeOnComplete();
         }
 
         private void Show(AsyncOperation task, bool fade, float showDuration, float hideDuration, Settings? settings = null,
@@ -335,7 +365,7 @@ namespace UnuGames
                 WaitTask(task);
         }
 
-        private void Show<T>(Func<Task<T>> task, Action<T> onTaskComplete, bool fade, float showDuration, float hideDuration,
+        private void Show<T>(Func<Task<T>> task, Action<T> onTaskResult, bool fade, float showDuration, float hideDuration,
                              Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
             if (task == null)
@@ -345,9 +375,9 @@ namespace UnuGames
             ShowInternal(settings);
 
             if (CanFade(fade))
-                FadeShow(task, onTaskComplete, showDuration, hideDuration);
+                FadeShow(task, onTaskResult, showDuration, hideDuration);
             else
-                WaitTask(task, onTaskComplete);
+                WaitTask(task, onTaskResult);
         }
     }
 }
