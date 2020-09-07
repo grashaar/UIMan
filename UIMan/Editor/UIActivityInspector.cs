@@ -77,6 +77,44 @@ namespace UnuGames
                 uiActivity.useBackgroundBinding = useBackgroundBinding;
             }
 
+            EditorGUI.BeginChangeCheck();
+
+            var canFade = EditorGUILayout.Toggle("Can Fade", uiActivity.canFade);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(uiActivity, nameof(canFade));
+                uiActivity.canFade = canFade;
+            }
+
+            if (canFade)
+            {
+                EditorGUILayout.LabelField("Duration");
+                EditorGUI.indentLevel += 1;
+
+                EditorGUI.BeginChangeCheck();
+
+                var showDuration = EditorGUILayout.FloatField("Show", uiActivity.showDuration);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(uiActivity, nameof(showDuration));
+                    uiActivity.showDuration = showDuration;
+                }
+
+                EditorGUI.BeginChangeCheck();
+
+                var hideDuration = EditorGUILayout.FloatField("Hide", uiActivity.hideDuration);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(uiActivity, nameof(hideDuration));
+                    uiActivity.hideDuration = hideDuration;
+                }
+
+                EditorGUI.indentLevel -= 1;
+            }
+
             GUILayout.Space(2f);
             GUILayout.EndVertical();
 

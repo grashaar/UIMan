@@ -12,6 +12,8 @@ namespace UnuGames
 
         private void ApplySettings(in Settings value)
         {
+            this.settings = value;
+
             if (this.icon)
                 this.icon.SetActive(value.showIcon);
 
@@ -23,8 +25,6 @@ namespace UnuGames
 
             if (value.alphaOnShow.HasValue)
                 SetAlpha(value.alphaOnShow.Value);
-
-            this.deactivateOnHide = value.deactivateOnHide;
 
             SetShowProgress(value.showProgress);
         }
@@ -196,14 +196,11 @@ namespace UnuGames
             Hide(hideDuration);
         }
 
-        private UITweener GetFadeTweener(float duration, float endAlpha)
+        protected UITweener GetFadeTweener(float duration, float endAlpha)
         {
-            return UITweener.Alpha(this.gameObject, duration, this.canvasGroup.alpha, endAlpha)
+            return UITweener.Alpha(this.gameObject, duration, GetAlpha(), endAlpha)
                             .SetOnUpdate(SetAlpha);
         }
-
-        private void SetAlpha(float value)
-            => this.canvasGroup.alpha = value;
 
         private void ShowInternal(in Settings? settings)
         {
@@ -214,7 +211,7 @@ namespace UnuGames
 
         private void HideInternal()
         {
-            var willDeactivate = this.deactivateOnHide;
+            var willDeactivate = this.settings.deactivateOnHide;
 
             this.isLoading = false;
             ApplySettings(default);
@@ -223,6 +220,12 @@ namespace UnuGames
 
             if (willDeactivate && this.gameObject.activeSelf)
                 this.gameObject.SetActive(false);
+        }
+
+        private void FadeHide(float duration)
+        {
+            OnHide();
+            GetFadeTweener(duration, 0f).SetOnComplete(HideInternal);
         }
 
         private void FadeShow(float duration)

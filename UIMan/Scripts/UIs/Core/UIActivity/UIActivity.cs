@@ -24,13 +24,28 @@ namespace UnuGames
         [HideInInspector]
         public Image background;
 
+        [HideInInspector]
+        public bool canFade = false;
+
+        [HideInInspector]
+        public float hideDuration = 0f;
+
+        [HideInInspector]
+        public float showDuration = 0f;
+
         public bool isLoading { get; private set; }
 
         public float progress { get; private set; }
 
+        protected Settings settings
+        {
+            get { return this.m_settings ?? Settings.Default; }
+            set { this.m_settings = value; }
+        }
+
+        private Settings? m_settings = null;
         private CanvasGroup canvasGroup;
         private GraphicRaycaster graphicRaycaster;
-        private bool deactivateOnHide;
         private UIActivityAction onComplete;
         private object[] onCompleteArgs;
 
@@ -49,37 +64,37 @@ namespace UnuGames
 
         public void Show(Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
-            Show(false, 0f, settings, onComplete, args);
+            Show(this.canFade, this.showDuration, settings, onComplete, args);
         }
 
         public void Show(AsyncOperation task, Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, false, 0f, 0f, settings, onComplete, args);
+            Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
         }
 
         public void Show(IEnumerator task, Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, false, 0f, 0f, settings, onComplete, args);
+            Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
         }
 
         public void Show(UnityWebRequest task, Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, false, 0f, 0f, settings, onComplete, args);
+            Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
         }
 
         public void Show(Func<Task> task, Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, false, 0f, 0f, settings, onComplete, args);
+            Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
         }
 
         public void Show<T>(Func<Task<T>> task, Action<T> onTaskResult, Settings? settings = null,
                             UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, onTaskResult, false, 0f, 0f, settings, onComplete, args);
+            Show(task, onTaskResult, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
         }
 
         public void Show(float showDuration, Settings? settings = null,
@@ -126,6 +141,12 @@ namespace UnuGames
 
         public void Hide()
         {
+            if (CanFade(this.canFade) && this.hideDuration > 0f)
+            {
+                FadeHide(this.hideDuration);
+                return;
+            }
+
             OnHide();
             HideInternal();
         }
@@ -138,8 +159,16 @@ namespace UnuGames
                 return;
             }
 
-            OnHide();
-            GetFadeTweener(duration, 0f).SetOnComplete(HideInternal);
+            FadeHide(duration);
+        }
+
+        public float GetAlpha()
+            => this.canvasGroup ? this.canvasGroup.alpha : 1f;
+
+        public void SetAlpha(float value)
+        {
+            if (this.canvasGroup)
+                this.canvasGroup.alpha = value;
         }
 
         public void BlockInput()
