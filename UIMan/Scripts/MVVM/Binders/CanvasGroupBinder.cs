@@ -35,7 +35,7 @@ namespace UnuGames.MVVM
 
             SubscribeOnChangedEvent(this.alphaField, OnUpdateAlpha);
             SubscribeOnChangedEvent(this.interactableField, OnUpdateInteractable);
-            SubscribeOnChangedEvent(this.blockRaycastsField, OnUpdateInteractable);
+            SubscribeOnChangedEvent(this.blockRaycastsField, OnUpdateBlockRaycasts);
         }
 
         private void OnUpdateAlpha(object val)
