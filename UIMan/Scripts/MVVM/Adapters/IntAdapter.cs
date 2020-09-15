@@ -13,12 +13,9 @@ namespace UnuGames.MVVM
 
         public static int Convert(object value, int defaultValue, Object context)
         {
-            if (value == null)
-                return defaultValue;
-
             if (!(value is int val))
             {
-                if (!int.TryParse(value.ToString(), out val))
+                if (!int.TryParse(value?.ToString(), out val))
                 {
                     UnuLogger.LogError($"Cannot convert '{value}' to int.", context);
                     val = defaultValue;

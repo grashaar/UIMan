@@ -13,13 +13,10 @@ namespace UnuGames.MVVM
 
         public static float Convert(object value, float defaultValue, Object context)
         {
-            if (value == null)
-                return defaultValue;
-
             if (!(value is float valFloat))
             {
                 if (value is double valDouble ||
-                    double.TryParse(value.ToString(), out valDouble))
+                    double.TryParse(value?.ToString(), out valDouble))
                 {
                     valFloat = (float)valDouble;
                 }

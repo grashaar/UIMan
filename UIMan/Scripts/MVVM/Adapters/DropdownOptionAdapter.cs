@@ -18,14 +18,11 @@ namespace UnuGames.MVVM
 
         public static OptionData Convert(object value, bool forceToString, Object context)
         {
-            if (value == null)
-                return _defaultValue;
-
             if (!(value is OptionData val))
             {
                 if (forceToString)
                 {
-                    val = new OptionData(value.ToString());
+                    val = new OptionData(value?.ToString() ?? string.Empty);
                 }
                 else
                 {

@@ -16,9 +16,6 @@ namespace UnuGames.MVVM
 
         public static Color Convert(object value, Color defaultValue, bool tryParse, Object context)
         {
-            if (value == null)
-                return defaultValue;
-
             if (!(value is Color val))
             {
                 if (tryParse)
@@ -39,7 +36,7 @@ namespace UnuGames.MVVM
         {
             if (!(value is string valStr))
             {
-                valStr = value.ToString();
+                valStr = value?.ToString();
             }
 
             if (valStr.Length > 0 && valStr[0] != '#')

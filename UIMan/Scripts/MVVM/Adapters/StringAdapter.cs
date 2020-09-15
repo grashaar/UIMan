@@ -16,14 +16,11 @@ namespace UnuGames.MVVM
 
         public static string Convert(object value, string defaultValue, bool forceToString, Object context)
         {
-            if (value == null)
-                return defaultValue;
-
             if (!(value is string val))
             {
                 if (forceToString)
                 {
-                    val = value.ToString();
+                    val = value?.ToString() ?? string.Empty;
                 }
                 else
                 {

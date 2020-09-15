@@ -13,12 +13,9 @@ namespace UnuGames.MVVM
 
         public static bool Convert(object value, bool defaultValue, Object context)
         {
-            if (value == null)
-                return defaultValue;
-
             if (!(value is bool val))
             {
-                if (!bool.TryParse(value.ToString(), out val))
+                if (!bool.TryParse(value?.ToString(), out val))
                 {
                     UnuLogger.LogError($"Cannot convert '{value}' to boolean.", context);
                     val = defaultValue;
