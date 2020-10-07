@@ -7,13 +7,15 @@ namespace UnuGames.MVVM
     [DisallowMultipleComponent]
     public class ToggleBinder : BinderBase
     {
+        public bool ignoreGroup = false;
+
         protected Toggle toggle;
 
         [HideInInspector]
         public BindingField valueField = new BindingField("Value");
 
         [HideInInspector]
-        public TwoWayBinding onValueChanged = new TwoWayBinding("On Value Changed");
+        public TwoWayBindingBool onValueChanged = new TwoWayBindingBool("On Value Changed");
 
         [HideInInspector]
         public BoolConverter valueConverter = new BoolConverter("Value");
@@ -39,7 +41,10 @@ namespace UnuGames.MVVM
 
         private void OnValueChanged(bool value)
         {
-            SetValue(this.valueField.member, value);
+            if (!this.ignoreGroup && !value && this.toggle.group)
+                return;
+
+            SetValue(this.valueField, this.onValueChanged.converter.Convert(value, this));
         }
 
         private void OnValueChanged_OnChanged(bool value)

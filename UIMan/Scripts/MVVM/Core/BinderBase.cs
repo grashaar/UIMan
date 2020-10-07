@@ -249,7 +249,7 @@ namespace UnuGames.MVVM
                 {
                     var fieldInfo = memberInfo as FieldInfo;
 
-                    if (fieldInfo.FieldType == twoWayBindingType)
+                    if (twoWayBindingType.IsAssignableFrom(fieldInfo.FieldType))
                     {
                         listTwoWayBinding.Add(fieldInfo.GetValue(this) as TwoWayBinding);
                     }

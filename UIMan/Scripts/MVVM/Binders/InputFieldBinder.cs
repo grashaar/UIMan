@@ -13,7 +13,7 @@ namespace UnuGames.MVVM
         public BindingField valueField = new BindingField("Text");
 
         [HideInInspector]
-        public TwoWayBinding onValueChanged = new TwoWayBinding("On Value Changed");
+        public TwoWayBindingString onValueChanged = new TwoWayBindingString("On Value Changed");
 
         [HideInInspector]
         public StringConverter valueConverter = new StringConverter("Text");
@@ -39,7 +39,7 @@ namespace UnuGames.MVVM
 
         private void OnValueChanged(string value)
         {
-            SetValue(this.valueField.member, value);
+            SetValue(this.valueField, this.onValueChanged.converter.Convert(value, this));
         }
 
         private void OnValueChanged_OnChanged(bool value)

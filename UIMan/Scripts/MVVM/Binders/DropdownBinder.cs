@@ -18,7 +18,7 @@ namespace UnuGames.MVVM
         public BindingField valueField = new BindingField("Value");
 
         [HideInInspector]
-        public TwoWayBinding onValueChanged = new TwoWayBinding("On Value Changed");
+        public TwoWayBindingInt onValueChanged = new TwoWayBindingInt("On Value Changed");
 
         [HideInInspector]
         public DropdownOptionConverter optionDataConverter = new DropdownOptionConverter("Option Data");
@@ -78,7 +78,7 @@ namespace UnuGames.MVVM
 
         private void OnValueChanged(int value)
         {
-            SetValue(this.valueField.member, value);
+            SetValue(this.valueField, this.onValueChanged.converter.Convert(value, this));
         }
 
         private void OnValueChanged_OnChanged(bool value)

@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace UnuGames.MVVM
 {
     [Serializable]
-    public sealed class TwoWayBinding
+    public class TwoWayBinding
     {
         public string label;
 
@@ -30,6 +32,38 @@ namespace UnuGames.MVVM
         public TwoWayBinding(string label)
         {
             this.label = label;
+        }
+
+        private Converter[] converters;
+
+        public Converter[] GetConverters()
+        {
+#if !UNITY_EDITOR
+            if (this.converters != null)
+                return  this.converters;
+#endif
+
+            var listConverter = new List<Converter>();
+            MemberInfo[] members = GetType().GetMembers();
+            var converterType = typeof(Converter);
+
+            for (var i = 0; i < members.Length; i++)
+            {
+                MemberInfo memberInfo = members[i];
+
+                if (memberInfo.MemberType == MemberTypes.Field)
+                {
+                    var fieldInfo = memberInfo as FieldInfo;
+
+                    if (converterType.IsAssignableFrom(fieldInfo.FieldType))
+                    {
+                        listConverter.Add(fieldInfo.GetValue(this) as Converter);
+                    }
+                }
+            }
+
+            this.converters = listConverter.ToArray();
+            return this.converters;
         }
 
         public static implicit operator bool(TwoWayBinding value)

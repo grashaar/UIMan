@@ -114,12 +114,12 @@ namespace UnuGames.MVVM
             }
         }
 
-        public void DrawConverter(Converter converter)
+        public void DrawConverter(Converter converter, string prefix = "", string suffix = "")
         {
             GUILayout.BeginVertical();
             GUILayout.BeginHorizontal();
 
-            EditorGUILayout.PrefixLabel(new GUIContent(converter.label));
+            EditorGUILayout.PrefixLabel(new GUIContent($"{prefix}{converter.label}{suffix}"));
 
             var adapter = converter.GetAdapter();
             var adapterType = converter.GetAdapterType();
@@ -157,6 +157,24 @@ namespace UnuGames.MVVM
             }
 
             GUILayout.EndHorizontal();
+
+            Converter[] arrConverters = twoWayBinding.GetConverters();
+
+            if (arrConverters.Length > 0)
+            {
+                const string suffix = " Converter";
+
+                GUILayout.BeginVertical();
+
+                for (var i = 0; i < arrConverters.Length; i++)
+                {
+                    DrawConverter(arrConverters[i], suffix: suffix);
+                }
+
+                GUILayout.EndVertical();
+                GUILayout.Space(4);
+            }
+
             GUILayout.EndVertical();
         }
 

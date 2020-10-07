@@ -19,7 +19,7 @@ namespace UnuGames.MVVM
         public BindingField valueField = new BindingField("Value");
 
         [HideInInspector]
-        public TwoWayBinding onValueChanged = new TwoWayBinding("On Value Changed");
+        public TwoWayBindingFloat onValueChanged = new TwoWayBindingFloat("On Value Changed");
 
         [HideInInspector]
         public BindingField durationField = new BindingField("Duration");
@@ -87,7 +87,7 @@ namespace UnuGames.MVVM
 
         private void OnValueChanged(float value)
         {
-            SetValue(this.valueField.member, value);
+            SetValue(this.valueField, this.onValueChanged.converter.Convert(value, this));
         }
 
         private void OnValueChanged_OnChanged(bool value)
