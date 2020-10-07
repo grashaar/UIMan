@@ -10,5 +10,8 @@ namespace UnuGames.MVVM
 
         protected override Dropdown.OptionData ConvertWithoutAdapter(object value, UnityEngine.Object context)
             => DropdownOptionAdapter.Convert(value, true, context);
+
+        protected override object ConvertWithoutAdapter(Dropdown.OptionData value, UnityEngine.Object context)
+            => DropdownOptionAdapter.Convert(value);
     }
 }

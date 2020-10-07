@@ -9,5 +9,8 @@ namespace UnuGames.MVVM
 
         protected override bool ConvertWithoutAdapter(object value, UnityEngine.Object context)
             => BoolAdapter.Convert(value, false, context);
+
+        protected override object ConvertWithoutAdapter(bool value, UnityEngine.Object context)
+            => BoolAdapter.Convert(value);
     }
 }

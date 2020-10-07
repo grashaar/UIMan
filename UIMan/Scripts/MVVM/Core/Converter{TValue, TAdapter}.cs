@@ -23,7 +23,17 @@ namespace UnuGames.MVVM
             return ConvertWithoutAdapter(value, context);
         }
 
+        public object Convert(TValue value, UnityEngine.Object context)
+        {
+            if (this.m_adapter)
+                return this.m_adapter.Convert(value, context);
+
+            return ConvertWithoutAdapter(value, context);
+        }
+
         protected abstract TValue ConvertWithoutAdapter(object value, UnityEngine.Object context);
+
+        protected abstract object ConvertWithoutAdapter(TValue value, UnityEngine.Object context);
 
         public sealed override Adapter GetAdapter()
             => this.m_adapter;

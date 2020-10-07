@@ -11,6 +11,9 @@ namespace UnuGames.MVVM
         public override bool Convert(object value, Object context)
             => Convert(value, this.defaultValue, context);
 
+        public override object Convert(bool value, Object context)
+            => Convert(value);
+
         public static bool Convert(object value, bool defaultValue, Object context)
         {
             if (!(value is bool val))
@@ -24,6 +27,9 @@ namespace UnuGames.MVVM
 
             return val;
         }
+
+        public static object Convert(bool value)
+            => value;
 
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("UIMan/Adapters/Bool Adapter")]

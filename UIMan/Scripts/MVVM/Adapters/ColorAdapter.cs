@@ -14,6 +14,9 @@ namespace UnuGames.MVVM
         public override Color Convert(object value, Object context)
             => Convert(value, this.defaultValue, this.tryParse, context);
 
+        public override object Convert(Color value, Object context)
+            => Convert(value);
+
         public static Color Convert(object value, Color defaultValue, bool tryParse, Object context)
         {
             if (!(value is Color val))
@@ -52,6 +55,9 @@ namespace UnuGames.MVVM
 
             return val;
         }
+
+        public static object Convert(Color value)
+            => value;
 
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("UIMan/Adapters/Color Adapter")]

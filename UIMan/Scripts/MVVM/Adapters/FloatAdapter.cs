@@ -11,6 +11,9 @@ namespace UnuGames.MVVM
         public override float Convert(object value, Object context)
             => Convert(value, this.defaultValue, context);
 
+        public override object Convert(float value, Object context)
+            => Convert(value);
+
         public static float Convert(object value, float defaultValue, Object context)
         {
             if (!(value is float valFloat))
@@ -29,6 +32,9 @@ namespace UnuGames.MVVM
 
             return valFloat;
         }
+
+        public static object Convert(float value)
+            => value;
 
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("UIMan/Adapters/Float Adapter")]

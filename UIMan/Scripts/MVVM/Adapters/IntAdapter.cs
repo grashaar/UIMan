@@ -11,6 +11,9 @@ namespace UnuGames.MVVM
         public override int Convert(object value, Object context)
             => Convert(value, this.defaultValue, context);
 
+        public override object Convert(int value, Object context)
+            => Convert(value);
+
         public static int Convert(object value, int defaultValue, Object context)
         {
             if (!(value is int val))
@@ -24,6 +27,9 @@ namespace UnuGames.MVVM
 
             return val;
         }
+
+        public static object Convert(int value)
+            => value;
 
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("UIMan/Adapters/Int Adapter")]

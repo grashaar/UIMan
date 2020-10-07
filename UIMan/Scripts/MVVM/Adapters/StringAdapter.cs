@@ -14,6 +14,9 @@ namespace UnuGames.MVVM
         public override string Convert(object value, Object context)
             => Convert(value, this.defaultValue, this.forceToString, context);
 
+        public override object Convert(string value, Object context)
+            => Convert(value);
+
         public static string Convert(object value, string defaultValue, bool forceToString, Object context)
         {
             if (!(value is string val))
@@ -31,6 +34,9 @@ namespace UnuGames.MVVM
 
             return val;
         }
+
+        public static object Convert(string value)
+            => value;
 
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("UIMan/Adapters/String Adapter")]

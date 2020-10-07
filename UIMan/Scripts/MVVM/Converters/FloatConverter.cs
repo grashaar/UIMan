@@ -9,5 +9,8 @@ namespace UnuGames.MVVM
 
         protected override float ConvertWithoutAdapter(object value, UnityEngine.Object context)
             => FloatAdapter.Convert(value, 0f, context);
+
+        protected override object ConvertWithoutAdapter(float value, UnityEngine.Object context)
+            => FloatAdapter.Convert(value);
     }
 }

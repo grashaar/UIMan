@@ -13,6 +13,8 @@ namespace UnuGames.MVVM
     {
         public abstract T Convert(object value, Object context);
 
+        public abstract object Convert(T value, Object context);
+
 #if UNITY_EDITOR
         /// <summary>
         /// Create an adapter asset. Only use in editor mode.

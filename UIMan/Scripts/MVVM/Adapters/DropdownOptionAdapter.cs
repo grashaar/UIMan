@@ -16,6 +16,9 @@ namespace UnuGames.MVVM
         public override OptionData Convert(object value, Object context)
             => Convert(value, this.forceToString, context);
 
+        public override object Convert(OptionData value, Object context)
+            => Convert(value);
+
         public static OptionData Convert(object value, bool forceToString, Object context)
         {
             if (!(value is OptionData val))
@@ -33,6 +36,9 @@ namespace UnuGames.MVVM
 
             return val;
         }
+
+        public static object Convert(OptionData value)
+            => value;
 
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("UIMan/Adapters/Dropdown Option Adapter")]

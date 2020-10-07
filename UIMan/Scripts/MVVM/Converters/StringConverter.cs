@@ -9,5 +9,8 @@ namespace UnuGames.MVVM
 
         protected override string ConvertWithoutAdapter(object value, UnityEngine.Object context)
             => StringAdapter.Convert(value, string.Empty, true, context);
+
+        protected override object ConvertWithoutAdapter(string value, UnityEngine.Object context)
+            => StringAdapter.Convert(value);
     }
 }
