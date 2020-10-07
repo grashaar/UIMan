@@ -110,6 +110,20 @@ namespace UnuGames.MVVM
             return sf.GetMethod().Name;
         }
 
+        private void CacheProperty(string propertyKey, string propertyName)
+        {
+            if (this.propertyCache.ContainsKey(propertyKey))
+                return;
+
+            var type = this.GetCachedType();
+            var property = type?.GetProperty(propertyName);
+
+            if (property == null)
+                return;
+
+            this.propertyCache.Add(propertyKey, property);
+        }
+
         /// <summary>
         /// Subcribe action to notify on property changed
         /// </summary>
@@ -125,7 +139,7 @@ namespace UnuGames.MVVM
             else
             {
                 this.actions.Add(propertyKey, updateAction);
-                this.propertyCache.Add(propertyKey, this.GetCachedType().GetProperty(propertyName));
+                CacheProperty(propertyKey, propertyName);
             }
         }
 
@@ -150,7 +164,7 @@ namespace UnuGames.MVVM
         /// <param name="value">Value.</param>
         public void SetValue(string propertyName, object value)
         {
-            if (this.propertyCache.TryGetValue(propertyName, out PropertyInfo property))
+            if (this.propertyCache.TryGetValue("set_" + propertyName, out PropertyInfo property))
             {
                 property.SetValue(this, value, null);
             }

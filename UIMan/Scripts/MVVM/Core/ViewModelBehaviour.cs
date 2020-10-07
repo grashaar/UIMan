@@ -116,7 +116,13 @@ namespace UnuGames.MVVM
             if (this.propertyCache.ContainsKey(propertyKey))
                 return;
 
-            this.propertyCache.Add(propertyKey, this.GetCachedType().GetProperty(propertyName));
+            var type = this.GetCachedType();
+            var property = type?.GetProperty(propertyName);
+
+            if (property == null)
+                return;
+
+            this.propertyCache.Add(propertyKey, property);
         }
 
         /// <summary>

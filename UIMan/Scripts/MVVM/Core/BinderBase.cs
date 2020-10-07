@@ -35,10 +35,11 @@ namespace UnuGames.MVVM
         /// <returns></returns>
         public DataContext FindDataContext()
         {
-            if (this.dataContext == null)
+            if (!this.dataContext)
             {
                 this.dataContext = GetComponent<DataContext>();
-                if (this.dataContext == null)
+
+                if (!this.dataContext)
                     this.dataContext = GetComponentInParent<DataContext>();
             }
 
@@ -51,8 +52,14 @@ namespace UnuGames.MVVM
         /// <returns></returns>
         public IObservable GetViewModel()
         {
-            if (this.dataContext == null)
+            if (!this.dataContext)
                 FindDataContext();
+
+            if (!this.dataContext)
+                return default;
+
+            if (this.dataContext.model is ObservableModel model)
+                return model;
 
             return this.dataContext.viewModel;
         }
@@ -136,18 +143,14 @@ namespace UnuGames.MVVM
         /// <param name="propertyName">Property name.</param>
         private void RegisterViewModel(string propertyName, Action<object> updateAction)
         {
-            if (this.dataContext != null && !string.IsNullOrEmpty(propertyName))
-            {
-                if (this.dataContext.model != null && this.dataContext.model is ObservableModel)
-                {
-                    ((ObservableModel)this.dataContext.model).SubscribeAction(propertyName, updateAction);
-                    this.dataContext.viewModel.SubscribeAction(propertyName, updateAction);
-                }
-                else
-                {
-                    this.dataContext.viewModel.SubscribeAction(propertyName, updateAction);
-                }
-            }
+            if (this.dataContext == null || string.IsNullOrEmpty(propertyName))
+                return;
+
+            if (this.dataContext.model != null && this.dataContext.model is ObservableModel model)
+                model.SubscribeAction(propertyName, updateAction);
+
+            if (this.dataContext.viewModel)
+                this.dataContext.viewModel.SubscribeAction(propertyName, updateAction);
         }
 
         /// <summary>
@@ -156,10 +159,14 @@ namespace UnuGames.MVVM
         /// <param name="propertyName">Property name.</param>
         private void UnregisterViewModel(string propertyName, Action<object> updateAction)
         {
-            if (this.dataContext != null && !string.IsNullOrEmpty(propertyName) && this.dataContext.viewModel != null)
-            {
+            if (this.dataContext == null || string.IsNullOrEmpty(propertyName))
+                return;
+
+            if (this.dataContext.model != null && this.dataContext.model is ObservableModel model)
+                model.UnsubscribeAction(propertyName, updateAction);
+
+            if (this.dataContext.viewModel)
                 this.dataContext.viewModel.UnsubscribeAction(propertyName, updateAction);
-            }
         }
 
         private BindingField[] fields;
@@ -281,6 +288,17 @@ namespace UnuGames.MVVM
                 return;
 
             GetViewModel().SetValue(memberName, value);
+        }
+
+        protected void SetValue(BindingField field, object value)
+        {
+            if (!this.enabled)
+                return;
+
+            if (string.IsNullOrEmpty(field.member))
+                return;
+
+            GetViewModel().SetValue(field.member, value);
         }
     }
 }
