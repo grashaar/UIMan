@@ -195,6 +195,12 @@ namespace UnuGames
             this.canvasGroup.blocksRaycasts = false;
         }
 
+        public virtual void Deactivate()
+        {
+            if (this.gameObject.activeSelf)
+                this.gameObject.SetActive(false);
+        }
+
         protected virtual void OnAwake() { }
 
         protected virtual void OnShow() { }

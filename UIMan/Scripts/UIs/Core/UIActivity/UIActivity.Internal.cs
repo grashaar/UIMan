@@ -218,8 +218,8 @@ namespace UnuGames
             UnblockInput();
             OnHideComplete();
 
-            if (willDeactivate && this.gameObject.activeSelf)
-                this.gameObject.SetActive(false);
+            if (willDeactivate)
+                Deactivate();
         }
 
         private void FadeHide(float duration)

@@ -678,16 +678,16 @@ namespace UnuGames
         /// Preload the specified UIMan.
         /// </summary>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public void Preload<T>() where T : ViewModelBehaviour
+        public void Preload<T>(bool deactivate = false) where T : ViewModelBehaviour
         {
-            Preload(typeof(T));
+            Preload(typeof(T), deactivate);
         }
 
         /// <summary>
         /// Preload the specified UIMan
         /// </summary>
         /// <param name="uiType">User interface type.</param>
-        public void Preload(Type uiType)
+        public void Preload(Type uiType, bool deactivate = false)
         {
             var isSupported = false;
 
@@ -709,7 +709,7 @@ namespace UnuGames
 
             if (isSupported)
             {
-                UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessPreload(key, asset, uiType));
+                UIManLoader.Load<GameObject>(uiType.Name, (key, asset) => PreprocessPreload(key, asset, uiType, deactivate));
             }
             else
             {
@@ -717,7 +717,7 @@ namespace UnuGames
             }
         }
 
-        private void PreprocessPreload(string key, UnityObject asset, Type uiType)
+        private void PreprocessPreload(string key, UnityObject asset, Type uiType, bool deactivate)
         {
             if (!(asset is GameObject prefab))
             {
@@ -745,9 +745,13 @@ namespace UnuGames
                         this.screenDict.Add(uiType, screen);
 
                     screen.ForceState(UIState.Hide);
+
+                    if (deactivate)
+                        screen.Deactivate();
                     break;
 
                 case UIManDialog dialogue:
+                {
                     dialogue.Transform.SetParent(this.dialogRoot, false);
                     dialogue.RectTransform.localScale = Vector3.one;
 
@@ -755,19 +759,30 @@ namespace UnuGames
                         this.dialogDict.Add(uiType, dialogue);
 
                     dialogue.ForceState(UIState.Hide);
+
+                    if (deactivate)
+                        dialogue.Deactivate();
+                }
                     break;
 
                 case UIActivity activity:
+                {
                     activity.Transform.SetParent(this.activityRoot, false);
                     activity.RectTransform.localScale = Vector3.one;
 
                     if (!this.activityDict.ContainsKey(uiType))
                         this.activityDict.Add(uiType, activity);
+
+                    if (deactivate)
+                        activity.Deactivate();
+                }
                     break;
 
                 default:
+                {
                     Destroy(obj);
                     UnuLogger.LogError($"{obj} does not contain any component derived from either UIManScreen, UIManDialogue or UIActivity.");
+                }
                     break;
             }
         }
