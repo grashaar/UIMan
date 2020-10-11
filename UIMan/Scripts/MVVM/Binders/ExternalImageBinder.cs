@@ -47,6 +47,7 @@ namespace UnuGames.MVVM
         [ShowIf("useNoSpriteColor")]
 #endif
         public Color noSpriteColor = Color.white;
+
         private float alpha = 1f;
 
         public override void Initialize(bool forceInit)
@@ -55,6 +56,7 @@ namespace UnuGames.MVVM
                 return;
 
             this.image = GetComponent<Image>();
+            this.alpha = this.image.color.a;
 
             SubscribeOnChangedEvent(this.imageField, OnUpdateImage);
             SubscribeOnChangedEvent(this.colorField, OnUpdateColor);

@@ -65,6 +65,8 @@ namespace UnuGames.MVVM
                 return;
 
             this.image = GetComponent<Image>();
+            this.alpha = this.image.color.a;
+
             SetLoadedAtlas(this.atlas);
 
             SubscribeOnChangedEvent(this.atlasField, OnUpdateAtlas);
