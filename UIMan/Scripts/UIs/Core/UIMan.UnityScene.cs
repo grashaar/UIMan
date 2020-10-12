@@ -32,7 +32,7 @@ namespace UnuGames
                 return;
             }
 
-            GetActivity(x => x.Show(SceneManager.LoadSceneAsync(name), UIActivity.Settings.Default,
+            GetActivity(x => x.Show(SceneManager.LoadSceneAsync(name), true, UIActivity.Settings.Default,
                                     OnLoadUnitySceneComplete, screenType, args));
         }
 

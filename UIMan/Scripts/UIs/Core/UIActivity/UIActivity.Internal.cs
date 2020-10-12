@@ -52,7 +52,7 @@ namespace UnuGames
         private bool CanFade(bool value)
                => value && this.canvasGroup;
 
-        private IEnumerator WaitTask(IEnumerator coroutine)
+        private IEnumerator WaitTask(IEnumerator coroutine, bool autoHide)
         {
             OnShowComplete();
 
@@ -60,10 +60,12 @@ namespace UnuGames
 
             InvokeOnComplete();
             OnTaskComplete();
-            Hide();
+
+            if (autoHide)
+                Hide();
         }
 
-        private IEnumerator WaitTask(AsyncOperation asyncTask)
+        private IEnumerator WaitTask(AsyncOperation asyncTask, bool autoHide)
         {
             OnShowComplete();
 
@@ -77,10 +79,12 @@ namespace UnuGames
 
             InvokeOnComplete();
             OnTaskComplete();
-            Hide();
+
+            if (autoHide)
+                Hide();
         }
 
-        private IEnumerator WaitTask(UnityWebRequest request)
+        private IEnumerator WaitTask(UnityWebRequest request, bool autoHide)
         {
             OnShowComplete();
 
@@ -94,10 +98,12 @@ namespace UnuGames
 
             InvokeOnComplete();
             OnTaskComplete();
-            Hide();
+
+            if (autoHide)
+                Hide();
         }
 
-        private async void WaitTask(Func<Task> task)
+        private async void WaitTask(Func<Task> task, bool autoHide)
         {
             OnShowComplete();
 
@@ -105,10 +111,12 @@ namespace UnuGames
 
             InvokeOnComplete();
             OnTaskComplete();
-            Hide();
+
+            if (autoHide)
+                Hide();
         }
 
-        private async void WaitTask<T>(Func<Task<T>> task, Action<T> onTaskResult)
+        private async void WaitTask<T>(Func<Task<T>> task, Action<T> onTaskResult, bool autoHide)
         {
             OnShowComplete();
 
@@ -117,7 +125,9 @@ namespace UnuGames
 
             InvokeOnComplete();
             OnTaskComplete();
-            Hide();
+
+            if (autoHide)
+                Hide();
         }
 
         private void WaitTask(float hideDuration)
@@ -244,12 +254,28 @@ namespace UnuGames
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(hideDuration));
         }
 
+        private void FadeShow(AsyncOperation task, float showDuration)
+        {
+            if (showDuration <= 0f)
+                StartCoroutine(WaitTask(task, false));
+            else
+                GetFadeTweener(showDuration, 1f).SetOnComplete(() => StartCoroutine(WaitTask(task, false)));
+        }
+
         private void FadeShow(AsyncOperation task, float showDuration, float hideDuration)
         {
             if (showDuration <= 0f)
                 StartCoroutine(WaitTask(task, hideDuration));
             else
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => StartCoroutine(WaitTask(task, hideDuration)));
+        }
+
+        private void FadeShow(IEnumerator task, float showDuration)
+        {
+            if (showDuration <= 0f)
+                StartCoroutine(WaitTask(task, false));
+            else
+                GetFadeTweener(showDuration, 1f).SetOnComplete(() => StartCoroutine(WaitTask(task, false)));
         }
 
         private void FadeShow(IEnumerator task, float showDuration, float hideDuration)
@@ -260,12 +286,28 @@ namespace UnuGames
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => StartCoroutine(WaitTask(task, hideDuration)));
         }
 
+        private void FadeShow(UnityWebRequest task, float showDuration)
+        {
+            if (showDuration <= 0f)
+                StartCoroutine(WaitTask(task, false));
+            else
+                GetFadeTweener(showDuration, 1f).SetOnComplete(() => StartCoroutine(WaitTask(task, false)));
+        }
+
         private void FadeShow(UnityWebRequest task, float showDuration, float hideDuration)
         {
             if (showDuration <= 0f)
                 StartCoroutine(WaitTask(task, hideDuration));
             else
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => StartCoroutine(WaitTask(task, hideDuration)));
+        }
+
+        private void FadeShow(Func<Task> task, float showDuration)
+        {
+            if (showDuration <= 0f)
+                WaitTask(task, false);
+            else
+                GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(task, false));
         }
 
         private void FadeShow(Func<Task> task, float showDuration, float hideDuration)
@@ -276,12 +318,28 @@ namespace UnuGames
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(task, hideDuration));
         }
 
+        private void FadeShow<T>(Func<Task<T>> task, float showDuration)
+        {
+            if (showDuration <= 0f)
+                WaitTask(task, null, false);
+            else
+                GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(task, null, false));
+        }
+
         private void FadeShow<T>(Func<Task<T>> task, float showDuration, float hideDuration)
         {
             if (showDuration <= 0f)
                 WaitTask(task, null, hideDuration);
             else
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(task, null, hideDuration));
+        }
+
+        private void FadeShow<T>(Func<Task<T>> task, Action<T> onTaskResult, float showDuration)
+        {
+            if (showDuration <= 0f)
+                WaitTask(task, onTaskResult, false);
+            else
+                GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(task, onTaskResult, false));
         }
 
         private void FadeShow<T>(Func<Task<T>> task, Action<T> onTaskResult, float showDuration, float hideDuration)
@@ -316,6 +374,21 @@ namespace UnuGames
                 InvokeOnComplete();
         }
 
+        private void Show(AsyncOperation task, bool fade, float showDuration, Settings? settings = null,
+                          UIActivityAction onComplete = null, params object[] args)
+        {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
+            Begin(onComplete, args);
+            ShowInternal(settings);
+
+            if (CanFade(fade))
+                FadeShow(task, showDuration);
+            else
+                StartCoroutine(WaitTask(task, false));
+        }
+
         private void Show(AsyncOperation task, bool fade, float showDuration, float hideDuration, Settings? settings = null,
                           UIActivityAction onComplete = null, params object[] args)
         {
@@ -328,7 +401,22 @@ namespace UnuGames
             if (CanFade(fade))
                 FadeShow(task, showDuration, hideDuration);
             else
-                StartCoroutine(WaitTask(task));
+                StartCoroutine(WaitTask(task, true));
+        }
+
+        private void Show(IEnumerator task, bool fade, float showDuration, Settings? settings = null,
+                          UIActivityAction onComplete = null, params object[] args)
+        {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
+            Begin(onComplete, args);
+            ShowInternal(settings);
+
+            if (CanFade(fade))
+                FadeShow(task, showDuration);
+            else
+                StartCoroutine(WaitTask(task, false));
         }
 
         private void Show(IEnumerator task, bool fade, float showDuration, float hideDuration, Settings? settings = null,
@@ -343,7 +431,22 @@ namespace UnuGames
             if (CanFade(fade))
                 FadeShow(task, showDuration, hideDuration);
             else
-                StartCoroutine(WaitTask(task));
+                StartCoroutine(WaitTask(task, true));
+        }
+
+        private void Show(UnityWebRequest task, bool fade, float showDuration, Settings? settings = null,
+                          UIActivityAction onComplete = null, params object[] args)
+        {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
+            Begin(onComplete, args);
+            ShowInternal(settings);
+
+            if (CanFade(fade))
+                FadeShow(task, showDuration);
+            else
+                StartCoroutine(WaitTask(task, false));
         }
 
         private void Show(UnityWebRequest task, bool fade, float showDuration, float hideDuration, Settings? settings = null,
@@ -358,7 +461,22 @@ namespace UnuGames
             if (CanFade(fade))
                 FadeShow(task, showDuration, hideDuration);
             else
-                StartCoroutine(WaitTask(task));
+                StartCoroutine(WaitTask(task, true));
+        }
+
+        private void Show(Func<Task> task, bool fade, float showDuration, Settings? settings = null,
+                          UIActivityAction onComplete = null, params object[] args)
+        {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
+            Begin(onComplete, args);
+            ShowInternal(settings);
+
+            if (CanFade(fade))
+                FadeShow(task, showDuration);
+            else
+                WaitTask(task, false);
         }
 
         private void Show(Func<Task> task, bool fade, float showDuration, float hideDuration, Settings? settings = null,
@@ -373,7 +491,22 @@ namespace UnuGames
             if (CanFade(fade))
                 FadeShow(task, showDuration, hideDuration);
             else
-                WaitTask(task);
+                WaitTask(task, true);
+        }
+
+        private void Show<T>(Func<Task<T>> task, bool fade, float showDuration,
+                             Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
+            Begin(onComplete, args);
+            ShowInternal(settings);
+
+            if (CanFade(fade))
+                FadeShow(task, showDuration);
+            else
+                WaitTask(task, null, false);
         }
 
         private void Show<T>(Func<Task<T>> task, bool fade, float showDuration, float hideDuration,
@@ -388,7 +521,22 @@ namespace UnuGames
             if (CanFade(fade))
                 FadeShow(task, showDuration, hideDuration);
             else
-                WaitTask(task, null);
+                WaitTask(task, null, true);
+        }
+
+        private void Show<T>(Func<Task<T>> task, Action<T> onTaskResult, bool fade, float showDuration,
+                             Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
+            Begin(onComplete, args);
+            ShowInternal(settings);
+
+            if (CanFade(fade))
+                FadeShow(task, onTaskResult, showDuration);
+            else
+                WaitTask(task, onTaskResult, false);
         }
 
         private void Show<T>(Func<Task<T>> task, Action<T> onTaskResult, bool fade, float showDuration, float hideDuration,
@@ -403,7 +551,7 @@ namespace UnuGames
             if (CanFade(fade))
                 FadeShow(task, onTaskResult, showDuration, hideDuration);
             else
-                WaitTask(task, onTaskResult);
+                WaitTask(task, onTaskResult, true);
         }
     }
 }

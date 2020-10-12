@@ -62,51 +62,129 @@ namespace UnuGames
             this.transform.SetParent(root, false);
         }
 
-        public void Show(Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        public void Show(bool autoHide = false, Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
-            Show(this.canFade, this.showDuration, settings, onComplete, args);
+            if (autoHide)
+                Show(this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(this.canFade, this.showDuration, settings, onComplete, args);
         }
 
-        public void Show(AsyncOperation task, Settings? settings = null,
+        public void Show(AsyncOperation task, bool autoHide = false, Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            if (autoHide)
+                Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, this.canFade, this.showDuration, settings, onComplete, args);
         }
 
-        public void Show(IEnumerator task, Settings? settings = null,
+        public void Show(IEnumerator task, bool autoHide = false, Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            if (autoHide)
+                Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, this.canFade, this.showDuration, settings, onComplete, args);
         }
 
-        public void Show(UnityWebRequest task, Settings? settings = null,
+        public void Show(UnityWebRequest task, bool autoHide = false, Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            if (autoHide)
+                Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, this.canFade, this.showDuration, settings, onComplete, args);
         }
 
-        public void Show(Func<Task> task, Settings? settings = null,
+        public void Show(Func<Task> task, bool autoHide = false, Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            if (autoHide)
+                Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, this.canFade, this.showDuration, settings, onComplete, args);
         }
 
-        public void Show<T>(Func<Task<T>> task, Action<T> onTaskResult, Settings? settings = null,
+        public void Show<T>(Func<Task<T>> task, bool autoHide = false, Settings? settings = null,
                             UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, onTaskResult, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            if (autoHide)
+                Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, this.canFade, this.showDuration, settings, onComplete, args);
         }
 
-        public void Show<T>(Func<Task<T>> task, Settings? settings = null,
+        public void Show<T>(Func<Task<T>> task, Action<T> onTaskResult, bool autoHide = false, Settings? settings = null,
                             UIActivityAction onComplete = null, params object[] args)
         {
-            Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            if (autoHide)
+                Show(task, onTaskResult, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, onTaskResult, this.canFade, this.showDuration, settings, onComplete, args);
         }
 
-        public void Show(float showDuration, Settings? settings = null,
+        public void Show(float showDuration, bool autoHide = false, Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
-            Show(true, showDuration, settings, onComplete, args);
+            if (autoHide)
+                Show(true, showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(true, showDuration, settings, onComplete, args);
+        }
+
+        public void Show(AsyncOperation task, float showDuration, bool autoHide = false, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
+        {
+            if (autoHide)
+                Show(task, true, showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, true, showDuration, settings, onComplete, args);
+        }
+
+        public void Show(IEnumerator task, float showDuration, bool autoHide = false, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
+        {
+            if (autoHide)
+                Show(task, true, showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, true, showDuration, settings, onComplete, args);
+        }
+
+        public void Show(UnityWebRequest task, float showDuration, bool autoHide = false, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
+        {
+            if (autoHide)
+                Show(task, true, showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, true, showDuration, settings, onComplete, args);
+        }
+
+        public void Show(Func<Task> task, float showDuration, bool autoHide = false, Settings? settings = null,
+                         UIActivityAction onComplete = null, params object[] args)
+        {
+            if (autoHide)
+                Show(task, true, showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, true, showDuration, settings, onComplete, args);
+        }
+
+        public void Show<T>(Func<Task<T>> task, float showDuration, bool autoHide = false, Settings? settings = null,
+                            UIActivityAction onComplete = null, params object[] args)
+        {
+            if (autoHide)
+                Show(task, true, showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, true, showDuration, settings, onComplete, args);
+        }
+
+        public void Show<T>(Func<Task<T>> task, Action<T> onTaskResult, float showDuration, bool autoHide = false,
+                            Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            if (autoHide)
+                Show(task, onTaskResult, true, showDuration, this.hideDuration, settings,  onComplete, args);
+            else
+                Show(task, onTaskResult, true, showDuration, settings,  onComplete, args);
         }
 
         public void Show(float showDuration, float hideDuration, Settings? settings = null,

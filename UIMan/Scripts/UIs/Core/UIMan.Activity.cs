@@ -118,21 +118,16 @@ namespace UnuGames
             onGet?.Invoke(activity);
         }
 
-        public void ShowActivity(Type uiType, UIActivity.Settings? settings = null)
-        {
-            GetActivity(uiType, x => x.Show(settings));
-        }
-
-        public void ShowActivity(Type uiType, UIActivity.Settings? settings = null,
+        public void ShowActivity(Type uiType, bool autoHide = false, UIActivity.Settings? settings = null,
                                  UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity(uiType, x => x.Show(settings, onComplete, args));
+            GetActivity(uiType, x => x.Show(autoHide, settings, onComplete, args));
         }
 
-        public void ShowActivity(Type uiType, float showDuration, UIActivity.Settings? settings = null,
+        public void ShowActivity(Type uiType, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
                                  UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity(uiType, x => x.Show(showDuration, settings, onComplete, args));
+            GetActivity(uiType, x => x.Show(showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity(Type uiType, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
@@ -141,24 +136,90 @@ namespace UnuGames
             GetActivity(uiType, x => x.Show(showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(UIActivity.Settings? settings = null)
-            where T : UIActivity
+        public void ShowActivity(Type uiType, AsyncOperation task, bool autoHide = false,
+                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity<T>(x => x.Show(settings));
+            GetActivity(uiType, x => x.Show(task, autoHide, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(UIActivity.Settings? settings = null,
+        public void ShowActivity(Type uiType, AsyncOperation task, float showDuration, bool autoHide = false,
+                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(Type uiType, AsyncOperation task, float showDuration, float hideDuration,
+                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
+        }
+
+        public void ShowActivity(Type uiType, IEnumerator task, bool autoHide = false,
+                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(Type uiType, IEnumerator task, float showDuration, bool autoHide = false,
+                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(Type uiType, IEnumerator task, float showDuration, float hideDuration,
+                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
+        }
+
+        public void ShowActivity(Type uiType, UnityWebRequest task, bool autoHide = false,
+                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(Type uiType, UnityWebRequest task, float showDuration, bool autoHide = false,
+                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(Type uiType, UnityWebRequest task, float showDuration, float hideDuration,
+                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
+        }
+
+        public void ShowActivity(Type uiType, Func<Task> task, bool autoHide = false,
+                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(Type uiType, Func<Task> task, float showDuration, bool autoHide = false,
+                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(Type uiType, Func<Task> task, float showDuration, float hideDuration,
+                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
+        }
+
+        public void ShowActivity<T>(bool autoHide = false, UIActivity.Settings? settings = null,
                                     UIActivityAction onComplete = null, params object[] args)
             where T : UIActivity
         {
-            GetActivity<T>(x => x.Show(settings, onComplete, args));
+            GetActivity<T>(x => x.Show(autoHide, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(float showDuration, UIActivity.Settings? settings = null,
+        public void ShowActivity<T>(float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
                                     UIActivityAction onComplete = null, params object[] args)
             where T : UIActivity
         {
-            GetActivity<T>(x => x.Show(showDuration, settings, onComplete, args));
+            GetActivity<T>(x => x.Show(showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity<T>(float showDuration, float hideDuration, UIActivity.Settings? settings = null,
@@ -168,106 +229,16 @@ namespace UnuGames
             GetActivity<T>(x => x.Show(showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity(UIActivity.Settings? settings = null)
-        {
-            GetActivity<UIActivity>(x => x.Show(settings));
-        }
-
-        public void ShowActivity(UIActivity.Settings? settings = null,
-                                 UIActivityAction onComplete = null, params object[] args)
-        {
-            GetActivity<UIActivity>(x => x.Show(settings, onComplete, args));
-        }
-
-        public void ShowActivity(float showDuration, UIActivity.Settings? settings = null,
-                                 UIActivityAction onComplete = null, params object[] args)
-        {
-            GetActivity<UIActivity>(x => x.Show(showDuration, settings, onComplete, args));
-        }
-
-        public void ShowActivity(float showDuration, float hideDuration, UIActivity.Settings? settings = null,
-                                 UIActivityAction onComplete = null, params object[] args)
-        {
-            GetActivity<UIActivity>(x => x.Show(showDuration, hideDuration, settings, onComplete, args));
-        }
-
-        public void ShowActivity(Type uiType, AsyncOperation task, UIActivity.Settings? settings = null)
-        {
-            GetActivity(uiType, x => x.Show(task, settings));
-        }
-
-        public void ShowActivity(Type uiType, AsyncOperation task,
-                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
-        {
-            GetActivity(uiType, x => x.Show(task, settings, onComplete, args));
-        }
-
-        public void ShowActivity(Type uiType, AsyncOperation task, float showDuration, float hideDuration,
-                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
-        {
-            GetActivity(uiType, x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
-        }
-
-        public void ShowActivity(Type uiType, IEnumerator task, UIActivity.Settings? settings = null)
-        {
-            GetActivity(uiType, x => x.Show(task, settings));
-        }
-
-        public void ShowActivity(Type uiType, IEnumerator task,
-                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
-        {
-            GetActivity(uiType, x => x.Show(task, settings, onComplete, args));
-        }
-
-        public void ShowActivity(Type uiType, IEnumerator task, float showDuration, float hideDuration,
-                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
-        {
-            GetActivity(uiType, x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
-        }
-
-        public void ShowActivity(Type uiType, UnityWebRequest task, UIActivity.Settings? settings = null)
-        {
-            GetActivity(uiType, x => x.Show(task, settings));
-        }
-
-        public void ShowActivity(Type uiType, UnityWebRequest task,
-                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
-        {
-            GetActivity(uiType, x => x.Show(task, settings, onComplete, args));
-        }
-
-        public void ShowActivity(Type uiType, UnityWebRequest task, float showDuration, float hideDuration,
-                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
-        {
-            GetActivity(uiType, x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
-        }
-
-        public void ShowActivity(Type uiType, Func<Task> task, UIActivity.Settings? settings = null)
-        {
-            GetActivity(uiType, x => x.Show(task, settings));
-        }
-
-        public void ShowActivity(Type uiType, Func<Task> task,
-                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
-        {
-            GetActivity(uiType, x => x.Show(task, settings, onComplete, args));
-        }
-
-        public void ShowActivity(Type uiType, Func<Task> task, float showDuration, float hideDuration,
-                                 UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
-        {
-            GetActivity(uiType, x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
-        }
-
-        public void ShowActivity<T>(Type uiType, Func<Task<T>> task, UIActivity.Settings? settings = null)
-        {
-            GetActivity(uiType, x => x.Show(task, settings));
-        }
-
-        public void ShowActivity<T>(Type uiType, Func<Task<T>> task, UIActivity.Settings? settings = null,
+        public void ShowActivity<T>(Type uiType, Func<Task<T>> task, bool autoHide = false, UIActivity.Settings? settings = null,
                                     UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity(uiType, x => x.Show(task, settings, onComplete, args));
+            GetActivity(uiType, x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity<T>(Type uiType, Func<Task<T>> task, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                    UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity<T>(Type uiType, Func<Task<T>> task, float showDuration, float hideDuration,
@@ -276,15 +247,16 @@ namespace UnuGames
             GetActivity(uiType, x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(Type uiType, Func<Task<T>> task, Action<T> onTaskResult, UIActivity.Settings? settings = null)
-        {
-            GetActivity(uiType, x => x.Show(task, onTaskResult, settings));
-        }
-
-        public void ShowActivity<T>(Type uiType, Func<Task<T>> task, Action<T> onTaskResult,
+        public void ShowActivity<T>(Type uiType, Func<Task<T>> task, Action<T> onTaskResult, bool autoHide = false,
                                     UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity(uiType, x => x.Show(task, onTaskResult, settings, onComplete, args));
+            GetActivity(uiType, x => x.Show(task, onTaskResult, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity<T>(Type uiType, Func<Task<T>> task, Action<T> onTaskResult, float showDuration, bool autoHide = false,
+                                    UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity(uiType, x => x.Show(task, onTaskResult, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity<T>(Type uiType, Func<Task<T>> task, Action<T> onTaskResult, float showDuration, float hideDuration,
@@ -293,17 +265,18 @@ namespace UnuGames
             GetActivity(uiType, x => x.Show(task, onTaskResult, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(AsyncOperation task, UIActivity.Settings? settings = null)
-            where T : UIActivity
-        {
-            GetActivity<T>(x => x.Show(task, settings));
-        }
-
-        public void ShowActivity<T>(AsyncOperation task, UIActivity.Settings? settings = null,
+        public void ShowActivity<T>(AsyncOperation task, bool autoHide = false, UIActivity.Settings? settings = null,
                                     UIActivityAction onComplete = null, params object[] args)
             where T : UIActivity
         {
-            GetActivity<T>(x => x.Show(task, settings, onComplete, args));
+            GetActivity<T>(x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity<T>(AsyncOperation task, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                    UIActivityAction onComplete = null, params object[] args)
+            where T : UIActivity
+        {
+            GetActivity<T>(x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity<T>(AsyncOperation task, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
@@ -313,17 +286,18 @@ namespace UnuGames
             GetActivity<T>(x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(IEnumerator task, UIActivity.Settings? settings = null)
-            where T : UIActivity
-        {
-            GetActivity<T>(x => x.Show(task, settings));
-        }
-
-        public void ShowActivity<T>(IEnumerator task, UIActivity.Settings? settings = null,
+        public void ShowActivity<T>(IEnumerator task, bool autoHide = false, UIActivity.Settings? settings = null,
                                     UIActivityAction onComplete = null, params object[] args)
             where T : UIActivity
         {
-            GetActivity<T>(x => x.Show(task, settings, onComplete, args));
+            GetActivity<T>(x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity<T>(IEnumerator task, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                    UIActivityAction onComplete = null, params object[] args)
+            where T : UIActivity
+        {
+            GetActivity<T>(x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity<T>(IEnumerator task, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
@@ -333,17 +307,18 @@ namespace UnuGames
             GetActivity<T>(x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(UnityWebRequest task, UIActivity.Settings? settings = null)
-            where T : UIActivity
-        {
-            GetActivity<T>(x => x.Show(task, settings));
-        }
-
-        public void ShowActivity<T>(UnityWebRequest task, UIActivity.Settings? settings = null,
+        public void ShowActivity<T>(UnityWebRequest task, bool autoHide = false, UIActivity.Settings? settings = null,
                                     UIActivityAction onComplete = null, params object[] args)
             where T : UIActivity
         {
-            GetActivity<T>(x => x.Show(task, settings, onComplete, args));
+            GetActivity<T>(x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity<T>(UnityWebRequest task, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                    UIActivityAction onComplete = null, params object[] args)
+            where T : UIActivity
+        {
+            GetActivity<T>(x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity<T>(UnityWebRequest task, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
@@ -353,17 +328,18 @@ namespace UnuGames
             GetActivity<T>(x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(Func<Task> task, UIActivity.Settings? settings = null)
-            where T : UIActivity
-        {
-            GetActivity<T>(x => x.Show(task, settings));
-        }
-
-        public void ShowActivity<T>(Func<Task> task, UIActivity.Settings? settings = null,
+        public void ShowActivity<T>(Func<Task> task, bool autoHide = false, UIActivity.Settings? settings = null,
                                     UIActivityAction onComplete = null, params object[] args)
             where T : UIActivity
         {
-            GetActivity<T>(x => x.Show(task, settings, onComplete, args));
+            GetActivity<T>(x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity<T>(Func<Task> task, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                    UIActivityAction onComplete = null, params object[] args)
+            where T : UIActivity
+        {
+            GetActivity<T>(x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity<T>(Func<Task> task, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
@@ -373,17 +349,18 @@ namespace UnuGames
             GetActivity<T>(x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T, U>(Func<Task<U>> task, UIActivity.Settings? settings = null)
-            where T : UIActivity
-        {
-            GetActivity<T>(x => x.Show(task, settings));
-        }
-
-        public void ShowActivity<T, U>(Func<Task<U>> task, UIActivity.Settings? settings = null,
+        public void ShowActivity<T, U>(Func<Task<U>> task, bool autoHide = false, UIActivity.Settings? settings = null,
                                        UIActivityAction onComplete = null, params object[] args)
             where T : UIActivity
         {
-            GetActivity<T>(x => x.Show(task, settings, onComplete, args));
+            GetActivity<T>(x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity<T, U>(Func<Task<U>> task, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                       UIActivityAction onComplete = null, params object[] args)
+            where T : UIActivity
+        {
+            GetActivity<T>(x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity<T, U>(Func<Task<U>> task, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
@@ -393,17 +370,18 @@ namespace UnuGames
             GetActivity<T>(x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T, U>(Func<Task<U>> task, Action<U> onTaskResult, UIActivity.Settings? settings = null)
+        public void ShowActivity<T, U>(Func<Task<U>> task, Action<U> onTaskResult, bool autoHide = false,
+                                       UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
             where T : UIActivity
         {
-            GetActivity<T>(x => x.Show(task, onTaskResult, settings));
+            GetActivity<T>(x => x.Show(task, onTaskResult, autoHide, settings, onComplete, args));
         }
 
-        public void ShowActivity<T, U>(Func<Task<U>> task, Action<U> onTaskResult, UIActivity.Settings? settings = null,
-                                       UIActivityAction onComplete = null, params object[] args)
+        public void ShowActivity<T, U>(Func<Task<U>> task, Action<U> onTaskResult, float showDuration, bool autoHide = false,
+                                       UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
             where T : UIActivity
         {
-            GetActivity<T>(x => x.Show(task, onTaskResult, settings, onComplete, args));
+            GetActivity<T>(x => x.Show(task, onTaskResult, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity<T, U>(Func<Task<U>> task, Action<U> onTaskResult, float showDuration, float hideDuration,
@@ -413,15 +391,34 @@ namespace UnuGames
             GetActivity<T>(x => x.Show(task, onTaskResult, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity(AsyncOperation task, UIActivity.Settings? settings = null)
-        {
-            GetActivity<UIActivity>(x => x.Show(task, settings));
-        }
-
-        public void ShowActivity(AsyncOperation task, UIActivity.Settings? settings = null,
+        public void ShowActivity(bool autoHide = false, UIActivity.Settings? settings = null,
                                  UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity<UIActivity>(x => x.Show(task, settings, onComplete, args));
+            GetActivity<UIActivity>(x => x.Show(autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                 UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity<UIActivity>(x => x.Show(showDuration, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(float showDuration, float hideDuration, UIActivity.Settings? settings = null,
+                                 UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity<UIActivity>(x => x.Show(showDuration, hideDuration, settings, onComplete, args));
+        }
+
+        public void ShowActivity(AsyncOperation task, bool autoHide = false, UIActivity.Settings? settings = null,
+                                 UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity<UIActivity>(x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(AsyncOperation task, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                 UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity<UIActivity>(x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity(AsyncOperation task, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
@@ -430,15 +427,16 @@ namespace UnuGames
             GetActivity<UIActivity>(x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity(IEnumerator task, UIActivity.Settings? settings = null)
-        {
-            GetActivity<UIActivity>(x => x.Show(task, settings));
-        }
-
-        public void ShowActivity(IEnumerator task, UIActivity.Settings? settings = null,
+        public void ShowActivity(IEnumerator task, bool autoHide = false, UIActivity.Settings? settings = null,
                                  UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity<UIActivity>(x => x.Show(task, settings, onComplete, args));
+            GetActivity<UIActivity>(x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(IEnumerator task, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                 UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity<UIActivity>(x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity(IEnumerator task, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
@@ -447,15 +445,16 @@ namespace UnuGames
             GetActivity<UIActivity>(x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity(UnityWebRequest task, UIActivity.Settings? settings = null)
-        {
-            GetActivity<UIActivity>(x => x.Show(task, settings));
-        }
-
-        public void ShowActivity(UnityWebRequest task, UIActivity.Settings? settings = null,
+        public void ShowActivity(UnityWebRequest task, bool autoHide = false, UIActivity.Settings? settings = null,
                                  UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity<UIActivity>(x => x.Show(task, settings, onComplete, args));
+            GetActivity<UIActivity>(x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(UnityWebRequest task, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                 UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity<UIActivity>(x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity(UnityWebRequest task, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
@@ -464,15 +463,16 @@ namespace UnuGames
             GetActivity<UIActivity>(x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity(Func<Task> task, UIActivity.Settings? settings = null)
-        {
-            GetActivity<UIActivity>(x => x.Show(task, settings));
-        }
-
-        public void ShowActivity(Func<Task> task, UIActivity.Settings? settings = null,
+        public void ShowActivity(Func<Task> task, bool autoHide = false, UIActivity.Settings? settings = null,
                                  UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity<UIActivity>(x => x.Show(task, settings, onComplete, args));
+            GetActivity<UIActivity>(x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity(Func<Task> task, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                 UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity<UIActivity>(x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity(Func<Task> task, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
@@ -481,15 +481,16 @@ namespace UnuGames
             GetActivity<UIActivity>(x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(Func<Task<T>> task, UIActivity.Settings? settings = null)
-        {
-            GetActivity<UIActivity>(x => x.Show(task, settings));
-        }
-
-        public void ShowActivity<T>(Func<Task<T>> task, UIActivity.Settings? settings = null,
+        public void ShowActivity<T>(Func<Task<T>> task, bool autoHide = false, UIActivity.Settings? settings = null,
                                     UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity<UIActivity>(x => x.Show(task, settings, onComplete, args));
+            GetActivity<UIActivity>(x => x.Show(task, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity<T>(Func<Task<T>> task, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                    UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity<UIActivity>(x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity<T>(Func<Task<T>> task, float showDuration, float hideDuration,
@@ -498,15 +499,16 @@ namespace UnuGames
             GetActivity<UIActivity>(x => x.Show(task, showDuration, hideDuration, settings, onComplete, args));
         }
 
-        public void ShowActivity<T>(Func<Task<T>> task, Action<T> onTaskResult, UIActivity.Settings? settings = null)
-        {
-            GetActivity<UIActivity>(x => x.Show(task, onTaskResult, settings));
-        }
-
-        public void ShowActivity<T>(Func<Task<T>> task, Action<T> onTaskResult,
+        public void ShowActivity<T>(Func<Task<T>> task, Action<T> onTaskResult, bool autoHide = false,
                                     UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
-            GetActivity<UIActivity>(x => x.Show(task, onTaskResult, settings, onComplete, args));
+            GetActivity<UIActivity>(x => x.Show(task, onTaskResult, autoHide, settings, onComplete, args));
+        }
+
+        public void ShowActivity<T>(Func<Task<T>> task, Action<T> onTaskResult, float showDuration, bool autoHide = false,
+                                    UIActivity.Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            GetActivity<UIActivity>(x => x.Show(task, onTaskResult, showDuration, autoHide, settings, onComplete, args));
         }
 
         public void ShowActivity<T>(Func<Task<T>> task, Action<T> onTaskResult, float showDuration, float hideDuration,
