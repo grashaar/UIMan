@@ -276,6 +276,14 @@ namespace UnuGames
                 GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(task, hideDuration));
         }
 
+        private void FadeShow<T>(Func<Task<T>> task, float showDuration, float hideDuration)
+        {
+            if (showDuration <= 0f)
+                WaitTask(task, null, hideDuration);
+            else
+                GetFadeTweener(showDuration, 1f).SetOnComplete(() => WaitTask(task, null, hideDuration));
+        }
+
         private void FadeShow<T>(Func<Task<T>> task, Action<T> onTaskResult, float showDuration, float hideDuration)
         {
             if (showDuration <= 0f)
@@ -366,6 +374,21 @@ namespace UnuGames
                 FadeShow(task, showDuration, hideDuration);
             else
                 WaitTask(task);
+        }
+
+        private void Show<T>(Func<Task<T>> task, bool fade, float showDuration, float hideDuration,
+                             Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+        {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
+            Begin(onComplete, args);
+            ShowInternal(settings);
+
+            if (CanFade(fade))
+                FadeShow(task, showDuration, hideDuration);
+            else
+                WaitTask(task, null);
         }
 
         private void Show<T>(Func<Task<T>> task, Action<T> onTaskResult, bool fade, float showDuration, float hideDuration,

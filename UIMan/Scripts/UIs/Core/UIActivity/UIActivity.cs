@@ -97,6 +97,12 @@ namespace UnuGames
             Show(task, onTaskResult, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
         }
 
+        public void Show<T>(Func<Task<T>> task, Settings? settings = null,
+                            UIActivityAction onComplete = null, params object[] args)
+        {
+            Show(task, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+        }
+
         public void Show(float showDuration, Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
@@ -129,6 +135,12 @@ namespace UnuGames
 
         public void Show(Func<Task> task, float showDuration, float hideDuration, Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
+        {
+            Show(task, true, showDuration, hideDuration, settings, onComplete, args);
+        }
+
+        public void Show<T>(Func<Task<T>> task, float showDuration, float hideDuration,
+                            Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
             Show(task, true, showDuration, hideDuration, settings, onComplete, args);
         }
