@@ -68,6 +68,13 @@ namespace UnuGames
             GetActivity<T>(x => x.Show(task, autoHide, settings, onComplete, args));
         }
 
+        public void ShowActivity<T>(Func<UniTask> task, float showDuration, bool autoHide = false, UIActivity.Settings? settings = null,
+                                    UIActivityAction onComplete = null, params object[] args)
+            where T : UIActivity
+        {
+            GetActivity<T>(x => x.Show(task, showDuration, autoHide, settings, onComplete, args));
+        }
+
         public void ShowActivity<T>(Func<UniTask> task, float showDuration, float hideDuration, UIActivity.Settings? settings = null,
                                     UIActivityAction onComplete = null, params object[] args)
             where T : UIActivity

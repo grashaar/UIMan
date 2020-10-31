@@ -16,15 +16,6 @@ namespace UnuGames
                 Show(task, this.canFade, this.showDuration, settings, onComplete, args);
         }
 
-        public void Show<T>(Func<UniTask<T>> task, Action<T> onTaskResult, bool autoHide = false, Settings? settings = null,
-                            UIActivityAction onComplete = null, params object[] args)
-        {
-            if (autoHide)
-                Show(task, onTaskResult, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
-            else
-                Show(task, onTaskResult, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
-        }
-
         public void Show<T>(Func<UniTask<T>> task, bool autoHide = false, Settings? settings = null,
                             UIActivityAction onComplete = null, params object[] args)
         {
@@ -34,31 +25,40 @@ namespace UnuGames
                 Show(task, this.canFade, this.showDuration, settings, onComplete, args);
         }
 
+        public void Show<T>(Func<UniTask<T>> task, Action<T> onTaskResult, bool autoHide = false, Settings? settings = null,
+                            UIActivityAction onComplete = null, params object[] args)
+        {
+            if (autoHide)
+                Show(task, onTaskResult, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, onTaskResult, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
+        }
+
         public void Show(Func<UniTask> task, float showDuration, bool autoHide = false, Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
             if (autoHide)
-                Show(task, true, this.showDuration, this.hideDuration, settings, onComplete, args);
+                Show(task, true, showDuration, this.hideDuration, settings, onComplete, args);
             else
-                Show(task, true, this.showDuration, settings, onComplete, args);
-        }
-
-        public void Show<T>(Func<UniTask<T>> task, Action<T> onTaskResult, float showDuration, bool autoHide = false, Settings? settings = null,
-                            UIActivityAction onComplete = null, params object[] args)
-        {
-            if (autoHide)
-                Show(task, onTaskResult, true, this.showDuration, this.hideDuration, settings, onComplete, args);
-            else
-                Show(task, onTaskResult, true, this.showDuration, settings, onComplete, args);
+                Show(task, true, showDuration, settings, onComplete, args);
         }
 
         public void Show<T>(Func<UniTask<T>> task, float showDuration, bool autoHide = false, Settings? settings = null,
                             UIActivityAction onComplete = null, params object[] args)
         {
             if (autoHide)
-                Show(task, true, this.showDuration, this.hideDuration, settings, onComplete, args);
+                Show(task, true, showDuration, this.hideDuration, settings, onComplete, args);
             else
-                Show(task, true, this.showDuration, settings, onComplete, args);
+                Show(task, true, showDuration, settings, onComplete, args);
+        }
+
+        public void Show<T>(Func<UniTask<T>> task, Action<T> onTaskResult, float showDuration, bool autoHide = false, Settings? settings = null,
+                            UIActivityAction onComplete = null, params object[] args)
+        {
+            if (autoHide)
+                Show(task, onTaskResult, true, showDuration, this.hideDuration, settings, onComplete, args);
+            else
+                Show(task, onTaskResult, true, showDuration, settings, onComplete, args);
         }
 
         public void Show(Func<UniTask> task, float showDuration, float hideDuration, Settings? settings = null,
