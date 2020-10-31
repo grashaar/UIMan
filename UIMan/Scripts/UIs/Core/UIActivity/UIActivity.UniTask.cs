@@ -7,7 +7,7 @@ namespace UnuGames
 {
     public partial class UIActivity
     {
-        public void Show(Func<UniTask> task, bool autoHide = false, Settings? settings = null,
+        public void Show(Func<UniTask> task, bool autoHide = false, in Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
             if (autoHide)
@@ -16,7 +16,7 @@ namespace UnuGames
                 Show(task, this.canFade, this.showDuration, settings, onComplete, args);
         }
 
-        public void Show<T>(Func<UniTask<T>> task, bool autoHide = false, Settings? settings = null,
+        public void Show<T>(Func<UniTask<T>> task, bool autoHide = false, in Settings? settings = null,
                             UIActivityAction onComplete = null, params object[] args)
         {
             if (autoHide)
@@ -25,7 +25,7 @@ namespace UnuGames
                 Show(task, this.canFade, this.showDuration, settings, onComplete, args);
         }
 
-        public void Show<T>(Func<UniTask<T>> task, Action<T> onTaskResult, bool autoHide = false, Settings? settings = null,
+        public void Show<T>(Func<UniTask<T>> task, Action<T> onTaskResult, bool autoHide = false, in Settings? settings = null,
                             UIActivityAction onComplete = null, params object[] args)
         {
             if (autoHide)
@@ -34,7 +34,7 @@ namespace UnuGames
                 Show(task, onTaskResult, this.canFade, this.showDuration, this.hideDuration, settings, onComplete, args);
         }
 
-        public void Show(Func<UniTask> task, float showDuration, bool autoHide = false, Settings? settings = null,
+        public void Show(Func<UniTask> task, float showDuration, bool autoHide = false, in Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
             if (autoHide)
@@ -43,7 +43,7 @@ namespace UnuGames
                 Show(task, true, showDuration, settings, onComplete, args);
         }
 
-        public void Show<T>(Func<UniTask<T>> task, float showDuration, bool autoHide = false, Settings? settings = null,
+        public void Show<T>(Func<UniTask<T>> task, float showDuration, bool autoHide = false, in Settings? settings = null,
                             UIActivityAction onComplete = null, params object[] args)
         {
             if (autoHide)
@@ -52,8 +52,8 @@ namespace UnuGames
                 Show(task, true, showDuration, settings, onComplete, args);
         }
 
-        public void Show<T>(Func<UniTask<T>> task, Action<T> onTaskResult, float showDuration, bool autoHide = false, Settings? settings = null,
-                            UIActivityAction onComplete = null, params object[] args)
+        public void Show<T>(Func<UniTask<T>> task, Action<T> onTaskResult, float showDuration, bool autoHide = false,
+                            in Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
             if (autoHide)
                 Show(task, onTaskResult, true, showDuration, this.hideDuration, settings, onComplete, args);
@@ -61,32 +61,32 @@ namespace UnuGames
                 Show(task, onTaskResult, true, showDuration, settings, onComplete, args);
         }
 
-        public void Show(Func<UniTask> task, float showDuration, float hideDuration, Settings? settings = null,
+        public void Show(Func<UniTask> task, float showDuration, float hideDuration, in Settings? settings = null,
                          UIActivityAction onComplete = null, params object[] args)
         {
             Show(task, true, showDuration, hideDuration, settings, onComplete, args);
         }
 
         public void Show<T>(Func<UniTask<T>> task, float showDuration, float hideDuration,
-                            Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+                            in Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
             Show(task, true, showDuration, hideDuration, settings, onComplete, args);
         }
 
         public void Show<T>(Func<UniTask<T>> task, Action<T> onTaskResult, float showDuration, float hideDuration,
-                            Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+                            in Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
             Show(task, onTaskResult, true, showDuration, hideDuration, settings, onComplete, args);
         }
 
-        private void Show(Func<UniTask> task, bool fade, float showDuration, Settings? settings = null,
+        private void Show(Func<UniTask> task, bool fade, float showDuration, in Settings? settings = null,
                           UIActivityAction onComplete = null, params object[] args)
         {
             if (task == null)
                 throw new ArgumentNullException(nameof(task));
 
             Begin(onComplete, args);
-            ShowInternal(settings);
+            DoShow(settings);
 
             if (CanFade(fade))
                 FadeShow(task, showDuration);
@@ -94,14 +94,14 @@ namespace UnuGames
                 WaitTask(task, false);
         }
 
-        private void Show(Func<UniTask> task, bool fade, float showDuration, float hideDuration, Settings? settings = null,
+        private void Show(Func<UniTask> task, bool fade, float showDuration, float hideDuration, in Settings? settings = null,
                           UIActivityAction onComplete = null, params object[] args)
         {
             if (task == null)
                 throw new ArgumentNullException(nameof(task));
 
             Begin(onComplete, args);
-            ShowInternal(settings);
+            DoShow(settings);
 
             if (CanFade(fade))
                 FadeShow(task, showDuration, hideDuration);
@@ -110,13 +110,13 @@ namespace UnuGames
         }
 
         private void Show<T>(Func<UniTask<T>> task, bool fade, float showDuration,
-                             Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+                             in Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
             if (task == null)
                 throw new ArgumentNullException(nameof(task));
 
             Begin(onComplete, args);
-            ShowInternal(settings);
+            DoShow(settings);
 
             if (CanFade(fade))
                 FadeShow(task, showDuration);
@@ -125,13 +125,13 @@ namespace UnuGames
         }
 
         private void Show<T>(Func<UniTask<T>> task, bool fade, float showDuration, float hideDuration,
-                             Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+                             in Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
             if (task == null)
                 throw new ArgumentNullException(nameof(task));
 
             Begin(onComplete, args);
-            ShowInternal(settings);
+            DoShow(settings);
 
             if (CanFade(fade))
                 FadeShow(task, showDuration, hideDuration);
@@ -140,13 +140,13 @@ namespace UnuGames
         }
 
         private void Show<T>(Func<UniTask<T>> task, Action<T> onTaskResult, bool fade, float showDuration,
-                             Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+                             in Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
             if (task == null)
                 throw new ArgumentNullException(nameof(task));
 
             Begin(onComplete, args);
-            ShowInternal(settings);
+            DoShow(settings);
 
             if (CanFade(fade))
                 FadeShow(task, onTaskResult, showDuration);
@@ -155,13 +155,13 @@ namespace UnuGames
         }
 
         private void Show<T>(Func<UniTask<T>> task, Action<T> onTaskResult, bool fade, float showDuration, float hideDuration,
-                             Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
+                             in Settings? settings = null, UIActivityAction onComplete = null, params object[] args)
         {
             if (task == null)
                 throw new ArgumentNullException(nameof(task));
 
             Begin(onComplete, args);
-            ShowInternal(settings);
+            DoShow(settings);
 
             if (CanFade(fade))
                 FadeShow(task, onTaskResult, showDuration, hideDuration);

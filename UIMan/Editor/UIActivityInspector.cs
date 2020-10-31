@@ -99,7 +99,7 @@ namespace UnuGames
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RecordObject(uiActivity, nameof(showDuration));
-                    uiActivity.showDuration = showDuration;
+                    uiActivity.showDuration = Mathf.Max(showDuration, 0f);
                 }
 
                 EditorGUI.BeginChangeCheck();
@@ -109,10 +109,20 @@ namespace UnuGames
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RecordObject(uiActivity, nameof(hideDuration));
-                    uiActivity.hideDuration = hideDuration;
+                    uiActivity.hideDuration = Mathf.Max(hideDuration, 0f);
                 }
 
                 EditorGUI.indentLevel -= 1;
+            }
+
+            EditorGUI.BeginChangeCheck();
+
+            var hideDelay = EditorGUILayout.FloatField("Hide Delay", uiActivity.hideDelay);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(uiActivity, nameof(hideDelay));
+                uiActivity.hideDelay = Mathf.Max(hideDelay, 0f);
             }
 
             GUILayout.Space(2f);
