@@ -40,18 +40,16 @@ namespace UnuGames
         private CanvasGroup canvasGroup;
         private Image image;
 
-        // Use this for initialization
         private void Run()
         {
             this.lastTime = Time.realtimeSinceStartup;
-            this.t = 0;
+            this.t = 0f;
             this.originalPosition = this.transform.localPosition;
             this.canvasGroup = GetComponent<CanvasGroup>();
             this.image = GetComponent<Image>();
             this.isRunning = true;
         }
 
-        // Update is called once per frame
         private void Update()
         {
             if (!this.isRunning)
@@ -59,10 +57,10 @@ namespace UnuGames
 
             var deltaTime = Time.realtimeSinceStartup - this.lastTime;
             this.lastTime = Time.realtimeSinceStartup;
-            if (this.time > 0)
+            if (this.time > 0f)
                 this.t += deltaTime / this.time;
             else
-                this.t = 1;
+                this.t = 1f;
             switch (this.tweenType)
             {
                 case UITweenType.Value:
@@ -108,7 +106,15 @@ namespace UnuGames
             return this;
         }
 
-        private static UITweener DoTween(GameObject targetObject, UITweenType tweenType, float time, params object[] tweenArgs)
+        public UITweener ResetCallbacks()
+        {
+            this.onComplete = null;
+            this.onUpdate = null;
+            return this;
+        }
+
+        private static UITweener DoTween(GameObject targetObject, bool resetCallbacks,
+                                         UITweenType tweenType, float time, params object[] tweenArgs)
         {
             UITweener tweener = null;
 
@@ -124,6 +130,10 @@ namespace UnuGames
 
             if (tweener == null)
                 tweener = targetObject.AddComponent<UITweener>();
+
+            if (resetCallbacks)
+                tweener.ResetCallbacks();
+
             tweener.tweenType = tweenType;
             tweener.time = time;
 
@@ -144,19 +154,19 @@ namespace UnuGames
             return tweener;
         }
 
-        public static UITweener Move(GameObject target, float time, Vector3 position)
+        public static UITweener Move(GameObject target, float time, Vector3 position, bool resetCallbacks = false)
         {
-            return DoTween(target, UITweenType.Move, time, position);
+            return DoTween(target, resetCallbacks, UITweenType.Move, time, position);
         }
 
-        public static UITweener Value(GameObject target, float time, float startValue, float endValue)
+        public static UITweener Value(GameObject target, float time, float startValue, float endValue, bool resetCallbacks = false)
         {
-            return DoTween(target, UITweenType.Value, time, startValue, endValue);
+            return DoTween(target, resetCallbacks, UITweenType.Value, time, startValue, endValue);
         }
 
-        public static UITweener Alpha(GameObject target, float time, float startAlpha, float endAlpha)
+        public static UITweener Alpha(GameObject target, float time, float startAlpha, float endAlpha, bool resetCallbacks = false)
         {
-            return DoTween(target, UITweenType.Alpha, time, startAlpha, endAlpha);
+            return DoTween(target, resetCallbacks, UITweenType.Alpha, time, startAlpha, endAlpha);
         }
     }
 }
