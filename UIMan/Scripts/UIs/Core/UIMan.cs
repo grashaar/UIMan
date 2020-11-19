@@ -446,7 +446,10 @@ namespace UnuGames
                     }
 
                     if (deactivate)
+                    {
+                        UITweener.StopAll(ui.gameObject);
                         ui.Deactivate();
+                    }
                 });
             }
         }

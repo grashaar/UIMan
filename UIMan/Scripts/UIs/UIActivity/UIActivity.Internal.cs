@@ -36,8 +36,7 @@ namespace UnuGames
             this.onCompleteArgs = args ?? _noArgs;
             this.isLoading = true;
 
-            if (!this.gameObject.activeSelf)
-                this.gameObject.SetActive(true);
+            Activate();
         }
 
         private void InvokeOnComplete()
@@ -237,7 +236,10 @@ namespace UnuGames
             OnHideComplete();
 
             if (willDeactivate)
+            {
+                UITweener.StopAll(this.gameObject);
                 Deactivate();
+            }
         }
 
         private void DelayHide()
