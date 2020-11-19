@@ -128,8 +128,8 @@ namespace UnuGames
         private static UITweener DoTween(GameObject targetObject, bool resetCallbacks,
                                          UITweenType tweenType, float time, params object[] tweenArgs)
         {
+            var tweeners = targetObject.GetComponents<UITweener>();
             UITweener tweener = null;
-            UITweener[] tweeners = targetObject.GetComponents<UITweener>();
 
             for (var i = 0; i < tweeners.Length; i++)
             {
@@ -183,6 +183,47 @@ namespace UnuGames
         public static UITweener Alpha(GameObject target, float time, float startAlpha, float endAlpha, bool resetCallbacks = false)
         {
             return DoTween(target, resetCallbacks, UITweenType.Alpha, time, startAlpha, endAlpha);
+        }
+
+        private static void StopAll(GameObject targetObject, UITweenType? tweenType)
+        {
+            var tweeners = targetObject.GetComponents<UITweener>();
+
+            if (tweenType.HasValue)
+            {
+                for (var i = 0; i < tweeners.Length; i++)
+                {
+                    if (tweeners[i].tweenType == tweenType.Value)
+                        tweeners[i].isRunning = false;
+                }
+            }
+            else
+            {
+                for (var i = 0; i < tweeners.Length; i++)
+                {
+                    tweeners[i].isRunning = false;
+                }
+            }
+        }
+
+        public static void StopAll(GameObject target)
+        {
+            StopAll(target, null);
+        }
+
+        public static void StopValue(GameObject target)
+        {
+            StopAll(target, UITweenType.Value);
+        }
+
+        public static void StopAlpha(GameObject target)
+        {
+            StopAll(target, UITweenType.Alpha);
+        }
+
+        public static void StopMove(GameObject target)
+        {
+            StopAll(target, UITweenType.Move);
         }
     }
 }
