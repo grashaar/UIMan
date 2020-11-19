@@ -6,47 +6,57 @@ namespace UnuGames
 {
     public class UITweener : MonoBehaviour
     {
-        private enum UITweenType
+        public enum UITweenType
         {
             Value,
-            Move,
-            Alpha
+            Alpha,
+            Move
         }
 
-        private UITweenType tweenType;
-        private float time;
-        private Action onComplete;
-        private Action<float> onUpdate;
+        public UITweenType tweenType => this.m_tweenType;
 
-        private bool isRunning = false;
+        public float time => this.m_time;
 
-        public bool IsReady
-        {
-            get
-            {
-                return !this.isRunning;
-            }
-        }
+        public float elapsed => this.m_elapsed;
 
-        private float lastTime;
-        private float t;
+        public bool isReady => !this.isRunning;
 
-        private Vector3 originalPosition;
-        private Vector3 targetPosition;
-        private float startValue;
-        private float endValue;
-        private float currentValue;
+        public float startValue => this.m_startValue;
+
+        public float endValue => this.m_endValue;
+
+        public float currentValue => this.m_currentValue;
+
+        public Vector3 startPosition => this.m_startPosition;
+
+        public Vector3 endPosition => this.m_endPosition;
+
+        public Vector3 currentPosition => this.transform.localPosition;
 
         private CanvasGroup canvasGroup;
         private Image image;
 
+        private Action onComplete;
+        private Action<float> onUpdate;
+        private bool isRunning = false;
+        private float lastTime;
+
+        private UITweenType m_tweenType;
+        private float m_time;
+        private float m_elapsed;
+
+        private float m_startValue;
+        private float m_endValue;
+        private float m_currentValue;
+
+        private Vector3 m_startPosition;
+        private Vector3 m_endPosition;
+
         private void Run()
         {
             this.lastTime = Time.realtimeSinceStartup;
-            this.t = 0f;
-            this.originalPosition = this.transform.localPosition;
-            this.canvasGroup = GetComponent<CanvasGroup>();
-            this.image = GetComponent<Image>();
+            this.m_elapsed = 0f;
+            this.m_startPosition = this.transform.localPosition;
             this.isRunning = true;
         }
 
@@ -57,40 +67,42 @@ namespace UnuGames
 
             var deltaTime = Time.realtimeSinceStartup - this.lastTime;
             this.lastTime = Time.realtimeSinceStartup;
-            if (this.time > 0f)
-                this.t += deltaTime / this.time;
+
+            if (this.m_time > 0f)
+                this.m_elapsed += deltaTime / this.m_time;
             else
-                this.t = 1f;
-            switch (this.tweenType)
+                this.m_elapsed = 1f;
+
+            switch (this.m_tweenType)
             {
                 case UITweenType.Value:
                 case UITweenType.Alpha:
-                    this.currentValue = Mathf.Lerp(this.startValue, this.endValue, this.t);
-                    if (this.tweenType == UITweenType.Alpha)
+                    this.m_currentValue = Mathf.Lerp(this.m_startValue, this.m_endValue, this.m_elapsed);
+                    if (this.m_tweenType == UITweenType.Alpha)
                     {
                         if (this.canvasGroup != null)
-                            this.canvasGroup.alpha = this.currentValue;
+                            this.canvasGroup.alpha = this.m_currentValue;
                         else if (this.image != null)
-                            this.image.color = new Color(this.image.color.r, this.image.color.g, this.image.color.b, this.currentValue);
+                            this.image.color = new Color(this.image.color.r, this.image.color.g, this.image.color.b, this.m_currentValue);
                         else
-                            UnuLogger.LogWarning(this.gameObject.name + " have no CanvasGroup or Image. TweenAlpha require component that contain alpha value!");
+                            UnuLogger.LogWarning(this.gameObject.name + " has no CanvasGroup or Image. TweenAlpha requires component that contain alpha value!");
                     }
                     break;
 
                 case UITweenType.Move:
-                    this.transform.localPosition = Vector3.Lerp(this.originalPosition, this.targetPosition, this.t);
+                    this.transform.localPosition = Vector3.Lerp(this.m_startPosition, this.m_endPosition, this.m_elapsed);
                     break;
             }
 
-            if (this.t >= 1f)
+            if (this.m_elapsed >= 1f)
             {
                 this.isRunning = false;
-                this.onUpdate?.Invoke(this.currentValue);
+                this.onUpdate?.Invoke(this.m_currentValue);
                 this.onComplete?.Invoke();
             }
             else
             {
-                this.onUpdate?.Invoke(this.currentValue);
+                this.onUpdate?.Invoke(this.m_currentValue);
             }
         }
 
@@ -117,11 +129,11 @@ namespace UnuGames
                                          UITweenType tweenType, float time, params object[] tweenArgs)
         {
             UITweener tweener = null;
-
             UITweener[] tweeners = targetObject.GetComponents<UITweener>();
+
             for (var i = 0; i < tweeners.Length; i++)
             {
-                if (tweeners[i].IsReady || tweeners[i].tweenType == tweenType)
+                if (tweeners[i].isReady && tweeners[i].m_tweenType == tweenType)
                 {
                     tweener = tweeners[i];
                     break;
@@ -129,24 +141,28 @@ namespace UnuGames
             }
 
             if (tweener == null)
+            {
                 tweener = targetObject.AddComponent<UITweener>();
+                tweener.m_tweenType = tweenType;
+                tweener.canvasGroup = targetObject.GetComponent<CanvasGroup>();
+                tweener.image = targetObject.GetComponent<Image>();
+            }
 
             if (resetCallbacks)
                 tweener.ResetCallbacks();
 
-            tweener.tweenType = tweenType;
-            tweener.time = time;
+            tweener.m_time = time;
 
             switch (tweenType)
             {
                 case UITweenType.Value:
                 case UITweenType.Alpha:
-                    tweener.startValue = (float)tweenArgs[0];
-                    tweener.endValue = (float)tweenArgs[1];
+                    tweener.m_startValue = (float)tweenArgs[0];
+                    tweener.m_endValue = (float)tweenArgs[1];
                     break;
 
                 case UITweenType.Move:
-                    tweener.targetPosition = (Vector3)tweenArgs[0];
+                    tweener.m_endPosition = (Vector3)tweenArgs[0];
                     break;
             }
 
