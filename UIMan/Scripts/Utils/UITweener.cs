@@ -60,6 +60,12 @@ namespace UnuGames
             this.isRunning = true;
         }
 
+        private void Stop()
+        {
+            this.m_elapsed = 0f;
+            this.isRunning = false;
+        }
+
         private void Update()
         {
             if (!this.isRunning)
@@ -194,14 +200,14 @@ namespace UnuGames
                 for (var i = 0; i < tweeners.Length; i++)
                 {
                     if (tweeners[i].tweenType == tweenType.Value)
-                        tweeners[i].isRunning = false;
+                        tweeners[i].Stop();
                 }
             }
             else
             {
                 for (var i = 0; i < tweeners.Length; i++)
                 {
-                    tweeners[i].isRunning = false;
+                    tweeners[i].Stop();
                 }
             }
         }
