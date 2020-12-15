@@ -140,7 +140,11 @@ namespace UnuGames.MVVM
 
         public void DrawTwoWayBinding(TwoWayBinding twoWayBinding)
         {
-            GUILayout.BeginVertical();
+            if (twoWayBinding.value)
+                GUILayout.BeginVertical("Box");
+            else
+                GUILayout.BeginVertical();
+
             GUILayout.BeginHorizontal();
 
             EditorGUILayout.PrefixLabel(new GUIContent(twoWayBinding.label));
@@ -158,21 +162,31 @@ namespace UnuGames.MVVM
 
             GUILayout.EndHorizontal();
 
-            Converter[] arrConverters = twoWayBinding.GetConverters();
-
-            if (arrConverters.Length > 0)
+            if (twoWayBinding.value)
             {
-                const string suffix = " Converter";
+                Converter[] arrConverters = twoWayBinding.GetConverters();
 
-                GUILayout.BeginVertical();
-
-                for (var i = 0; i < arrConverters.Length; i++)
+                if (arrConverters.Length > 0)
                 {
-                    DrawConverter(arrConverters[i], suffix: suffix);
-                }
+                    GUILayout.BeginVertical();
 
-                GUILayout.EndVertical();
-                GUILayout.Space(4);
+                    if (arrConverters.Length < 2)
+                    {
+                        DrawConverter(arrConverters[0], suffix: " Converter");
+                    }
+                    else
+                    {
+                        EditorGUILayout.LabelField("Converters", EditorStyles.boldLabel);
+
+                        for (var i = 0; i < arrConverters.Length; i++)
+                        {
+                            DrawConverter(arrConverters[i]);
+                        }
+                    }
+
+                    GUILayout.EndVertical();
+                    GUILayout.Space(4);
+                }
             }
 
             GUILayout.EndVertical();
