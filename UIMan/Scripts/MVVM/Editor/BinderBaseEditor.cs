@@ -78,20 +78,6 @@ namespace UnuGames.MVVM
                 GUILayout.Space(4);
             }
 
-            if (arrTwoWayBindings.Length > 0)
-            {
-                EditorGUILayout.LabelField("Two-way Bindings", EditorStyles.boldLabel);
-                GUILayout.BeginVertical();
-
-                for (var i = 0; i < arrTwoWayBindings.Length; i++)
-                {
-                    DrawTwoWayBinding(arrTwoWayBindings[i]);
-                }
-
-                GUILayout.EndVertical();
-                GUILayout.Space(4);
-            }
-
             if (arrConverters.Length > 0)
             {
                 EditorGUILayout.LabelField("Converters", EditorStyles.boldLabel);
@@ -100,6 +86,20 @@ namespace UnuGames.MVVM
                 for (var i = 0; i < arrConverters.Length; i++)
                 {
                     DrawConverter(arrConverters[i]);
+                }
+
+                GUILayout.EndVertical();
+                GUILayout.Space(4);
+            }
+
+            if (arrTwoWayBindings.Length > 0)
+            {
+                EditorGUILayout.LabelField("Two-way Bindings", EditorStyles.boldLabel);
+                GUILayout.BeginVertical();
+
+                for (var i = 0; i < arrTwoWayBindings.Length; i++)
+                {
+                    DrawTwoWayBinding(arrTwoWayBindings[i]);
                 }
 
                 GUILayout.EndVertical();
