@@ -64,6 +64,7 @@ namespace UnuGames
         {
             this.m_elapsed = 0f;
             this.isRunning = false;
+            ResetCallbacks();
         }
 
         private void Update()
