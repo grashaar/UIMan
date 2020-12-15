@@ -5,10 +5,9 @@ namespace UnuGames.MVVM
     [Serializable]
     public class BindingField
     {
-        public BindingField(string fieldLabel, bool nullable = false)
+        public BindingField(string fieldLabel)
         {
             this.label = fieldLabel;
-            this.isNullable = nullable;
         }
 
         /// <summary>
@@ -31,7 +30,5 @@ namespace UnuGames.MVVM
         /// </summary>
         /// <returns></returns>
         public Action<object> UpdateAction { get; set; }
-
-        public bool isNullable = false;
     }
 }

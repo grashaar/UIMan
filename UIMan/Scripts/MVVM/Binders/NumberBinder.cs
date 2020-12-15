@@ -13,7 +13,7 @@ namespace UnuGames.MVVM
         public BindingField valueField = new BindingField("Number");
 
         [HideInInspector]
-        public BindingField colorField = new BindingField("Color", true);
+        public BindingField colorField = new BindingField("Color");
 
         [HideInInspector]
         public BindingField formatField = new BindingField("Format");
