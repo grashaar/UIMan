@@ -71,11 +71,13 @@ namespace UnuGames.MVVM
 
             if (this.dataContext.type == ContextType.MonoBehaviour)
             {
-                return this.dataContext.viewModel.GetAllMembers(boldName, withReturnType, withDeclaringType, asPath, memberTypes);
+                return this.dataContext.viewModel
+                           .GetAllMembersWithAttribute<UIManPropertyAttribute>(boldName, withReturnType, withDeclaringType, asPath, memberTypes);
             }
             else if (this.dataContext.type == ContextType.Property)
             {
-                return this.dataContext.GetPropertyInfo().GetAllMembers(boldName, withReturnType, withDeclaringType, asPath, memberTypes);
+                return this.dataContext.GetPropertyInfo()
+                           .GetAllMembersWithAttribute<UIManPropertyAttribute>(boldName, withReturnType, withDeclaringType, asPath, memberTypes);
             }
 
             return new string[0];

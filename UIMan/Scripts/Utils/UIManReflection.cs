@@ -184,6 +184,47 @@ namespace UnuGames
             return results.ToArray();
         }
 
+        public static string[] GetAllMembersWithAttribute<T>(this IObservable type, bool boldName, bool withReturnType, bool withDeclaringType, bool asPath, params MemberTypes[] memberTypes)
+            where T : Attribute
+        {
+            if (type == null)
+            {
+                return null;
+            }
+
+            MemberInfo[] members = type.GetCachedType().GetMembers();
+            var all = false;
+            if (memberTypes == null || (memberTypes != null && memberTypes.Length == 0))
+            {
+                all = true;
+            }
+
+            var results = new List<string>();
+            for (var i = 0; i < members.Length; i++)
+            {
+                if (members[i].GetCustomAttribute<T>() == null)
+                    continue;
+
+                if (all)
+                {
+                    results.Add(members[i].GetName(boldName, withReturnType, withDeclaringType, asPath));
+                }
+                else
+                {
+                    for (var j = 0; j < memberTypes.Length; j++)
+                    {
+                        if (all || members[i].MemberType == memberTypes[j])
+                        {
+                            results.Add(members[i].GetName(boldName, withReturnType, withDeclaringType, asPath));
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return results.ToArray();
+        }
+
         public static MemberInfo[] GetAllMembersInfo(this IObservable type, params MemberTypes[] memberTypes)
         {
             if (type == null)
@@ -238,6 +279,47 @@ namespace UnuGames
             var results = new List<string>();
             for (var i = 0; i < members.Length; i++)
             {
+                if (all)
+                {
+                    results.Add(members[i].GetName(boldName, withReturnType, withDeclaringType, asPath));
+                }
+                else
+                {
+                    for (var j = 0; j < memberTypes.Length; j++)
+                    {
+                        if (members[i].MemberType == memberTypes[j])
+                        {
+                            results.Add(members[i].GetName(boldName, withReturnType, withDeclaringType, asPath));
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return results.ToArray();
+        }
+
+        public static string[] GetAllMembersWithAttribute<T>(this PropertyInfo proInfo, bool boldName, bool withReturnType, bool withDeclaringType, bool asPath, params MemberTypes[] memberTypes)
+            where T : Attribute
+        {
+            if (proInfo == null)
+            {
+                return null;
+            }
+
+            MemberInfo[] members = proInfo.PropertyType.GetMembers();
+            var all = false;
+            if (memberTypes == null || (memberTypes != null && memberTypes.Length == 0))
+            {
+                all = true;
+            }
+
+            var results = new List<string>();
+            for (var i = 0; i < members.Length; i++)
+            {
+                if (members[i].GetCustomAttribute<T>() == null)
+                    continue;
+
                 if (all)
                 {
                     results.Add(members[i].GetName(boldName, withReturnType, withDeclaringType, asPath));
