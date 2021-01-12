@@ -63,8 +63,11 @@ namespace UnuGames.MVVM
                     context.viewModel = viewModel as ViewModelBehaviour;
                 }
 
-                var viewMembers = context.viewModel.GetAllMembers(false, true, false, false, MemberTypes.Field, MemberTypes.Property);
-                var dataMembers = context.viewModel.GetAllMembers(false, false, false, false, MemberTypes.Field, MemberTypes.Property);
+                var viewMembers = context.viewModel
+                    .GetAllMembersWithAttribute<UIManPropertyAttribute>(false, true, false, false, MemberTypes.Field, MemberTypes.Property);
+
+                var dataMembers = context.viewModel
+                    .GetAllMembersWithAttribute<UIManPropertyAttribute>(false, false, false, false, MemberTypes.Field, MemberTypes.Property);
 
                 if (dataMembers != null)
                 {
@@ -120,9 +123,8 @@ namespace UnuGames.MVVM
 
                         if (attributes == null || attributes.Length == 0)
                         {
-                            GUILayout.BeginHorizontal("Box");
-                            EditorGUILayout.PrefixLabel(" ");
-                            GUILayout.Label("Field/Property must be decorated with either [UIManProperty] or [UIManAutoProperty] attribute!", EditorGUIHelper.RichText(true, CommonColor.GetRed()));
+                            GUILayout.BeginHorizontal();
+                            EditorGUILayout.HelpBox("Field/Property must be decorated with either [UIManProperty] or [UIManAutoProperty] attribute.", MessageType.Error);
                             GUILayout.EndHorizontal();
                         }
                     }
