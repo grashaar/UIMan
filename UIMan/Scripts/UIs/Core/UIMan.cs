@@ -353,7 +353,7 @@ namespace UnuGames
         }
 
         /// <summary>
-        /// Dos the animation show.
+        /// Does the animation show.
         /// </summary>
         /// <param name="ui">User interface.</param>
         private void DoAnimShow(UIManBase ui)
@@ -402,7 +402,7 @@ namespace UnuGames
         }
 
         /// <summary>
-        /// Dos the animation hide.
+        /// Does the animation hide.
         /// </summary>
         /// <param name="ui">User interface.</param>
         private void DoAnimHide(UIManBase ui, bool deactivate)
@@ -455,7 +455,7 @@ namespace UnuGames
         }
 
         /// <summary>
-        /// Dos the animation idle.
+        /// Does the animation idle.
         /// </summary>
         /// <param name="ui">User interface.</param>
         public void DoAnimIdle(UIManBase ui)
