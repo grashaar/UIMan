@@ -76,7 +76,7 @@ namespace UnuGames.MVVM
             RegisterBindingMessage(false);
         }
 
-        // Subscript for property change event
+        // Subscribe for property change event
         public void Initialize()
         {
             GetPropertyInfo();
