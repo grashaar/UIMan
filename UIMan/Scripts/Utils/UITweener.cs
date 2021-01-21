@@ -21,6 +21,8 @@ namespace UnuGames
 
         public bool isReady => !this.isRunning;
 
+        public bool isRunning { get; private set; }
+
         public float startValue => this.m_startValue;
 
         public float endValue => this.m_endValue;
@@ -38,7 +40,6 @@ namespace UnuGames
 
         private Action onComplete;
         private Action<float> onUpdate;
-        private bool isRunning = false;
         private float lastTime;
 
         private UITweenType m_tweenType;
