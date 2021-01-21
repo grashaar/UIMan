@@ -155,6 +155,21 @@ namespace UnuGames
         }
 
         /// <summary>
+        /// Internal function for hide current ui
+        /// </summary>
+        public void HideMe(bool deactivate)
+        {
+            if (GetUIBaseType() == UIBaseType.Screen)
+            {
+                UIMan.Instance.HideScreen(this.Type, deactivate);
+            }
+            else
+            {
+                UIMan.Instance.HideDialog(this.Type, deactivate);
+            }
+        }
+
+        /// <summary>
         /// Animations the show.
         /// </summary>
         public virtual IEnumerator AnimationShow()
