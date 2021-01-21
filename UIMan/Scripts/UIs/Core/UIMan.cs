@@ -520,23 +520,37 @@ namespace UnuGames
         {
             yield return StartCoroutine(coroutine);
 
-            this.IsInDialogTransition = false;
-            ui.UnlockInput();
-
             if (isHiding)
             {
                 ui.OnHideComplete();
+                OnHideUIComplete(ui);
+
+                if (ui.GetUIBaseType() == UIBaseType.Dialog)
+                {
+                    this.IsInDialogTransition = false;
+
+                    if (!resetDialogTransitionStatus)
+                        DequeueDialog();
+                }
 
                 if (ui.ShouldDeactivateAfterHidden)
+                {
+                    UITweener.StopAll(ui.gameObject);
                     ui.Deactivate();
+                }
             }
             else
             {
                 ui.OnShowComplete();
-            }
+                OnShowUIComplete(ui);
 
-            if (ui.GetUIBaseType() == UIBaseType.Dialog && !resetDialogTransitionStatus)
-                DequeueDialog();
+                if (ui.GetUIBaseType() == UIBaseType.Dialog)
+                {
+                    this.IsInDialogTransition = false;
+                }
+
+                ui.UnlockInput();
+            }
         }
 
         /// <summary>
