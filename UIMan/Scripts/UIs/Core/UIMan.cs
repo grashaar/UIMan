@@ -370,7 +370,7 @@ namespace UnuGames
             {
                 // Custom animation use overrided function
                 ui.animRoot.Disable();
-                StartCoroutine(DelayDequeueDialog(ui.AnimationShow(), ui, true));
+                StartCoroutine(DelayDequeueDialog(ui.AnimationShow(), ui, true, false));
             }
             else
             {
@@ -420,7 +420,7 @@ namespace UnuGames
                 // Custom animation use overrided function
                 ui.ShouldDeactivateAfterHidden = deactivate;
                 ui.animRoot.Disable();
-                StartCoroutine(DelayDequeueDialog(ui.AnimationHide(), ui, false));
+                StartCoroutine(DelayDequeueDialog(ui.AnimationHide(), ui, false, true));
             }
             else
             {
@@ -469,7 +469,7 @@ namespace UnuGames
             {
                 // Custom animation use overrided function
                 ui.animRoot.Disable();
-                StartCoroutine(DelayDequeueDialog(ui.AnimationIdle(), ui, false));
+                StartCoroutine(DelayDequeueDialog(ui.AnimationIdle(), ui, false, false));
             }
             else
             {
@@ -515,13 +515,25 @@ namespace UnuGames
         /// <param name="coroutine">Coroutine.</param>
         /// <param name="ui">User interface.</param>
         /// <param name="resetDialogTransitionStatus">If set to <c>true</c> reset dialog transition status.</param>
-        private IEnumerator DelayDequeueDialog(IEnumerator coroutine, UIManBase ui, bool resetDialogTransitionStatus)
+        /// <param name="isHiding">Is the UI hiding or showing</param>
+        private IEnumerator DelayDequeueDialog(IEnumerator coroutine, UIManBase ui, bool resetDialogTransitionStatus, bool isHiding)
         {
             yield return StartCoroutine(coroutine);
 
             this.IsInDialogTransition = false;
             ui.UnlockInput();
-            ui.OnHideComplete();
+
+            if (isHiding)
+            {
+                ui.OnHideComplete();
+
+                if (ui.ShouldDeactivateAfterHidden)
+                    ui.Deactivate();
+            }
+            else
+            {
+                ui.OnShowComplete();
+            }
 
             if (ui.GetUIBaseType() == UIBaseType.Dialog && !resetDialogTransitionStatus)
                 DequeueDialog();
