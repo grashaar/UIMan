@@ -145,7 +145,7 @@ namespace UnuGames
             OnBack(this.CurrentScreen, beforeScreen, args);
 
             this.screenQueue.RemoveAt(this.screenQueue.Count - 1);
-            ShowScreen(beforeScreen.Type, true, args);
+            ShowScreen(beforeScreen.Type, true, false, args);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace UnuGames
             OnBack(this.CurrentScreen, beforeScreen, args);
 
             this.screenQueue.RemoveAt(this.screenQueue.Count - 1);
-            ShowScreen(beforeScreen.Type, true, args);
+            ShowScreen(beforeScreen.Type, true, false, args);
         }
 
         private void HideScreen_Internal(Type uiType, bool deactivate = false)
