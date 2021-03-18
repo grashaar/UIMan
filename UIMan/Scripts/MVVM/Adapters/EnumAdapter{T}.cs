@@ -18,6 +18,9 @@ namespace UnuGames.MVVM
         public override T Convert(object value, UnityEngine.Object context)
             => Convert(value, this.isDefined, this.ignoreCase, this.defaultValue, context);
 
+        public override object Convert(T value, UnityEngine.Object context)
+            => Convert(value);
+
         protected static Type EnumType { get; } = typeof(T);
 
         public static T Convert(object value, bool isDefined, bool ignoreCase, T defaultValue, UnityEngine.Object context)
@@ -99,6 +102,9 @@ namespace UnuGames.MVVM
 
             return val;
         }
+
+        public static object Convert(T value)
+            => value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsNotDefined(bool isDefined, object value)
