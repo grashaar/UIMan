@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UnuGames.MVVM
 {
-    public abstract class EnumAdapter<T> : Adapter<T> where T : struct, Enum
+    public abstract class EnumAdapter<T> : Adapter<T> where T : unmanaged, Enum
     {
         [SerializeField]
         private bool isDefined = true;

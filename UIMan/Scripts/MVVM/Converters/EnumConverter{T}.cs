@@ -3,7 +3,7 @@
 namespace UnuGames.MVVM
 {
     [Serializable]
-    public class EnumConverter<T> : Converter<T, EnumAdapter<T>> where T : struct, Enum
+    public class EnumConverter<T> : Converter<T, EnumAdapter<T>> where T : unmanaged, Enum
     {
         public EnumConverter(string label) : base(label) { }
 
